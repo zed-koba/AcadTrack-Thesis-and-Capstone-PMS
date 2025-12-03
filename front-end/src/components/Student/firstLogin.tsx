@@ -10,7 +10,7 @@ const FirstLogin = () => {
         </div>
         <div className="flex justify-between items-start">
           <div className="started-card relative bg-green-600 p-5 rounded-4xl text-white text-[12px] flex items-center justify-center">
-            <Notebook size="20" />
+            <Notebook size={20} strokeWidth={2.5} />
           </div>
           <div className="started-card relative bg-card p-5 rounded-4xl text-white text-[12px] flex items-center justfity-center">
             <Calendar size="20" />
