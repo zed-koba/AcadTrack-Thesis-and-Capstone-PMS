@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { apiUrl } from "../components/common/http";
+import { apiUrl } from "./Routes/http";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import {
   Mail,

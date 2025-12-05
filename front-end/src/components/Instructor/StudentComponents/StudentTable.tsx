@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { apiUrl } from "../../common/http";
+import { apiUrl } from "../../Routes/http";
 import { useEffect, useState } from "react";
 const SortButton = ({ label }: { label: string }) => (
   <Button
