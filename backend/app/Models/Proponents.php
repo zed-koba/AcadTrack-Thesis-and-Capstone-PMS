@@ -18,10 +18,7 @@ class Proponents extends Model
 
     protected static function booted()
     {
- echo "Boot Fired";
         static::creating(function ($model){
-            echo "Creating event fired for proponents_id\n";  // Console output
-    \Log::info('Creating event fired for proponents_id');
             $latestRecord = static::orderBy('id', 'DESC')->first();
             $nextNumber = $latestRecord ? ((int) str_replace('P-', '', $latestRecord->proponents_id) + 1) : 1;
             $model->proponents_id = 'P-' . str_pad($nextNumber, 7, '0', STR_PAD_LEFT);

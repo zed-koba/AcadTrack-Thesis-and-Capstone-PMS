@@ -14,7 +14,7 @@ import {
   InputGroupInput,
   InputGroupAddon,
 } from "@/components/ui/input-group";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, PencilRuler, ReceiptText, Trash } from "lucide-react";
 const SortButton = ({ label }: { label: string }) => (
   <Button
     variant="ghost"
@@ -24,7 +24,45 @@ const SortButton = ({ label }: { label: string }) => (
     {label}
   </Button>
 );
+interface ProponentsProps {
+    id: number;
+    proponents_id: string;
+    academic_yr: string;
+    semester: number;
+    title: string;
+    adviser: string;
+    program: string;
+    created_at: string,
+    updated_at: string,
+
+  }
 const ProponentsTable = () => {
+    const [proponents, setProponents] = useState<ProponentsProps[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetch(`${apiUrl}/proponents`, {
+                    method: "GET",
+                    headers: {
+                        "Content-type": "application/json",
+                        Accept: "application/json",
+                    },
+                })
+                if(!res.ok) throw new Error("Failed to fetch data");
+                
+                const data = await res.json();
+                setProponents(data.data); 
+            }catch(err: any) {
+                console.log(err);
+            }finally{
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+         console.log(proponents);        
   return (
     <>
       <div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -54,23 +92,20 @@ const ProponentsTable = () => {
                 <TableHead className="text-center">
                   <SortButton label="#" />
                 </TableHead>
-                <TableHead className="text-center">
-                  <SortButton label="Student ID" />
-                </TableHead>
                 <TableHead>
-                  <SortButton label="Email" />
+                  <SortButton label="Title" />
                 </TableHead>
                 <TableHead className="text-center">
-                  <SortButton label="Role" />
+                  <SortButton label="Academic Year" />
+                </TableHead>
+                <TableHead className="text-center">
+                  <SortButton label="Semester" />
                 </TableHead>
                 <TableHead className="text-center">
                   <SortButton label="Program" />
                 </TableHead>
                 <TableHead className="text-center">
-                  <SortButton label="Section" />
-                </TableHead>
-                <TableHead className="text-center">
-                  <SortButton label="Status" />
+                  <SortButton label="Adviser" />
                 </TableHead>
                 <TableHead>
                   <SortButton label="Created At" />
@@ -78,56 +113,54 @@ const ProponentsTable = () => {
                 <TableHead>
                   <SortButton label="Updated At" />
                 </TableHead>
-                <TableHead>
+                <TableHead className="text-right">
                   <SortButton label="Actions" />
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* {accounts.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={9}
-                    className="-ml-3 h-8 text-white text-center"
-                  >
-                    No students found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                accounts.map((student) => (
-                  <TableRow key={student.id} className="text-white">
-                    <TableCell className="text-center">{student.id}</TableCell>
-                    <TableCell className="text-center">
-                      {student.student_id}
+                {loading ? (
+                    <TableRow>
+                    <TableCell colSpan={9} className="-ml-3 h-8 text-white text-center">
+                        Loading...
                     </TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell className="text-center">
-                      {student.role}
+                    </TableRow>
+                ) : proponents.length === 0 ? (
+                    <TableRow>
+                    <TableCell colSpan={9} className="-ml-3 h-8 text-white text-center">
+                        No proponents are found
                     </TableCell>
-                    <TableCell className="text-center">
-                      {student.program}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {student.section}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div
-                        className={`text-base ${
-                          student.status == "approved"
-                            ? "bg-approved"
-                            : student.status == "pending"
-                            ? "bg-pending"
-                            : "bg-destructive"
-                        } p-3 border-none rounded-lg text-white`}
-                      >
-                        {student.status}
-                      </div>
-                    </TableCell>
-                    <TableCell>{student.created_at}</TableCell>
-                    <TableCell>{student.updated_at}</TableCell>
-                  </TableRow>
-                ))
-              )} */}
+                    </TableRow>
+                ) : (
+                    proponents.map((proponent) => (
+                    <TableRow key={proponent.proponents_id} className="text-white">
+                        <TableCell className="text-center">{proponent.proponents_id}</TableCell>
+                        <TableCell className="">{proponent.title}</TableCell>
+                        <TableCell className="text-center">{proponent.academic_yr}</TableCell>
+                        <TableCell className="text-center">{proponent.semester === 1 ? "1st Semester" : "2nd Semester"}</TableCell>
+                        <TableCell className="text-center">{proponent.program}</TableCell>
+                        <TableCell className="text-center">{proponent.adviser}</TableCell>
+                        <TableCell>{proponent.created_at}</TableCell>
+                        <TableCell>{proponent.updated_at}</TableCell>
+                        <TableCell className="text-right flex gap-2 justify-end items-center">
+                            <Button
+                            className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center">
+                                <PencilRuler size={16}/>
+                            </Button>
+                            <Button
+                            className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center">
+                                <ReceiptText size={16}/>
+                            </Button>
+                            <Button
+                            className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center">
+                                <Trash size={24}/>
+                            </Button>
+
+                        </TableCell>
+                    </TableRow>
+                    ))
+                    
+                )}
             </TableBody>
           </Table>
         </div>

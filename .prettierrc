@@ -1,0 +1,8 @@
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "quoteProps": "preserve",
+  "singleQuote": true,
+  "parser": "php",
+  "plugins": ["@prettier/plugin-php"]
+}
