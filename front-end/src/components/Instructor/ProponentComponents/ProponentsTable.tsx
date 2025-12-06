@@ -14,7 +14,10 @@ import {
   InputGroupInput,
   InputGroupAddon,
 } from "@/components/ui/input-group";
+import type { ProponentsProps } from "../interface/proponent";
+
 import { Search, Plus, PencilRuler, ReceiptText, Trash } from "lucide-react";
+import ProponentsAdd from "./ProponentsAdd";
 const SortButton = ({ label }: { label: string }) => (
   <Button
     variant="ghost"
@@ -24,24 +27,11 @@ const SortButton = ({ label }: { label: string }) => (
     {label}
   </Button>
 );
-interface ProponentsProps {
-    id: number;
-    proponents_id: string;
-    academic_yr: string;
-    semester: number;
-    title: string;
-    adviser: string;
-    program: string;
-    created_at: string,
-    updated_at: string,
 
-  }
 const ProponentsTable = () => {
     const [proponents, setProponents] = useState<ProponentsProps[]>([]);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchData = async () => {
             try {
                 const res = await fetch(`${apiUrl}/proponents`, {
                     method: "GET",
@@ -54,15 +44,15 @@ const ProponentsTable = () => {
                 
                 const data = await res.json();
                 setProponents(data.data); 
-            }catch(err: any) {
-                console.log(err);
+            }catch(error) {
+                console.log(error);
             }finally{
                 setLoading(false);
             }
         };
+    useEffect(() => {
         fetchData();
-    }, []);
-         console.log(proponents);        
+    }, []);     
   return (
     <>
       <div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -73,13 +63,11 @@ const ProponentsTable = () => {
               <InputGroupAddon>
                 <Search />
               </InputGroupAddon>
-              <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
+              <InputGroupAddon align="inline-end">0 results</InputGroupAddon>
             </InputGroup>
           </div>
           <div className="space-y-6 text-white">
-            <Button variant="primary">
-              Add Student <Plus />
-            </Button>
+           <ProponentsAdd onSuccess={fetchData}/>
           </div>
         </div>
         <div className="mb-4 flex items-center justify-between">
@@ -144,15 +132,21 @@ const ProponentsTable = () => {
                         <TableCell>{proponent.updated_at}</TableCell>
                         <TableCell className="text-right flex gap-2 justify-end items-center">
                             <Button
-                            className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center">
+                            className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"
+                            aria-label="Edit"
+                            title="Edit">
                                 <PencilRuler size={16}/>
                             </Button>
                             <Button
-                            className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center">
+                            className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
+                            aria-label="Details"
+                            title="Details">
                                 <ReceiptText size={16}/>
                             </Button>
                             <Button
-                            className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center">
+                            className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
+                            aria-label="Delete"
+                            title="Delete">
                                 <Trash size={24}/>
                             </Button>
 

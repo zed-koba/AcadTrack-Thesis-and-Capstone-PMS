@@ -29,7 +29,6 @@ class ProponentsController extends Controller
       'title' => 'required|string',
       'adviser' => 'required|string',
       'program' => 'required',
-
       'details' => 'required|array|max:4',
       'details.*.name' => 'required|string',
     ];
@@ -47,7 +46,7 @@ class ProponentsController extends Controller
     try {
       $proponents = Proponents::create([
         'academic_yr' => $request->academic_yr,
-        'semester' => $request->semester,
+        'semester' => (int) $request->semester,
         'title' => $request->title,
         'adviser' => $request->adviser,
         'program' => $request->program,
