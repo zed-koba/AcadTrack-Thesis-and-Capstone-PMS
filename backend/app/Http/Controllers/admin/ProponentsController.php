@@ -106,10 +106,9 @@ class ProponentsController extends Controller
     try {
       $proponents = Proponents::find($id);
       $proponents->update($request->only(['academic_yr', 'semester', 'title', 'program', 'adviser']));
-      
       foreach($request->details as $detail) {
-        if(isset($detail['id'])) {
-          $detailModel = ProponentsDetails::find($detail['id']);
+        if(isset($detail['propsdetails_id'])) {
+          $detailModel = ProponentsDetails::find($detail['propsdetails_id']);
           $detailModel->update(['name' => $detail['name']]);
         }else{
           ProponentsDetails::create([
@@ -117,6 +116,10 @@ class ProponentsController extends Controller
             'name' => $detail["name"],
           ]);
         }
+      }
+
+      if(!empty($request->deleted_ids)) {
+        ProponentsDetails::whereIn('propsdetails_id', $request->deleted_ids)->delete();
       }
       DB::commit();
       return response()->json([

@@ -1,5 +1,5 @@
 export type ProponentsDetailsProps = {
-	propsdetails_id: number;
+	propsdetails_id?: number;
 	name: string;
 };
 export type ProponentsProps = {

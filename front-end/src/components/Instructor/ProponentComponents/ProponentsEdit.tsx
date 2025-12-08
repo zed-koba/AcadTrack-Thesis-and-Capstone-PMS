@@ -11,7 +11,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowRightToLine, UserCircle } from 'lucide-react';
+import { ArrowRightToLine, Plus, UserCircle } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Input } from '@/components/ui/input';
@@ -53,16 +53,15 @@ const ProponetsEdit = ({
 	onSuccess,
 }: ProponentsEditProps) => {
 	const [loading, setLoading] = useState(false);
+	const [editFirst, setEditFirst] = useState(false);
 	const [openProponent, setOpenPropent] = useState(false);
+	const [removedProponents, setRemovedProponents] = useState<number[]>([]);
 	const [proponentsDetails, setProponents] = useState<ProponentsDetailsProps[]>(
 		proponent.details
 	);
 	const [selectedProponent, setSelectedProponent] =
 		useState<ProponentsDetailsProps | null>(null);
 
-	const handleRemove = (id: number) => {
-		setProponents(proponentsDetails.filter((p) => p.propsdetails_id !== id));
-	};
 	useEffect(() => {
 		setProponents(proponent.details);
 	}, [proponent]);
@@ -75,7 +74,29 @@ const ProponetsEdit = ({
 					: p
 			)
 		);
+		setEditFirst(false);
 		setSelectedProponent(null);
+	};
+
+	const handleNewProponent = () => {
+		if (proponentsDetails.length >= 4) {
+			toast.error('Maximum of 4 Proponents allowed.', { theme: 'colored' });
+			return;
+		}
+		const hasUnedited = proponentsDetails.some(
+			(p) => p.name == 'Edit this proponent' && !p.propsdetails_id
+		);
+		if (hasUnedited) {
+			toast.error('Please fill in the new proponent before adding another.', {
+				theme: 'colored',
+			});
+			setEditFirst(true);
+			return;
+		}
+		const newProponent: ProponentsDetailsProps = {
+			name: 'Edit this proponent',
+		};
+		setProponents((prev) => [...prev, newProponent]);
 	};
 	type formValues = z.infer<typeof proponentSchema>;
 	const defaultValues: formValues = {
@@ -95,6 +116,36 @@ const ProponetsEdit = ({
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
+			try {
+				const res = await fetch(`${apiUrl}/proponents/edit/${proponent.id}`, {
+					method: 'PUT',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
+					body: JSON.stringify({
+						academic_yr: value.academic_yr,
+						title: value.title,
+						adviser: value.adviser,
+						program: value.program,
+						semester: value.semester,
+						details: proponentsDetails,
+						deleted_ids: removedProponents,
+					}),
+				});
+				if (!res.ok) {
+					console.log('Failed to fetch data' + JSON.stringify({ value }));
+					console.log(proponentsDetails);
+					return JSON.stringify({ value });
+				}
+				form.reset();
+				toast.success('Successfully updated proponent');
+				setOpen(false);
+				onSuccess?.();
+				setLoading(false);
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 	<ToastContainer
@@ -298,6 +349,15 @@ const ProponetsEdit = ({
 							</Button>
 							<Button
 								className="cursor-pointer"
+								variant="details"
+								type="button"
+								onClick={handleNewProponent}
+								disabled={editFirst}
+							>
+								Add Proponent <Plus />
+							</Button>
+							<Button
+								className="cursor-pointer"
 								type="submit"
 								variant="edit"
 								disabled={loading}
@@ -315,11 +375,17 @@ const ProponetsEdit = ({
 						proponent={selectedProponent}
 						setOpen={setSelectedProponent}
 						onUpdate={handleNameUpdate}
-						onRemove={(id) =>
+						onRemove={(id?: number, index?: number) => {
 							setProponents((prev) =>
 								prev.filter((p) => p.propsdetails_id !== id)
-							)
-						}
+							);
+							if (id) {
+								setRemovedProponents((prev) => [...prev, id]);
+							}
+							setProponents((prev) =>
+								prev.filter((p, i) => p.propsdetails_id !== id && i !== index)
+							);
+						}}
 					/>
 				)}
 			</Dialog>

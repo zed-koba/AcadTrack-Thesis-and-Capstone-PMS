@@ -13,5 +13,4 @@ class ProponentsDetails extends Model
     public function proponent() {
         return $this->belongsTo(Proponents::class, 'foreign_proponents_id', 'proponents_id');
     }
-
 }
