@@ -1,4 +1,7 @@
-export interface ProponentsProps{
+export type ProponentsDetailsProps = ProponentsProps & {
+    name: string,      
+}
+export type ProponentsProps = {
     id: number;
     proponents_id: string;
     academic_yr: string;
@@ -8,8 +11,12 @@ export interface ProponentsProps{
     program: string;
     created_at: string,
     updated_at: string,
+    details: ProponentsDetailsProps[],
 }
 
-export interface ProponentsAddProps {
-
+export type ProponentsEditProps = {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    proponent: ProponentsProps;
+    onSuccess?: () => void;
 }

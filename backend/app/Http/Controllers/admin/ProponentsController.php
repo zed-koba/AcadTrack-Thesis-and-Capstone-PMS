@@ -14,7 +14,8 @@ class ProponentsController extends Controller
   //
   public function getProponents()
   {
-    $proponents = Proponents::orderBy('created_at', 'DESC')->get();
+    $proponents = Proponents::with('details')->orderBy('created_at', 'DESC')->get();
+
     return response()->json([
       'status' => 200,
       'data' => $proponents,
@@ -78,6 +79,48 @@ class ProponentsController extends Controller
         ],
         500,
       );
+    }
+  }
+
+  public function updateProponent($id, Request $request) {
+    $rules = [
+      'academic_yr' => 'required|string',
+      'semester' => 'required|integer',
+      'title' => 'required|string',
+      'adviser' => 'required|string',
+      'program' => 'required',
+      'details' => 'required|array|max:4',
+      'details.*.name' => 'required|string',
+    ];
+    $validator = Validator::make($request->all(), $rules);
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'status' => 422,
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+    DB::beginTransaction();
+    try {
+      $proponents = Proponents::find($id);
+      foreach($request->details as $detail) {
+        ProponentsDetails::find($detail->id);
+      }
+      return response()->json([
+        'status' => 200,
+        'message' => 'Sucessfully updated the proponent',
+        'data' => [
+          'proponent' => $proponents,
+          'details' => $request->details,
+        ]
+      ], 200);
+    }catch(\Exception $e) {
+      DB::rollBack();
+      return response()->json([
+        'error' => $e->getMessage(),
+      ], 500);
     }
   }
 }

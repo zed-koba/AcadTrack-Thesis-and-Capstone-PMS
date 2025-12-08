@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ProponentsDetails;
 
 class Proponents extends Model
 {
@@ -16,6 +17,10 @@ class Proponents extends Model
         'adviser', 
         'program'];
 
+    public function details() {
+        return $this->hasMany(ProponentsDetails::class, 'foreign_proponents_id', 'proponents_id');
+    }
+
     protected static function booted()
     {
         static::creating(function ($model){
@@ -24,5 +29,7 @@ class Proponents extends Model
             $model->proponents_id = 'P-' . str_pad($nextNumber, 7, '0', STR_PAD_LEFT);
         });
     }
+
+
     
 }

@@ -1,13 +1,6 @@
 import ProponentsTable from "../ProponentComponents/ProponentsTable";
 
 const Proponents = () => {
-  interface ProponentsProps {
-    proponent_id: string;
-    academic_yr: string;
-    semester: number;
-    title: string;
-    adviser: string;
-  }
   return (
     <>
       <div className="flex items-center justify-between text-white text-base">

@@ -13,3 +13,4 @@ Route::get('accounts', [StudentAccountController::class, 'getData']);
 Route::post('register', [StudentAccountController::class, 'storeAccount']);
 Route::get('proponents', [ProponentsController::class, 'getProponents']);
 Route::post('proponents/add', [ProponentsController::class, 'storeProponent']);
+Route::put('proponents/edit/{id}', [ProponentsController::class, 'updateProponent']);
