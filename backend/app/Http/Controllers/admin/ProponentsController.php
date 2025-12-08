@@ -105,9 +105,20 @@ class ProponentsController extends Controller
     DB::beginTransaction();
     try {
       $proponents = Proponents::find($id);
+      $proponents->update($request->only(['academic_yr', 'semester', 'title', 'program', 'adviser']));
+      
       foreach($request->details as $detail) {
-        ProponentsDetails::find($detail->id);
+        if(isset($detail['id'])) {
+          $detailModel = ProponentsDetails::find($detail['id']);
+          $detailModel->update(['name' => $detail['name']]);
+        }else{
+          ProponentsDetails::create([
+            'foreign_proponents_id' => $proponents->proponents_id,
+            'name' => $detail["name"],
+          ]);
+        }
       }
+      DB::commit();
       return response()->json([
         'status' => 200,
         'message' => 'Sucessfully updated the proponent',
