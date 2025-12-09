@@ -16,21 +16,21 @@ import {
 } from '@/components/ui/input-group';
 import type { ProponentsProps } from '../interface/proponent';
 
-import { Search, PencilRuler, ReceiptText, Trash } from 'lucide-react';
+import {
+	Search,
+	PencilRuler,
+	ReceiptText,
+	Trash,
+	ArrowUpDown,
+} from 'lucide-react';
 import ProponentsAdd from './ProponentsAdd';
 import ProponetsEdit from './ProponentsEdit';
 import ProponentDetails from './ProponentDetails';
 import ProponentDelete from './ProponentDelete';
-const SortButton = ({ label }: { label: string }) => (
-	<Button
-		variant="ghost"
-		className="-ml-3 h-8 font-semibold text-muted-foreground"
-		size="sm"
-	>
-		{label}
-	</Button>
-);
 
+type SortField = keyof ProponentsProps;
+type SortDirection = 'asc' | 'desc';
+const ITEMS_PER_PAGE = 10;
 const ProponentsTable = () => {
 	const [proponents, setProponents] = useState<ProponentsProps[]>([]);
 	const [selectedProponent, setSelectedProponent] =
@@ -39,6 +39,11 @@ const ProponentsTable = () => {
 	const [loading, setLoading] = useState(true);
 	const [proponentId, setProponetId] = useState<number | null>(null);
 	const [clickedButton, setClickedButton] = useState<string | null>(null);
+	const [sortField, setSortField] = useState<SortField>('created_at');
+	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+	const [searchTerm, setSearchTerm] = useState('');
+	const [currentPage, setCurrentPage] = useState(1);
+
 	const fetchData = async () => {
 		try {
 			const res = await fetch(`${apiUrl}/proponents`, {
@@ -61,13 +66,84 @@ const ProponentsTable = () => {
 	useEffect(() => {
 		fetchData();
 	}, []);
+
+	const handleSort = (field: SortField) => {
+		if (sortField === field) {
+			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+		} else {
+			setSortField(field);
+			setSortDirection('asc');
+		}
+	};
+
+	const SortButton = ({
+		field,
+		label,
+	}: {
+		field: SortField;
+		label: string;
+	}) => (
+		<Button
+			variant="ghost"
+			className="-ml-3 h-8 font-semibold text-muted-foreground"
+			size="sm"
+			onClick={() => handleSort(field)}
+		>
+			{label}
+			<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm font-semibold" />
+		</Button>
+	);
+
+	const filteredProponents = proponents.filter((props) => {
+		const searchLower = searchTerm.toLowerCase();
+		const semesterLabel =
+			props.semester === 1
+				? '1st Semester'
+				: props.semester === 2
+				? '2nd Semester'
+				: '';
+		return (
+			props.proponents_id.toLowerCase().includes(searchLower) ||
+			props.academic_yr.toLowerCase().includes(searchLower) ||
+			props.title.toLowerCase().includes(searchLower) ||
+			props.program.toLowerCase().includes(searchLower) ||
+			semesterLabel.toLowerCase().includes(searchLower) ||
+			props.created_at.toLowerCase().includes(searchLower) ||
+			props.updated_at.toLowerCase().includes(searchLower)
+		);
+	});
+	//console.log(filteredProponents);
+	const sortedProponents = [...filteredProponents].sort((a, b) => {
+		const aValue = a[sortField];
+		const bValue = b[sortField];
+
+		if (aValue === undefined || bValue === undefined) return 0;
+
+		const comparison = aValue.toString().localeCompare(bValue.toString());
+		return sortDirection === 'asc' ? comparison : -comparison;
+	});
+
+	const totalPage = Math.ceil(sortedProponents.length / ITEMS_PER_PAGE);
+	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+	const paginationProps = sortedProponents.slice(
+		startIndex,
+		startIndex + ITEMS_PER_PAGE
+	);
+	//console.log(filteredProponents);
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
 				<div className="flex items-center justify-between">
 					<div className="space-y-6 text-white">
 						<InputGroup>
-							<InputGroupInput placeholder="Search...." />
+							<InputGroupInput
+								value={searchTerm}
+								onChange={(e) => {
+									setSearchTerm(e.target.value);
+									setCurrentPage(1);
+								}}
+								placeholder="Search...."
+							/>
 							<InputGroupAddon>
 								<Search />
 							</InputGroupAddon>
@@ -79,38 +155,40 @@ const ProponentsTable = () => {
 					</div>
 				</div>
 				<div className="mb-4 flex items-center justify-between">
-					<p className="text-muted-foreground ">Total Students Accounts: 10</p>
+					<p className="text-muted-foreground ">
+						Total Proponents: {proponents.length}
+					</p>
 				</div>
 				<div className="rounded-lg border bg-card">
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-center">
-									<SortButton label="#" />
+								<TableHead className="text-left pl-5">
+									<SortButton field="proponents_id" label="Proponent ID" />
 								</TableHead>
 								<TableHead>
-									<SortButton label="Title" />
+									<SortButton field="title" label="Title" />
 								</TableHead>
 								<TableHead className="text-center">
-									<SortButton label="Academic Year" />
+									<SortButton field="academic_yr" label="Academic Year" />
 								</TableHead>
 								<TableHead className="text-center">
-									<SortButton label="Semester" />
+									<SortButton field="semester" label="Semester" />
 								</TableHead>
 								<TableHead className="text-center">
-									<SortButton label="Program" />
+									<SortButton field="program" label="Program" />
 								</TableHead>
 								<TableHead className="text-center">
-									<SortButton label="Adviser" />
+									<SortButton field="adviser" label="Adviser" />
 								</TableHead>
 								<TableHead>
-									<SortButton label="Created At" />
+									<SortButton field="created_at" label="Created At" />
 								</TableHead>
 								<TableHead>
-									<SortButton label="Updated At" />
+									<SortButton field="updated_at" label="Updated At" />
 								</TableHead>
-								<TableHead className="text-right">
-									<SortButton label="Actions" />
+								<TableHead className="text-center text-muted-foreground">
+									Actions
 								</TableHead>
 							</TableRow>
 						</TableHeader>
@@ -124,7 +202,7 @@ const ProponentsTable = () => {
 										Loading...
 									</TableCell>
 								</TableRow>
-							) : proponents.length === 0 ? (
+							) : paginationProps.length === 0 ? (
 								<TableRow>
 									<TableCell
 										colSpan={9}
@@ -134,12 +212,12 @@ const ProponentsTable = () => {
 									</TableCell>
 								</TableRow>
 							) : (
-								proponents.map((proponent) => (
+								paginationProps.map((proponent) => (
 									<TableRow
 										key={proponent.proponents_id}
 										className="text-white"
 									>
-										<TableCell className="text-center">
+										<TableCell className="text-left pl-5">
 											{proponent.proponents_id}
 										</TableCell>
 										<TableCell className="">{proponent.title}</TableCell>
