@@ -1,5 +1,5 @@
 import type {
-	ProponentsEditProps,
+	ProponentsEdit,
 	ProponentsDetailsProps,
 } from '../interface/proponent';
 import { useEffect, useState } from 'react';
@@ -51,7 +51,7 @@ const ProponetsEdit = ({
 	setOpen,
 	proponent,
 	onSuccess,
-}: ProponentsEditProps) => {
+}: ProponentsEdit) => {
 	const [loading, setLoading] = useState(false);
 	const [editFirst, setEditFirst] = useState(false);
 	const [openProponent, setOpenPropent] = useState(false);
@@ -385,6 +385,7 @@ const ProponetsEdit = ({
 							setProponents((prev) =>
 								prev.filter((p, i) => p.propsdetails_id !== id && i !== index)
 							);
+							setEditFirst(false);
 						}}
 					/>
 				)}

@@ -15,9 +15,15 @@ export type ProponentsProps = {
 	details: ProponentsDetailsProps[];
 };
 
-export type ProponentsEditProps = {
+export type ProponentsEdit = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	proponent: ProponentsProps;
 	onSuccess?: () => void;
+};
+
+export type ProponentsDetails = {
+	open: boolean;
+	setOpen: (open: boolean) => void;
+	proponent: ProponentsProps;
 };

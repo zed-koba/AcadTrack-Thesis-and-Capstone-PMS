@@ -137,4 +137,27 @@ class ProponentsController extends Controller
       ], 500);
     }
   }
+
+  public function deleteProponent($id) {
+    DB::beginTransaction();
+    try {
+      $proponents = Proponents::find($id);
+      if(!$proponents) {
+        return response()->json(['message' => "Not Found"], 404);
+      }
+      $proponents->delete();
+      $error = $proponents;
+      DB::commit();
+      return response()->json([
+        'status' => 200,
+        'message' => "Deleted Successfully",
+        'Error' => $error,
+      ], 200);  
+    }catch(\Exception $e) {
+      DB::rollBack();
+      return response()->json([
+        'error' => $e->getMessage(),
+      ], 500);
+    }
+  }
 }

@@ -16,9 +16,11 @@ import {
 } from '@/components/ui/input-group';
 import type { ProponentsProps } from '../interface/proponent';
 
-import { Search, Plus, PencilRuler, ReceiptText, Trash } from 'lucide-react';
+import { Search, PencilRuler, ReceiptText, Trash } from 'lucide-react';
 import ProponentsAdd from './ProponentsAdd';
 import ProponetsEdit from './ProponentsEdit';
+import ProponentDetails from './ProponentDetails';
+import ProponentDelete from './ProponentDelete';
 const SortButton = ({ label }: { label: string }) => (
 	<Button
 		variant="ghost"
@@ -35,6 +37,8 @@ const ProponentsTable = () => {
 		useState<ProponentsProps | null>(null);
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [proponentId, setProponetId] = useState<number | null>(null);
+	const [clickedButton, setClickedButton] = useState<string | null>(null);
 	const fetchData = async () => {
 		try {
 			const res = await fetch(`${apiUrl}/proponents`, {
@@ -163,6 +167,7 @@ const ProponentsTable = () => {
 												onClick={() => {
 													setSelectedProponent(proponent);
 													setOpen(true);
+													setClickedButton('edit');
 												}}
 											>
 												<PencilRuler size={16} />
@@ -171,6 +176,11 @@ const ProponentsTable = () => {
 												className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
 												aria-label="Details"
 												title="Details"
+												onClick={() => {
+													setSelectedProponent(proponent);
+													setOpen(true);
+													setClickedButton('details');
+												}}
 											>
 												<ReceiptText size={16} />
 											</Button>
@@ -178,6 +188,12 @@ const ProponentsTable = () => {
 												className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
 												aria-label="Delete"
 												title="Delete"
+												onClick={() => {
+													setSelectedProponent(proponent);
+													setProponetId(proponent.id);
+													setOpen(true);
+													setClickedButton('delete');
+												}}
 											>
 												<Trash size={24} />
 											</Button>
@@ -185,14 +201,28 @@ const ProponentsTable = () => {
 									</TableRow>
 								))
 							)}
-							{selectedProponent && (
-								<ProponetsEdit
-									open={open}
-									setOpen={setOpen}
-									proponent={selectedProponent}
-									onSuccess={fetchData}
-								/>
-							)}
+							{selectedProponent &&
+								(clickedButton === 'edit' ? (
+									<ProponetsEdit
+										open={open}
+										setOpen={setOpen}
+										proponent={selectedProponent}
+										onSuccess={fetchData}
+									/>
+								) : clickedButton === 'details' ? (
+									<ProponentDetails
+										open={open}
+										setOpen={setOpen}
+										proponent={selectedProponent}
+									/>
+								) : (
+									<ProponentDelete
+										open={open}
+										setOpen={setOpen}
+										proponent_id={proponentId}
+										onSuccess={fetchData}
+									/>
+								))}
 						</TableBody>
 					</Table>
 				</div>
