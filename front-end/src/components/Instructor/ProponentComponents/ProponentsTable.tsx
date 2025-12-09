@@ -27,6 +27,15 @@ import ProponentsAdd from './ProponentsAdd';
 import ProponetsEdit from './ProponentsEdit';
 import ProponentDetails from './ProponentDetails';
 import ProponentDelete from './ProponentDelete';
+import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from '@/components/ui/pagination';
 
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
@@ -147,7 +156,9 @@ const ProponentsTable = () => {
 							<InputGroupAddon>
 								<Search />
 							</InputGroupAddon>
-							<InputGroupAddon align="inline-end">0 results</InputGroupAddon>
+							<InputGroupAddon align="inline-end">
+								{searchTerm.length > 1 ? sortedProponents.length : 0} results
+							</InputGroupAddon>
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
@@ -304,6 +315,50 @@ const ProponentsTable = () => {
 						</TableBody>
 					</Table>
 				</div>
+				{totalPage > 1 && (
+					<div className="flex justify-between items-center pt-3">
+						<p className="text-muted-foreground text-base font-semibold w-full">
+							Showing {startIndex + 1} to{' '}
+							{Math.min(startIndex + ITEMS_PER_PAGE, sortedProponents.length)}{' '}
+							of {sortedProponents.length} proponents
+						</p>
+						<Pagination className="justify-end">
+							<PaginationContent>
+								<PaginationItem>
+									<PaginationPrevious
+										onClick={() =>
+											setCurrentPage((prev) => Math.max(1, prev - 1))
+										}
+										disabled={currentPage === 1}
+										className="hover:bg-blue-600"
+									/>
+								</PaginationItem>
+								{Array.from({ length: totalPage }, (_, i) => i + 1).map(
+									(page) => (
+										<PaginationItem>
+											<PaginationLink
+												key={page}
+												onClick={() => setCurrentPage(page)}
+												isActive={currentPage === page ? true : false}
+												className="cursor-pointer"
+											>
+												{page}
+											</PaginationLink>
+										</PaginationItem>
+									)
+								)}
+								<PaginationItem>
+									<PaginationNext
+										onClick={() =>
+											setCurrentPage((prev) => Math.min(totalPage, prev + 1))
+										}
+										disabled={currentPage === totalPage}
+									/>
+								</PaginationItem>
+							</PaginationContent>
+						</Pagination>
+					</div>
+				)}
 			</div>
 		</>
 	);
