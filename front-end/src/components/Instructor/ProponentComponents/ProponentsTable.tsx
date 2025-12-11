@@ -36,6 +36,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from '@/components/ui/pagination';
+import { formatDate } from '@/components/functions/functions';
 
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
@@ -117,8 +118,8 @@ const ProponentsTable = () => {
 			props.title.toLowerCase().includes(searchLower) ||
 			props.program.toLowerCase().includes(searchLower) ||
 			semesterLabel.toLowerCase().includes(searchLower) ||
-			props.created_at.toLowerCase().includes(searchLower) ||
-			props.updated_at.toLowerCase().includes(searchLower)
+			formatDate(props.created_at).toLowerCase().includes(searchLower) ||
+			formatDate(props.updated_at).toLowerCase().includes(searchLower)
 		);
 	});
 	//console.log(filteredProponents);
@@ -171,149 +172,151 @@ const ProponentsTable = () => {
 					</p>
 				</div>
 				<div className="rounded-lg border bg-card">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-left pl-5">
-									<SortButton field="proponents_id" label="Proponent ID" />
-								</TableHead>
-								<TableHead>
-									<SortButton field="title" label="Title" />
-								</TableHead>
-								<TableHead className="text-center">
-									<SortButton field="academic_yr" label="Academic Year" />
-								</TableHead>
-								<TableHead className="text-center">
-									<SortButton field="semester" label="Semester" />
-								</TableHead>
-								<TableHead className="text-center">
-									<SortButton field="program" label="Program" />
-								</TableHead>
-								<TableHead className="text-center">
-									<SortButton field="adviser" label="Adviser" />
-								</TableHead>
-								<TableHead>
-									<SortButton field="created_at" label="Created At" />
-								</TableHead>
-								<TableHead>
-									<SortButton field="updated_at" label="Updated At" />
-								</TableHead>
-								<TableHead className="text-center text-muted-foreground">
-									Actions
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{loading ? (
+					<div className="w-auto overflow-x-auto">
+						<Table className="w-full">
+							<TableHeader>
 								<TableRow>
-									<TableCell
-										colSpan={9}
-										className="-ml-3 h-8 text-white text-center"
-									>
-										Loading...
-									</TableCell>
+									<TableHead className="text-left pl-5">
+										<SortButton field="proponents_id" label="Proponent ID" />
+									</TableHead>
+									<TableHead>
+										<SortButton field="title" label="Title" />
+									</TableHead>
+									<TableHead className="text-left">
+										<SortButton field="academic_yr" label="Academic Year" />
+									</TableHead>
+									<TableHead className="text-left">
+										<SortButton field="semester" label="Semester" />
+									</TableHead>
+									<TableHead className="text-left">
+										<SortButton field="program" label="Program" />
+									</TableHead>
+									<TableHead className="text-left">
+										<SortButton field="adviser" label="Adviser" />
+									</TableHead>
+									<TableHead>
+										<SortButton field="created_at" label="Created At" />
+									</TableHead>
+									<TableHead>
+										<SortButton field="updated_at" label="Updated At" />
+									</TableHead>
+									<TableHead className="text-center text-muted-foreground">
+										Actions
+									</TableHead>
 								</TableRow>
-							) : paginationProps.length === 0 ? (
-								<TableRow>
-									<TableCell
-										colSpan={9}
-										className="-ml-3 h-8 text-white text-center"
-									>
-										No proponents are found
-									</TableCell>
-								</TableRow>
-							) : (
-								paginationProps.map((proponent) => (
-									<TableRow
-										key={proponent.proponents_id}
-										className="text-white"
-									>
-										<TableCell className="text-left pl-5">
-											{proponent.proponents_id}
-										</TableCell>
-										<TableCell className="">{proponent.title}</TableCell>
-										<TableCell className="text-center">
-											{proponent.academic_yr}
-										</TableCell>
-										<TableCell className="text-center">
-											{proponent.semester === 1
-												? '1st Semester'
-												: '2nd Semester'}
-										</TableCell>
-										<TableCell className="text-center">
-											{proponent.program}
-										</TableCell>
-										<TableCell className="text-center">
-											{proponent.adviser}
-										</TableCell>
-										<TableCell>{proponent.created_at}</TableCell>
-										<TableCell>{proponent.updated_at}</TableCell>
-										<TableCell className="text-right flex gap-2 justify-end items-center">
-											<Button
-												className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"
-												aria-label="Edit"
-												title="Edit"
-												onClick={() => {
-													setSelectedProponent(proponent);
-													setOpen(true);
-													setClickedButton('edit');
-												}}
-											>
-												<PencilRuler size={16} />
-											</Button>
-											<Button
-												className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
-												aria-label="Details"
-												title="Details"
-												onClick={() => {
-													setSelectedProponent(proponent);
-													setOpen(true);
-													setClickedButton('details');
-												}}
-											>
-												<ReceiptText size={16} />
-											</Button>
-											<Button
-												className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
-												aria-label="Delete"
-												title="Delete"
-												onClick={() => {
-													setSelectedProponent(proponent);
-													setProponetId(proponent.id);
-													setOpen(true);
-													setClickedButton('delete');
-												}}
-											>
-												<Trash size={24} />
-											</Button>
+							</TableHeader>
+							<TableBody>
+								{loading ? (
+									<TableRow>
+										<TableCell
+											colSpan={9}
+											className="-ml-3 h-8 text-white text-left"
+										>
+											Loading...
 										</TableCell>
 									</TableRow>
-								))
-							)}
-							{selectedProponent &&
-								(clickedButton === 'edit' ? (
-									<ProponetsEdit
-										open={open}
-										setOpen={setOpen}
-										proponent={selectedProponent}
-										onSuccess={fetchData}
-									/>
-								) : clickedButton === 'details' ? (
-									<ProponentDetails
-										open={open}
-										setOpen={setOpen}
-										proponent={selectedProponent}
-									/>
+								) : paginationProps.length === 0 ? (
+									<TableRow>
+										<TableCell
+											colSpan={9}
+											className="-ml-3 h-8 text-white text-left"
+										>
+											No proponents are found
+										</TableCell>
+									</TableRow>
 								) : (
-									<ProponentDelete
-										open={open}
-										setOpen={setOpen}
-										proponent_id={proponentId}
-										onSuccess={fetchData}
-									/>
-								))}
-						</TableBody>
-					</Table>
+									paginationProps.map((proponent) => (
+										<TableRow
+											key={proponent.proponents_id}
+											className="text-white"
+										>
+											<TableCell className="text-left pl-5">
+												{proponent.proponents_id}
+											</TableCell>
+											<TableCell className="">{proponent.title}</TableCell>
+											<TableCell className="text-left">
+												{proponent.academic_yr}
+											</TableCell>
+											<TableCell className="text-left">
+												{proponent.semester === 1
+													? '1st Semester'
+													: '2nd Semester'}
+											</TableCell>
+											<TableCell className="text-left">
+												{proponent.program}
+											</TableCell>
+											<TableCell className="text-left">
+												{proponent.adviser}
+											</TableCell>
+											<TableCell>{formatDate(proponent.created_at)}</TableCell>
+											<TableCell>{formatDate(proponent.updated_at)}</TableCell>
+											<TableCell className="text-right flex gap-2 justify-end items-center">
+												<Button
+													className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"
+													aria-label="Edit"
+													title="Edit"
+													onClick={() => {
+														setSelectedProponent(proponent);
+														setOpen(true);
+														setClickedButton('edit');
+													}}
+												>
+													<PencilRuler size={16} />
+												</Button>
+												<Button
+													className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
+													aria-label="Details"
+													title="Details"
+													onClick={() => {
+														setSelectedProponent(proponent);
+														setOpen(true);
+														setClickedButton('details');
+													}}
+												>
+													<ReceiptText size={16} />
+												</Button>
+												<Button
+													className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
+													aria-label="Delete"
+													title="Delete"
+													onClick={() => {
+														setSelectedProponent(proponent);
+														setProponetId(proponent.id);
+														setOpen(true);
+														setClickedButton('delete');
+													}}
+												>
+													<Trash size={24} />
+												</Button>
+											</TableCell>
+										</TableRow>
+									))
+								)}
+								{selectedProponent &&
+									(clickedButton === 'edit' ? (
+										<ProponetsEdit
+											open={open}
+											setOpen={setOpen}
+											proponent={selectedProponent}
+											onSuccess={fetchData}
+										/>
+									) : clickedButton === 'details' ? (
+										<ProponentDetails
+											open={open}
+											setOpen={setOpen}
+											proponent={selectedProponent}
+										/>
+									) : (
+										<ProponentDelete
+											open={open}
+											setOpen={setOpen}
+											proponent_id={proponentId}
+											onSuccess={fetchData}
+										/>
+									))}
+							</TableBody>
+						</Table>
+					</div>
 				</div>
 				{totalPage > 1 && (
 					<div className="flex justify-between items-center pt-3">
