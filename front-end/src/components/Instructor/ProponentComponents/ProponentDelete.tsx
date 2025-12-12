@@ -45,7 +45,7 @@ const ProponentDelete = ({
 			}
 			toast.success('Sucessfully deleted the proponent');
 			setOpen(false);
-
+			setLoading(false);
 			onSuccess?.();
 		} catch (error) {
 			console.log(error);

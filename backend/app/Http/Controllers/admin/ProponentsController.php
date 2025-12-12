@@ -30,8 +30,8 @@ class ProponentsController extends Controller
       'title' => 'required|string',
       'adviser' => 'required|string',
       'program' => 'required',
-      'details' => 'required|array|max:4',
-      'details.*.name' => 'required|string',
+      'details' => 'array|max:4',
+      'details.*.name' => 'string',
     ];
     $validator = Validator::make($request->all(), $rules);
     if ($validator->fails()) {
@@ -52,11 +52,13 @@ class ProponentsController extends Controller
         'adviser' => $request->adviser,
         'program' => $request->program,
       ]);
-      foreach ($request->details as $detail) {
-        ProponentsDetails::create([
-          'foreign_proponents_id' => $proponents->proponents_id,
-          'name' => $detail['name'],
-        ]);
+      if(isset($request->details)) {
+        foreach ($request->details as $detail) {
+          ProponentsDetails::create([
+            'foreign_proponents_id' => $proponents->proponents_id,
+            'name' => $detail['name'],
+          ]);
+        }
       }
 
       DB::commit();
@@ -89,8 +91,8 @@ class ProponentsController extends Controller
       'title' => 'required|string',
       'adviser' => 'required|string',
       'program' => 'required',
-      'details' => 'required|array|max:4',
-      'details.*.name' => 'required|string',
+      'details' => 'array|max:4',
+      'details.*.name' => 'string',
     ];
     $validator = Validator::make($request->all(), $rules);
     if ($validator->fails()) {

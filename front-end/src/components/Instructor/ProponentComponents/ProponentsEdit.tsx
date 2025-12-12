@@ -43,7 +43,7 @@ const proponentSchema = z.object({
 	semester: z.number().min(1, 'Must select a semester').max(2),
 	program: z.string().min(1, 'Program is required'),
 	adviser: z.string().min(1, 'Adviser is required'),
-	details: z.array(proponentDetailsSchema).min(1),
+	details: z.array(proponentDetailsSchema),
 });
 
 const ProponetsEdit = ({
@@ -116,6 +116,7 @@ const ProponetsEdit = ({
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
+			console.log('SUBMIT');
 			try {
 				const res = await fetch(`${apiUrl}/proponents/edit/${proponent.id}`, {
 					method: 'PUT',
