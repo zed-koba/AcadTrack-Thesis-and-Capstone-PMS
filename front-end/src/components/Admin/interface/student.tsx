@@ -1,11 +1,15 @@
 export type StudentProps = {
 	id: number;
-	email: string;
-	role: string;
 	student_id: string;
+	role: string;
+	mobile_num: string;
 	program: string;
 	section: string;
-	status: string;
+	semester: number;
+	year_level: number;
+	facebook_profile: string;
+	thesis_title: string;
+	name: string;
 	created_at: string;
 	updated_at: string;
 };

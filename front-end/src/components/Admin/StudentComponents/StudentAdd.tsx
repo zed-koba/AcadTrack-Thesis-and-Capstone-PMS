@@ -29,11 +29,22 @@ import {
 	FieldLabel,
 } from '@/components/ui/field';
 
-const accountSchema = z.object({
-	email: z.email('Invalid email address format').min(1, 'Email is required'),
+const studentSchema = z.object({
+	name: z.string().min(1, 'Name is required'),
 	student_id: z.string().min(1, 'Student ID is required'),
+	role: z.string().min(1, 'Role is required'),
+	mobile_num: z
+		.string()
+		.regex(/^(09\d{9}|\+639\d{9})$/, {
+			message: 'Invalid mobile number format',
+		})
+		.optional(),
 	program: z.string().min(1, 'Program is required'),
 	section: z.string().min(1, 'Section is required'),
+	semester: z.number().min(1, 'Must select a semester').max(2),
+	thesis_title: z.string().min(1, 'Thesis Title is required'),
+	year_Level: z.number().min(1, 'Must select a year level').max(4),
+	facebook_profile: z.string().optional(),
 });
 type Props = {
 	onSuccess?: () => void;
@@ -43,29 +54,41 @@ const StudentAdd = ({ onSuccess }: Props) => {
 	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	type formValues = z.infer<typeof accountSchema>;
+	type formValues = z.infer<typeof studentSchema>;
 	const defaultValues: formValues = {
-		email: '',
 		student_id: '',
 		program: '',
 		section: '',
+		name: '',
+		role: '',
+		mobile_num: '',
+		semester: 0,
+		thesis_title: '',
+		year_Level: 0,
+		facebook_profile: '',
 	};
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onChange: accountSchema,
-			onSubmit: accountSchema,
+			onChange: studentSchema,
+			onSubmit: studentSchema,
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
 			const payLoad = {
 				student_id: value.student_id,
-				email: value.email,
+				role: value.role,
+				year_level: value.year_Level,
+				name: value.name,
+				mobile_num: value.mobile_num,
+				semester: value.semester,
+				thesis_title: value.thesis_title,
 				program: value.program,
 				section: value.section,
+				facebook_profile: value.facebook_profile,
 			};
 			try {
-				const res = await fetch(`${apiUrl}/accounts/add`, {
+				const res = await fetch(`${apiUrl}/students/add`, {
 					method: 'POST',
 					headers: {
 						'Content-type': 'application/json',
@@ -83,12 +106,12 @@ const StudentAdd = ({ onSuccess }: Props) => {
 					);
 					return;
 				}
-				if (!result.ok) {
+				if (!res.ok) {
 					console.log('Failed to fetch data ' + JSON.stringify(payLoad));
 					return JSON.stringify(payLoad);
 				}
 				form.reset();
-				toast.success('Sucessfully added proponent');
+				toast.success('Sucessfully added proponent', { theme: 'colored' });
 				setOpen(false);
 				onSuccess?.();
 			} catch (error) {
@@ -98,21 +121,21 @@ const StudentAdd = ({ onSuccess }: Props) => {
 			}
 		},
 	});
+	<ToastContainer
+		position="top-right"
+		autoClose={5000}
+		hideProgressBar={false}
+		newestOnTop={true}
+		closeOnClick={false}
+		rtl={false}
+		pauseOnFocusLoss={false}
+		draggable
+		pauseOnHover
+		theme="dark"
+		transition={Bounce}
+	/>;
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={true}
-				closeOnClick={false}
-				rtl={false}
-				pauseOnFocusLoss={false}
-				draggable
-				pauseOnHover
-				theme="dark"
-				transition={Bounce}
-			/>
 			<DialogTrigger asChild>
 				<Button className="text-white cursor-pointer" variant="primary">
 					Add Student <Plus />
@@ -160,23 +183,22 @@ const StudentAdd = ({ onSuccess }: Props) => {
 								}}
 							/>
 							<form.Field
-								name="email"
+								name="name"
 								children={(field) => {
 									const isInvalid =
 										field.state.meta.isTouched && !field.state.meta.isValid;
 
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Email: </FieldLabel>
+											<FieldLabel htmlFor={field.name}>Name: </FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}
-												type="email"
 												value={field.state.value}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder="Ex. example@gmail.com"
+												placeholder="Ex. John Fritz Selloria"
 												autoComplete="off"
 											/>
 											{isInvalid && (
@@ -187,43 +209,137 @@ const StudentAdd = ({ onSuccess }: Props) => {
 								}}
 							/>
 						</div>
-						<div className="grid grid-cols-3 gap-4">
-							<div className="col-span-2">
-								<form.Field
-									name="program"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>Program:</FieldLabel>
-												<Select
-													name={field.name}
-													defaultValue={field.state.value}
-													onValueChange={(v) => field.handleChange(v)}
+						<form.Field
+							name="thesis_title"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Thesis Title: </FieldLabel>
+										<Input
+											id={field.name}
+											name={field.name}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											aria-invalid={isInvalid}
+											placeholder="Ex. Web-Based Thesis Management System"
+											autoComplete="off"
+										/>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<div className="grid grid-cols-2 gap-4">
+							<form.Field
+								name="semester"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Semester:</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={
+													field.state.value ? String(field.state.value) : ''
+												}
+												onValueChange={(v) => field.handleChange(Number(v))}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
 												>
-													<SelectTrigger
-														className="w-auto"
-														aria-invalid={isInvalid}
-														id={field.name}
-													>
-														<SelectValue placeholder="Select Program" />
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value="BSCS">BSCS</SelectItem>
-														<SelectItem value="BSIT">BSIT</SelectItem>
-														<SelectItem value="BSCpE">BSCpE</SelectItem>
-														<SelectItem value="BSIS">BSIS</SelectItem>
-													</SelectContent>
-												</Select>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-							</div>
+													<SelectValue placeholder="Select Semester" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="1">1st Semester</SelectItem>
+													<SelectItem value="2">2nd Semester</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="year_Level"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Year Level:</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={
+													field.state.value ? String(field.state.value) : ''
+												}
+												onValueChange={(v) => field.handleChange(Number(v))}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
+												>
+													<SelectValue placeholder="Select Semester" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="3">3rd Year</SelectItem>
+													<SelectItem value="4">4th Year</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+						</div>
+						<div className="grid grid-cols-3 gap-4">
+							<form.Field
+								name="program"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Program:</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={field.state.value}
+												onValueChange={(v) => field.handleChange(v)}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
+												>
+													<SelectValue placeholder="Select Program" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="BSCS">BSCS</SelectItem>
+													<SelectItem value="BSIT">BSIT</SelectItem>
+													<SelectItem value="BSCpE">BSCpE</SelectItem>
+													<SelectItem value="BSIS">BSIS</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+
 							<form.Field
 								name="section"
 								children={(field) => {
@@ -240,6 +356,101 @@ const StudentAdd = ({ onSuccess }: Props) => {
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
 												placeholder="Ex. CS801P"
+												autoComplete="off"
+											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="role"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Role:</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={field.state.value}
+												onValueChange={(v) => field.handleChange(v)}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
+												>
+													<SelectValue placeholder="Select Role" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="not assigned">
+														Not Assigned
+													</SelectItem>
+													<SelectItem value="programmer">Programmer</SelectItem>
+													<SelectItem value="user interface">UI</SelectItem>
+													<SelectItem value="database">Database</SelectItem>
+													<SelectItem value="system analyst">
+														System Analyst
+													</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+						</div>
+						<div className="grid grid-cols-2 gap-4">
+							<form.Field
+								name="facebook_profile"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>
+												Facebook Name:
+											</FieldLabel>
+											<Input
+												id={field.name}
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="Ex. Nathan Pabingwit"
+												autoComplete="off"
+											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="mobile_num"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>
+												Mobile Number:
+											</FieldLabel>
+											<Input
+												id={field.name}
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="Ex. 09xxxxxxxxx"
 												autoComplete="off"
 											/>
 											{isInvalid && (

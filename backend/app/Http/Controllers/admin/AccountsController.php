@@ -4,17 +4,17 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\StudentAccounts;
+use App\Models\Accounts;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
-class StudentAccountController extends Controller
+class AccountsController extends Controller
 {
   //
   public function getData()
   {
-    $accounts = StudentAccounts::orderBy('created_at', 'DESC')->get();
+    $accounts = Accounts::orderBy('created_at', 'DESC')->get();
     return response()->json([
       'status' => 200,
       'data' => $accounts,
@@ -25,7 +25,6 @@ class StudentAccountController extends Controller
   {
     $rules = [
       'email' => 'required|email|unique:accounts,email',
-      'student_id' => 'required|unique:accounts,student_id',
       'program' => 'required',
       'section' => 'required',
     ];
@@ -45,7 +44,7 @@ class StudentAccountController extends Controller
     }
     try {
       DB::beginTransaction();
-      $account = new StudentAccounts();
+      $account = new Accounts();
       $account->email = $request->email;
       $account->password = Hash::make('password');
       $account->student_id = $request->student_id;
@@ -92,7 +91,7 @@ class StudentAccountController extends Controller
     }
     try {
       DB::beginTransaction();
-      $account = StudentAccounts::find($id);
+      $account = Accounts::find($id);
       $account->update($request->only(['email', 'student_id', 'program', 'section']));
 
       DB::commit();
@@ -114,7 +113,7 @@ class StudentAccountController extends Controller
   {
     DB::beginTransaction();
     try {
-      $account = StudentAccounts::find($id);
+      $account = Accounts::find($id);
       $account->delete();
       DB::commit();
       return response()->json([

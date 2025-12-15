@@ -26,7 +26,7 @@ const StudentDelete = ({
 		if (!student_id) return;
 		setLoading(true);
 		try {
-			const res = await fetch(`${apiUrl}/accounts/delete/${student_id}`, {
+			const res = await fetch(`${apiUrl}/students/delete/${student_id}`, {
 				method: 'DELETE',
 				headers: {
 					'Content-type': 'application/json',
@@ -44,10 +44,10 @@ const StudentDelete = ({
 				return;
 			}
 			if (!res.ok) {
-				toast.error('Failed to delete the proponent', { theme: 'colored' });
+				toast.error('Failed to delete the student', { theme: 'colored' });
 				return;
 			}
-			toast.success('Sucessfully deleted the proponent');
+			toast.success('Sucessfully deleted the student');
 			setOpen(false);
 			setLoading(false);
 			onSuccess?.();

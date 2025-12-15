@@ -62,7 +62,7 @@ const SortButton = ({
 );
 
 const StudentTable = () => {
-	const [accounts, setAccounts] = useState<StudentProps[]>([]);
+	const [students, setAccounts] = useState<StudentProps[]>([]);
 	const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
 		null
 	);
@@ -77,7 +77,7 @@ const StudentTable = () => {
 
 	const fetchStudents = async () => {
 		try {
-			const res = await fetch(`${apiUrl}/accounts`, {
+			const res = await fetch(`${apiUrl}/students`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',
@@ -105,16 +105,27 @@ const StudentTable = () => {
 		}
 	};
 
-	const filteredStudents = accounts.filter((stud) => {
+	const filteredStudents = students.filter((stud) => {
 		const searchLower = searchTerm.toLowerCase();
+		const yearLevelLabel = stud.year_level === 3 ? '3rd Year' : '4th Year';
+		const semesterLabel =
+			stud.semester === 1
+				? '1st Semester'
+				: stud.semester === 2
+				? '2nd Semester'
+				: '';
 		return (
 			stud.id.toString().includes(searchLower) ||
+			stud.name.toLowerCase().includes(searchLower) ||
 			stud.student_id.toLowerCase().includes(searchLower) ||
-			stud.email.toLowerCase().includes(searchLower) ||
+			stud.mobile_num.toLowerCase().includes(searchLower) ||
 			stud.role.toLowerCase().includes(searchLower) ||
 			stud.program.toLowerCase().includes(searchLower) ||
 			stud.section.toLowerCase().includes(searchLower) ||
-			stud.status.toLowerCase().includes(searchLower) ||
+			semesterLabel.toLowerCase().includes(searchLower) ||
+			stud.facebook_profile.toLowerCase().includes(searchLower) ||
+			yearLevelLabel.toLowerCase().includes(searchLower) ||
+			stud.thesis_title.toLowerCase().includes(searchLower) ||
 			formatDate(stud.created_at).toLowerCase().includes(searchLower) ||
 			formatDate(stud.updated_at).toLowerCase().includes(searchLower)
 		);
@@ -160,7 +171,7 @@ const StudentTable = () => {
 				</div>
 				<div className="mb-4 flex items-center justify-between">
 					<p className="text-muted-foreground ">
-						Total Students: {accounts.length}
+						Total Students: {students.length}
 					</p>
 				</div>
 				<div className="rounded-lg border bg-card">
@@ -168,9 +179,6 @@ const StudentTable = () => {
 						<Table className="w-full">
 							<TableHeader>
 								<TableRow>
-									<TableHead className="text-center">
-										<SortButton label="#" field="id" onSort={handleSort} />
-									</TableHead>
 									<TableHead className="text-left">
 										<SortButton
 											label="Student ID"
@@ -179,14 +187,17 @@ const StudentTable = () => {
 										/>
 									</TableHead>
 									<TableHead>
-										<SortButton
-											label="Email"
-											field="email"
-											onSort={handleSort}
-										/>
+										<SortButton label="Name" field="name" onSort={handleSort} />
+									</TableHead>
+									<TableHead className="text-center">
+										<SortButton label="Role" field="role" onSort={handleSort} />
 									</TableHead>
 									<TableHead className="text-left">
-										<SortButton label="Role" field="role" onSort={handleSort} />
+										<SortButton
+											label="Thesis Title"
+											field="thesis_title"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead className="text-left">
 										<SortButton
@@ -204,8 +215,22 @@ const StudentTable = () => {
 									</TableHead>
 									<TableHead className="text-center">
 										<SortButton
-											label="Status"
-											field="status"
+											label="Mobile Number"
+											field="mobile_num"
+											onSort={handleSort}
+										/>
+									</TableHead>
+									<TableHead className="text-center">
+										<SortButton
+											label="Semester"
+											field="semester"
+											onSort={handleSort}
+										/>
+									</TableHead>
+									<TableHead className="text-center">
+										<SortButton
+											label="Year Level"
+											field="year_level"
 											onSort={handleSort}
 										/>
 									</TableHead>
@@ -213,13 +238,6 @@ const StudentTable = () => {
 										<SortButton
 											label="Created At"
 											field="created_at"
-											onSort={handleSort}
-										/>
-									</TableHead>
-									<TableHead>
-										<SortButton
-											label="Updated At"
-											field="updated_at"
 											onSort={handleSort}
 										/>
 									</TableHead>
@@ -250,15 +268,29 @@ const StudentTable = () => {
 								) : (
 									paginationProps.map((student) => (
 										<TableRow key={student.id} className="text-white">
-											<TableCell className="text-center">
-												{student.id}
-											</TableCell>
 											<TableCell className="text-left">
 												{student.student_id}
 											</TableCell>
-											<TableCell>{student.email}</TableCell>
+											<TableCell>{student.name}</TableCell>
+											<TableCell className="text-center capitalize">
+												<div
+													className={`text-base ${
+														student.role == 'programmer'
+															? 'bg-destructive'
+															: student.role == 'database'
+															? 'bg-green-400'
+															: student.role == 'user interface'
+															? 'bg-amber-400'
+															: student.role == 'system analyst'
+															? 'bg-blue-400'
+															: 'bg-pending'
+													} px-2 py-0.5 border-none rounded-4xl text-sm text-white font-semibold flex items-center justify-center `}
+												>
+													{student.role}
+												</div>
+											</TableCell>
 											<TableCell className="text-left">
-												{student.role}
+												{student.thesis_title}
 											</TableCell>
 											<TableCell className="text-left">
 												{student.program}
@@ -266,21 +298,17 @@ const StudentTable = () => {
 											<TableCell className="text-left">
 												{student.section}
 											</TableCell>
-											<TableCell className="text-left">
-												<div
-													className={`text-base ${
-														student.status == 'approved'
-															? 'bg-approved'
-															: student.status == 'pending'
-															? 'bg-pending'
-															: 'bg-destructive'
-													} px-3 py-0.5 border-none rounded-4xl text-white font-normal flex items-center justify-center `}
-												>
-													{student.status}
-												</div>
+
+											<TableCell>{student.mobile_num}</TableCell>
+											<TableCell>
+												{student.semester === 1
+													? '1st Semester'
+													: '2nd Semester'}
+											</TableCell>
+											<TableCell>
+												{student.year_level === 3 ? '3rd Year' : '4th Year'}
 											</TableCell>
 											<TableCell>{formatDate(student.created_at)}</TableCell>
-											<TableCell>{formatDate(student.updated_at)}</TableCell>
 											<TableCell className="text-right flex gap-2 justify-end items-center">
 												<Button
 													className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"

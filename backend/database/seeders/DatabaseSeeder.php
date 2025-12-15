@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'section' => 'ADMIN',
             'remember_token' => null,
         ]);*/
-        $this->call(AccountsSeeder::class);
+        $this->call(StudentsSeeder::class);
         //$this->call(ProponentSeeder::class);
     }
 }
