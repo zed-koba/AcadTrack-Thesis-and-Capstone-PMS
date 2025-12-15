@@ -233,7 +233,7 @@ const StudentTable = () => {
 									<TableRow>
 										<TableCell
 											colSpan={9}
-											className="-ml-3 h-8 text-white text-left"
+											className="-ml-3 h-8 text-white text-center"
 										>
 											Loading...
 										</TableCell>

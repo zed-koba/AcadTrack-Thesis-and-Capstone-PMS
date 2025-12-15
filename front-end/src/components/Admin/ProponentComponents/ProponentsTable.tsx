@@ -30,7 +30,6 @@ import ProponentDelete from './ProponentDelete';
 import {
 	Pagination,
 	PaginationContent,
-	PaginationEllipsis,
 	PaginationItem,
 	PaginationLink,
 	PaginationNext,
@@ -243,7 +242,7 @@ const ProponentsTable = () => {
 									<TableRow>
 										<TableCell
 											colSpan={9}
-											className="-ml-3 h-8 text-white text-left"
+											className="-ml-3 h-8 text-white text-center"
 										>
 											Loading...
 										</TableCell>
@@ -252,7 +251,7 @@ const ProponentsTable = () => {
 									<TableRow>
 										<TableCell
 											colSpan={9}
-											className="-ml-3 h-8 text-white text-left"
+											className="-ml-3 h-8 text-white text-center"
 										>
 											No proponents are found
 										</TableCell>

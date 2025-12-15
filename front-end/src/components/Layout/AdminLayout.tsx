@@ -1,13 +1,14 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
-import { LayoutDashboard, LibraryBig, UserRound } from 'lucide-react';
+import { Glasses, LayoutDashboard, LibraryBig, UserRound } from 'lucide-react';
 
 const AdminLayout = () => {
 	const navItem: NavItem[] = [
-		{ label: 'Dashboard', to: '/Instructor', icon: <LayoutDashboard /> },
-		{ label: 'Proponents', to: '/Instructor/Proponents', icon: <LibraryBig /> },
-		{ label: 'Students', to: '/Instructor/Students', icon: <UserRound /> },
+		{ label: 'Dashboard', to: '/Admin', icon: <LayoutDashboard /> },
+		{ label: 'Proponents', to: '/Admin/Proponents', icon: <LibraryBig /> },
+		{ label: 'Students', to: '/Admin/Students', icon: <UserRound /> },
+		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
 	];
 	return (
 		<div className="flex content-start relative">
