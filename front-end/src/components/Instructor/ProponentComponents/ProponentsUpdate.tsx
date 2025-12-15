@@ -16,7 +16,7 @@ type SelectedProponentProps = {
 	setOpen: (open: ProponentsDetailsProps | null) => void;
 	proponent: ProponentsDetailsProps;
 	onUpdate: (updatedProponent: ProponentsDetailsProps) => void;
-	onRemove: (id?: number, index?: number) => void;
+	onRemove: (id?: number) => void;
 };
 const ProponentUpdate = ({
 	open,

@@ -61,21 +61,43 @@ const ProponetsEdit = ({
 	);
 	const [selectedProponent, setSelectedProponent] =
 		useState<ProponentsDetailsProps | null>(null);
-
+	const [selectedProponentIndex, setSelectedProponentIndex] = useState<
+		number | null
+	>(null);
 	useEffect(() => {
 		setProponents(proponent.details);
 	}, [proponent]);
 
 	const handleNameUpdate = (updatedProponent: ProponentsDetailsProps) => {
 		setProponents((prev) =>
-			prev.map((p) =>
-				p.propsdetails_id === updatedProponent.propsdetails_id
-					? updatedProponent
-					: p
-			)
+			prev.map((p, i) => {
+				if (updatedProponent.propsdetails_id !== undefined) {
+					return p.propsdetails_id === updatedProponent.propsdetails_id
+						? updatedProponent
+						: p;
+				} else {
+					return i === selectedProponentIndex ? updatedProponent : p;
+				}
+			})
 		);
 		setEditFirst(false);
 		setSelectedProponent(null);
+		console.log(proponentsDetails);
+	};
+	const handleRemoveProponent = (id?: number) => {
+		setProponents((prev) =>
+			prev.filter((p, i) => {
+				if (id !== undefined) {
+					return p.propsdetails_id !== id;
+				} else {
+					return i !== selectedProponentIndex;
+				}
+			})
+		);
+		if (id) {
+			setRemovedProponents((prev) => [...prev, id]);
+		}
+		setEditFirst(false);
 	};
 
 	const handleNewProponent = () => {
@@ -134,6 +156,16 @@ const ProponetsEdit = ({
 						deleted_ids: removedProponents,
 					}),
 				});
+				const result = await res.json();
+				if (result.status === 422) {
+					const errors = result.errors as Record<string, string[]>;
+					Object.values(errors).forEach((errorMessages) =>
+						errorMessages.forEach((message) =>
+							toast.error(message, { theme: 'colored' })
+						)
+					);
+					return;
+				}
 				if (!res.ok) {
 					console.log('Failed to fetch data' + JSON.stringify({ value }));
 					console.log(proponentsDetails);
@@ -324,12 +356,13 @@ const ProponetsEdit = ({
 							<div className="pt-2 flex flex-col gap-4">
 								<h2 className="text-white text-lg">Proponents: </h2>
 								<div className="pt-2 flex flex-col gap-4">
-									{proponentsDetails.map((p) => (
+									{proponentsDetails.map((p, i) => (
 										<div
 											key={p.propsdetails_id}
 											className="bg-card p-4 rounded-lg border-none flex justify-start items-center gap-3 text-base font-semibold text-white cursor-pointer hover:bg-gray-700"
 											onClick={() => {
 												setSelectedProponent(p);
+												setSelectedProponentIndex(i);
 												setOpenPropent(true);
 											}}
 										>
@@ -376,17 +409,8 @@ const ProponetsEdit = ({
 						proponent={selectedProponent}
 						setOpen={setSelectedProponent}
 						onUpdate={handleNameUpdate}
-						onRemove={(id?: number, index?: number) => {
-							setProponents((prev) =>
-								prev.filter((p) => p.propsdetails_id !== id)
-							);
-							if (id) {
-								setRemovedProponents((prev) => [...prev, id]);
-							}
-							setProponents((prev) =>
-								prev.filter((p, i) => p.propsdetails_id !== id && i !== index)
-							);
-							setEditFirst(false);
+						onRemove={(id?: number) => {
+							handleRemoveProponent(id);
 						}}
 					/>
 				)}

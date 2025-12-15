@@ -1,29 +1,37 @@
 :root {
-  --pulse-color: 0, 166, 62;
+	--pulse-color: 0, 166, 62;
+	--approved: oklch(0.696 0.17 162.48);
+	--pending: oklch(0.769 0.188 70.08);
 }
 .line-card {
-  width: 8.5rem;
-  height: 10px;
-  z-index: 0;
+	width: 8.5rem;
+	height: 10px;
+	z-index: 0;
+}
+.bg-approved {
+	background-color: var(--approved);
 }
 
+.bg-pending {
+	background-color: var(--pending);
+}
 .pulse {
-  animation: pulse-animation 0.8s infinite;
+	animation: pulse-animation 0.8s infinite;
 }
 
 @keyframes pulse-animation {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(var(--pulse-color), 0.7);
-  }
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(var(--pulse-color), 0.7);
+	}
 
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 15px rgba(var(--pulse-color), 0);
-  }
+	70% {
+		transform: scale(1);
+		box-shadow: 0 0 0 15px rgba(var(--pulse-color), 0);
+	}
 
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(var(--pulse-color), 0);
-  }
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(var(--pulse-color), 0);
+	}
 }

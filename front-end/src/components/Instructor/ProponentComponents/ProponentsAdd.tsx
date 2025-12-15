@@ -52,7 +52,7 @@ const ProponentsAdd = ({ onSuccess }: Props) => {
 	const defaultValues: formValues = {
 		academic_yr: '',
 		title: '',
-		semester: 1,
+		semester: 0,
 		adviser: '',
 		program: '',
 		details: [{ name: '' }],
@@ -85,6 +85,16 @@ const ProponentsAdd = ({ onSuccess }: Props) => {
 					},
 					body: JSON.stringify(payLoad),
 				});
+				const result = await res.json();
+				if (result.status === 422) {
+					const errors = result.errors as Record<string, string[]>;
+					Object.values(errors).forEach((errorMessages) =>
+						errorMessages.forEach((message) =>
+							toast.error(message, { theme: 'colored' })
+						)
+					);
+					return;
+				}
 				if (!res.ok) {
 					console.log('Failed to fetch data ' + JSON.stringify(payLoad));
 					return JSON.stringify(payLoad);
@@ -100,24 +110,21 @@ const ProponentsAdd = ({ onSuccess }: Props) => {
 			}
 		},
 	});
-	// const onSubmit = async (values: z.infer<typeof proponentSchema>) => {
-	//     setLoading(true);
-	// }
+	<ToastContainer
+		position="top-right"
+		autoClose={5000}
+		hideProgressBar={false}
+		newestOnTop={true}
+		closeOnClick={false}
+		rtl={false}
+		pauseOnFocusLoss={false}
+		draggable
+		pauseOnHover
+		theme="dark"
+		transition={Bounce}
+	/>;
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={true}
-				closeOnClick={false}
-				rtl={false}
-				pauseOnFocusLoss={false}
-				draggable
-				pauseOnHover
-				theme="dark"
-				transition={Bounce}
-			/>
 			<DialogTrigger asChild>
 				<Button className="text-white cursor-pointer" variant="primary">
 					Add Proponent <Plus />
@@ -200,7 +207,7 @@ const ProponentsAdd = ({ onSuccess }: Props) => {
 											<FieldLabel htmlFor={field.name}>Semester</FieldLabel>
 											<Select
 												name={field.name}
-												value={
+												defaultValue={
 													field.state.value ? String(field.state.value) : ''
 												}
 												onValueChange={(v) => field.handleChange(Number(v))}

@@ -52,7 +52,7 @@ class ProponentsController extends Controller
         'adviser' => $request->adviser,
         'program' => $request->program,
       ]);
-      if(isset($request->details)) {
+      if (isset($request->details)) {
         foreach ($request->details as $detail) {
           ProponentsDetails::create([
             'foreign_proponents_id' => $proponents->proponents_id,
@@ -84,7 +84,8 @@ class ProponentsController extends Controller
     }
   }
 
-  public function updateProponent($id, Request $request) {
+  public function updateProponent($id, Request $request)
+  {
     $rules = [
       'academic_yr' => 'required|string',
       'semester' => 'required|integer',
@@ -108,11 +109,11 @@ class ProponentsController extends Controller
     try {
       $proponents = Proponents::find($id);
       $proponents->update($request->only(['academic_yr', 'semester', 'title', 'program', 'adviser']));
-      foreach($request->details as $detail) {
-        if(isset($detail['propsdetails_id'])) {
+      foreach ($request->details as $detail) {
+        if (isset($detail['propsdetails_id'])) {
           $detailModel = ProponentsDetails::find($detail['propsdetails_id']);
           $detailModel->update(['name' => $detail['name']]);
-        }else{
+        } else {
           ProponentsDetails::create([
             'foreign_proponents_id' => $proponents->proponents_id,
             'name' => $detail["name"],
@@ -120,7 +121,7 @@ class ProponentsController extends Controller
         }
       }
 
-      if(!empty($request->deleted_ids)) {
+      if (!empty($request->deleted_ids)) {
         ProponentsDetails::whereIn('propsdetails_id', $request->deleted_ids)->delete();
       }
       DB::commit();
@@ -132,7 +133,7 @@ class ProponentsController extends Controller
           'details' => $request->details,
         ]
       ], 200);
-    }catch(\Exception $e) {
+    } catch (\Exception $e) {
       DB::rollBack();
       return response()->json([
         'error' => $e->getMessage(),
@@ -140,11 +141,12 @@ class ProponentsController extends Controller
     }
   }
 
-  public function deleteProponent($id) {
+  public function deleteProponent($id)
+  {
     DB::beginTransaction();
     try {
       $proponents = Proponents::find($id);
-      if(!$proponents) {
+      if (!$proponents) {
         return response()->json(['message' => "Not Found"], 404);
       }
       $proponents->delete();
@@ -154,8 +156,8 @@ class ProponentsController extends Controller
         'status' => 200,
         'message' => "Deleted Successfully",
         'Error' => $error,
-      ], 200);  
-    }catch(\Exception $e) {
+      ], 200);
+    } catch (\Exception $e) {
       DB::rollBack();
       return response()->json([
         'error' => $e->getMessage(),

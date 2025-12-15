@@ -41,6 +41,25 @@ import { formatDate } from '@/components/functions/functions';
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
 const ITEMS_PER_PAGE = 10;
+const SortButton = ({
+	field,
+	label,
+	onSort,
+}: {
+	field: SortField;
+	label: string;
+	onSort: (field: SortField) => void;
+}) => (
+	<Button
+		variant="ghost"
+		className="-ml-3 h-8 font-semibold text-muted-foreground"
+		size="sm"
+		onClick={() => onSort(field)}
+	>
+		{label}
+		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm font-semibold" />
+	</Button>
+);
 const ProponentsTable = () => {
 	const [proponents, setProponents] = useState<ProponentsProps[]>([]);
 	const [selectedProponent, setSelectedProponent] =
@@ -85,24 +104,6 @@ const ProponentsTable = () => {
 			setSortDirection('asc');
 		}
 	};
-
-	const SortButton = ({
-		field,
-		label,
-	}: {
-		field: SortField;
-		label: string;
-	}) => (
-		<Button
-			variant="ghost"
-			className="-ml-3 h-8 font-semibold text-muted-foreground"
-			size="sm"
-			onClick={() => handleSort(field)}
-		>
-			{label}
-			<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm font-semibold" />
-		</Button>
-	);
 
 	const filteredProponents = proponents.filter((props) => {
 		const searchLower = searchTerm.toLowerCase();
@@ -177,28 +178,60 @@ const ProponentsTable = () => {
 							<TableHeader>
 								<TableRow>
 									<TableHead className="text-left pl-5">
-										<SortButton field="proponents_id" label="Proponent ID" />
+										<SortButton
+											field="proponents_id"
+											label="Proponent ID"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead>
-										<SortButton field="title" label="Title" />
+										<SortButton
+											field="title"
+											label="Title"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead className="text-left">
-										<SortButton field="academic_yr" label="Academic Year" />
+										<SortButton
+											field="academic_yr"
+											label="Academic Year"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead className="text-left">
-										<SortButton field="semester" label="Semester" />
+										<SortButton
+											field="semester"
+											label="Semester"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead className="text-left">
-										<SortButton field="program" label="Program" />
+										<SortButton
+											field="program"
+											label="Program"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead className="text-left">
-										<SortButton field="adviser" label="Adviser" />
+										<SortButton
+											field="adviser"
+											label="Adviser"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead>
-										<SortButton field="created_at" label="Created At" />
+										<SortButton
+											field="created_at"
+											label="Created At"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead>
-										<SortButton field="updated_at" label="Updated At" />
+										<SortButton
+											field="updated_at"
+											label="Updated At"
+											onSort={handleSort}
+										/>
 									</TableHead>
 									<TableHead className="text-center text-muted-foreground">
 										Actions
@@ -318,7 +351,7 @@ const ProponentsTable = () => {
 						</Table>
 					</div>
 				</div>
-				{totalPage > 1 && (
+				{totalPage > 0 && (
 					<div className="flex justify-between items-center pt-3">
 						<p className="text-muted-foreground text-base font-semibold w-full">
 							Showing {startIndex + 1} to{' '}

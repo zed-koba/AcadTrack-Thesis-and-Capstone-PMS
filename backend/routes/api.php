@@ -10,8 +10,10 @@ use App\Http\Controllers\admin\ProponentsController;
 // })->middleware('auth:sanctum');
 
 Route::get('accounts', [StudentAccountController::class, 'getData']);
-Route::post('register', [StudentAccountController::class, 'storeAccount']);
+Route::post('accounts/add', [StudentAccountController::class, 'storeAccount']);
 Route::get('proponents', [ProponentsController::class, 'getProponents']);
 Route::post('proponents/add', [ProponentsController::class, 'storeProponent']);
 Route::put('proponents/edit/{id}', [ProponentsController::class, 'updateProponent']);
 Route::delete('proponents/delete/{id}', [ProponentsController::class, 'deleteProponent']);
+Route::put('accounts/edit/{id}', [StudentAccountController::class, 'updateAccount']);
+Route::delete('accounts/delete/{id}', [StudentAccountController::class, 'deleteAccount']);

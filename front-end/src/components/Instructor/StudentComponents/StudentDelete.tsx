@@ -13,25 +13,20 @@ import { Spinner } from '@/components/ui/spinner';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import type { StudentDeleteProps } from '../interface/student';
 
-type ProponentDeleteProps = {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	proponent_id: number | null;
-	onSuccess?: () => void;
-};
-const ProponentDelete = ({
+const StudentDelete = ({
 	open,
 	setOpen,
-	proponent_id,
+	student_id,
 	onSuccess,
-}: ProponentDeleteProps) => {
+}: StudentDeleteProps) => {
 	const [loading, setLoading] = useState(false);
 	const handleDelete = async () => {
-		if (!proponent_id) return;
+		if (!student_id) return;
 		setLoading(true);
 		try {
-			const res = await fetch(`${apiUrl}/proponents/delete/${proponent_id}`, {
+			const res = await fetch(`${apiUrl}/accounts/delete/${student_id}`, {
 				method: 'DELETE',
 				headers: {
 					'Content-type': 'application/json',
@@ -68,7 +63,7 @@ const ProponentDelete = ({
 						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 						<AlertDialogDescription>
 							This action cannot be undone. This will permanently delete the
-							proponents and remove your data from the servers.
+							student and remove your data from the servers.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -90,4 +85,4 @@ const ProponentDelete = ({
 	);
 };
 
-export default ProponentDelete;
+export default StudentDelete;
