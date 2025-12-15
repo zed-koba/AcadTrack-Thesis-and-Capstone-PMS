@@ -115,7 +115,6 @@ const StudentTable = () => {
 				? '2nd Semester'
 				: '';
 		return (
-			stud.id.toString().includes(searchLower) ||
 			stud.name.toLowerCase().includes(searchLower) ||
 			stud.student_id.toLowerCase().includes(searchLower) ||
 			stud.mobile_num.toLowerCase().includes(searchLower) ||
@@ -123,7 +122,6 @@ const StudentTable = () => {
 			stud.program.toLowerCase().includes(searchLower) ||
 			stud.section.toLowerCase().includes(searchLower) ||
 			semesterLabel.toLowerCase().includes(searchLower) ||
-			stud.facebook_profile.toLowerCase().includes(searchLower) ||
 			yearLevelLabel.toLowerCase().includes(searchLower) ||
 			stud.thesis_title.toLowerCase().includes(searchLower) ||
 			formatDate(stud.created_at).toLowerCase().includes(searchLower) ||
