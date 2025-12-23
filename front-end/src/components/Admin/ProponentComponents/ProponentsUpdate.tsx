@@ -9,7 +9,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check, Trash } from 'lucide-react';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'sonner';
 
 type SelectedProponentProps = {
 	open: boolean;
@@ -33,11 +33,11 @@ const ProponentUpdate = ({
 
 	const handleSave = () => {
 		if (!name.trim()) {
-			toast.error('Proponent name cannot be empty.', { theme: 'colored' });
+			toast.error('Proponent name cannot be empty.');
 			return;
 		}
 		if (name == 'Edit this proponent') {
-			toast.error('Enter valid proponent name', { theme: 'colored' });
+			toast.error('Enter valid proponent name');
 			return;
 		}
 		onUpdate({ ...proponent, name });
@@ -48,19 +48,6 @@ const ProponentUpdate = ({
 		onRemove(proponent.propsdetails_id);
 		setOpen(null);
 	};
-	<ToastContainer
-		position="top-right"
-		autoClose={5000}
-		hideProgressBar={false}
-		newestOnTop={true}
-		closeOnClick={false}
-		rtl={false}
-		pauseOnFocusLoss={false}
-		draggable
-		pauseOnHover
-		theme="dark"
-		transition={Bounce}
-	/>;
 	return (
 		<Dialog open={open} onOpenChange={() => setOpen(null)}>
 			<DialogContent className="text-white">

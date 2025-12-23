@@ -23,7 +23,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { apiUrl } from '@/components/Routes/http';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
 import { Spinner } from '@/components/ui/spinner';
 import {
 	Field,
@@ -32,6 +31,7 @@ import {
 	FieldLabel,
 } from '@/components/ui/field';
 import ProponentUpdate from './ProponentsUpdate';
+import { toast } from 'sonner';
 
 const proponentDetailsSchema = z.object({
 	name: z.string().optional(),
@@ -102,16 +102,14 @@ const ProponetsEdit = ({
 
 	const handleNewProponent = () => {
 		if (proponentsDetails.length >= 4) {
-			toast.error('Maximum of 4 Proponents allowed.', { theme: 'colored' });
+			toast.error('Maximum of 4 Proponents allowed.');
 			return;
 		}
 		const hasUnedited = proponentsDetails.some(
 			(p) => p.name == 'Edit this proponent' && !p.propsdetails_id
 		);
 		if (hasUnedited) {
-			toast.error('Please fill in the new proponent before adding another.', {
-				theme: 'colored',
-			});
+			toast.error('Please fill in the new proponent before adding another.');
 			setEditFirst(true);
 			return;
 		}
@@ -160,9 +158,7 @@ const ProponetsEdit = ({
 				if (result.status === 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) =>
-							toast.error(message, { theme: 'colored' })
-						)
+						errorMessages.forEach((message) => toast.error(message))
 					);
 					return;
 				}
@@ -181,19 +177,6 @@ const ProponetsEdit = ({
 			}
 		},
 	});
-	<ToastContainer
-		position="top-right"
-		autoClose={5000}
-		hideProgressBar={false}
-		newestOnTop={true}
-		closeOnClick={false}
-		rtl={false}
-		pauseOnFocusLoss={false}
-		draggable
-		pauseOnHover
-		theme="dark"
-		transition={Bounce}
-	/>;
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>

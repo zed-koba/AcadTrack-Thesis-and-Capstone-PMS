@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
 import { Glasses, LayoutDashboard, LibraryBig, UserRound } from 'lucide-react';
+import { Toaster } from 'sonner';
 
 const AdminLayout = () => {
 	const navItem: NavItem[] = [
@@ -15,6 +16,7 @@ const AdminLayout = () => {
 			<Sidebar navItem={navItem} />
 			<main className="px-4 py-5 bg-background grow relative">
 				<Outlet />
+				<Toaster position="top-center" />
 			</main>
 		</div>
 	);

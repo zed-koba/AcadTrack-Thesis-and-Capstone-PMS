@@ -12,7 +12,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import type { StudentDeleteProps } from '../interface/student';
 
 const StudentDelete = ({
@@ -37,14 +37,12 @@ const StudentDelete = ({
 			if (result.status === 422) {
 				const errors = result.errors as Record<string, string[]>;
 				Object.values(errors).forEach((errorMessages) =>
-					errorMessages.forEach((message) =>
-						toast.error(message, { theme: 'colored' })
-					)
+					errorMessages.forEach((message) => toast.error(message))
 				);
 				return;
 			}
 			if (!res.ok) {
-				toast.error('Failed to delete the student', { theme: 'colored' });
+				toast.error('Failed to delete the student');
 				return;
 			}
 			toast.success('Sucessfully deleted the student');

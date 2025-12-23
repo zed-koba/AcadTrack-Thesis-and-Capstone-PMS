@@ -36,6 +36,7 @@ import {
 	PaginationPrevious,
 } from '@/components/ui/pagination';
 import { formatDate } from '@/components/functions/functions';
+import { toast } from 'sonner';
 
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
@@ -139,7 +140,7 @@ const ProponentsTable = () => {
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
-	//console.log(filteredProponents);
+
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">

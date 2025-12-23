@@ -19,7 +19,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { apiUrl } from '@/components/Routes/http';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import {
 	Field,
@@ -101,9 +101,7 @@ const StudentEdit = ({
 				if (result.status === 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) =>
-							toast.error(message, { theme: 'colored' })
-						)
+						errorMessages.forEach((message) => toast.error(message))
 					);
 					setLoading(false);
 					return;
@@ -114,7 +112,7 @@ const StudentEdit = ({
 					return JSON.stringify({ value });
 				}
 				form.reset();
-				toast.success('Successfully updated proponent', { theme: 'colored' });
+				toast.success('Successfully updated proponent');
 				console.log('CALLED');
 				setOpen(false);
 				onSuccess?.();
@@ -124,19 +122,6 @@ const StudentEdit = ({
 			}
 		},
 	});
-	<ToastContainer
-		position="top-right"
-		autoClose={5000}
-		hideProgressBar={false}
-		newestOnTop={true}
-		closeOnClick={false}
-		rtl={false}
-		pauseOnFocusLoss={false}
-		draggable
-		pauseOnHover
-		theme="dark"
-		transition={Bounce}
-	/>;
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>

@@ -20,7 +20,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { apiUrl } from '@/components/Routes/http';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import {
 	Field,
@@ -89,9 +89,7 @@ const ProponentsAdd = ({ onSuccess }: Props) => {
 				if (result.status === 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) =>
-							toast.error(message, { theme: 'colored' })
-						)
+						errorMessages.forEach((message) => toast.error(message))
 					);
 					return;
 				}
@@ -110,19 +108,6 @@ const ProponentsAdd = ({ onSuccess }: Props) => {
 			}
 		},
 	});
-	<ToastContainer
-		position="top-right"
-		autoClose={5000}
-		hideProgressBar={false}
-		newestOnTop={true}
-		closeOnClick={false}
-		rtl={false}
-		pauseOnFocusLoss={false}
-		draggable
-		pauseOnHover
-		theme="dark"
-		transition={Bounce}
-	/>;
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
