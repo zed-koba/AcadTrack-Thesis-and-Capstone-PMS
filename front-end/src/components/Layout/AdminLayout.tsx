@@ -1,7 +1,13 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
-import { Glasses, LayoutDashboard, LibraryBig, UserRound } from 'lucide-react';
+import {
+	Building2,
+	Glasses,
+	LayoutDashboard,
+	LibraryBig,
+	UserRound,
+} from 'lucide-react';
 import { Toaster } from 'sonner';
 
 const AdminLayout = () => {
@@ -10,6 +16,7 @@ const AdminLayout = () => {
 		{ label: 'Proponents', to: '/Admin/Proponents', icon: <LibraryBig /> },
 		{ label: 'Students', to: '/Admin/Students', icon: <UserRound /> },
 		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
+		{ label: 'Departments', to: '/Admin/Departments', icon: <Building2 /> },
 	];
 	return (
 		<div className="flex content-start relative">

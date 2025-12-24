@@ -10,6 +10,7 @@ import AdminLayout from '../Layout/AdminLayout';
 import AdviserLayout from '../Layout/AdviserLayout';
 import AdviserConsultation from '../Adviser/pages/AdviserConsultation';
 import Adviser from '../Admin/pages/Adviser';
+import Departments from '../Admin/pages/Departments';
 
 export const router = createBrowserRouter([
 	{
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
 			{ path: 'Proponents', element: <AdminProponents /> },
 			{ path: 'Students', element: <AdminStudents /> },
 			{ path: 'Adviser', element: <Adviser /> },
+			{ path: 'Departments', element: <Departments /> },
 		],
 	},
 	{
