@@ -1,14 +1,27 @@
 import { Building2, CircleCheckBig, CircleX } from 'lucide-react';
-
-const DepartmentsDashboard = () => {
+import type { DepartmentProps } from '../interface/department';
+type DepartmentsDashboardProps = {
+	departments?: DepartmentProps[];
+};
+const DepartmentsDashboard = ({
+	departments = [],
+}: DepartmentsDashboardProps) => {
+	const activeCount = departments.filter((d) => d.status === 'active').length;
+	const inactiveCount = departments.filter(
+		(d) => d.status === 'inactive'
+	).length;
 	const dashboards = [
 		{
 			label: 'Total Departments',
-			value: 15,
+			value: departments.length,
 			icon: <Building2 size={16} />,
 		},
-		{ label: 'Active ', value: 2, icon: <CircleCheckBig size={16} /> },
-		{ label: 'Inactive ', value: 1, icon: <CircleX size={16} /> },
+		{
+			label: 'Active ',
+			value: activeCount,
+			icon: <CircleCheckBig size={16} />,
+		},
+		{ label: 'Inactive ', value: inactiveCount, icon: <CircleX size={16} /> },
 	];
 	return (
 		<>

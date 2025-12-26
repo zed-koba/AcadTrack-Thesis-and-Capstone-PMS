@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	Dialog,
 	DialogContent,
@@ -122,6 +122,22 @@ const StudentEdit = ({
 			}
 		},
 	});
+	useEffect(() => {
+		if (student) {
+			form.reset({
+				student_id: student.student_id,
+				program: student.program,
+				section: student.section,
+				name: student.name,
+				role: student.role,
+				mobile_num: student.mobile_num,
+				semester: student.semester,
+				thesis_title: student.thesis_title,
+				year_Level: student.year_level,
+				facebook_profile: student.facebook_profile,
+			});
+		}
+	}, [form, student]);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>

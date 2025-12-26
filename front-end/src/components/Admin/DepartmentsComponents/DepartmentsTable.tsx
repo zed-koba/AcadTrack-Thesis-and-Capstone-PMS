@@ -12,12 +12,19 @@ import {
 	TableBody,
 	TableRow,
 } from '@/components/ui/table';
-import { ArrowUpDown, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+	ArrowUpDown,
+	MoreHorizontal,
+	PencilRuler,
+	PowerOff,
+	ReceiptText,
+	Search,
+	Trash,
+} from 'lucide-react';
+import { useState } from 'react';
 import type { DepartmentProps } from '../interface/department';
 import DepartmentAdd from './DepartmentAdd';
 import { formatDate } from '@/components/functions/functions';
-import { apiUrl } from '@/components/Routes/http';
 import { Badge } from '@/components/ui/badge';
 import {
 	Pagination,
@@ -27,7 +34,17 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from '@/components/ui/pagination';
-
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+type DepartmentTableProps = {
+	departments: DepartmentProps[];
+	loading: boolean;
+	refresh: () => void;
+};
 type SortField = keyof DepartmentProps;
 type SortDirection = 'asc' | 'desc';
 const SortButton = ({
@@ -51,12 +68,14 @@ const SortButton = ({
 );
 
 const ITEMS_PER_PAGE = 10;
-const DepartmentsTable = () => {
+const DepartmentsTable = ({
+	departments,
+	loading,
+	refresh,
+}: DepartmentTableProps) => {
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [sortField, setSortField] = useState<SortField>('created_at');
 	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
-	const [loading, setLoading] = useState(true);
-	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
 
 	const handleSort = (field: SortField) => {
@@ -67,31 +86,6 @@ const DepartmentsTable = () => {
 			setSortDrection('asc');
 		}
 	};
-
-	const fetchDepartments = async () => {
-		try {
-			const res = await fetch(`${apiUrl}/departments`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-			});
-			if (!res.ok) throw new Error('Failed to fetch data');
-			const result = await res.json();
-			if (result.status === 200) {
-				setDepartments(result.data);
-			}
-			// Handle the fetched data as needed
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	};
-	useEffect(() => {
-		fetchDepartments();
-	}, []);
 
 	const filteredDepartments = departments.filter((department) => {
 		const searchLower = searchTerm.toLowerCase();
@@ -149,7 +143,7 @@ const DepartmentsTable = () => {
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<DepartmentAdd onSuccess={fetchDepartments} />
+						<DepartmentAdd onSuccess={refresh} />
 					</div>
 				</div>
 				<div className="rounded-lg border bg-card mt-3 shadow-sm">
@@ -259,10 +253,32 @@ const DepartmentsTable = () => {
 											<TableCell className="text-left">
 												{formatDate(department.updated_at)}
 											</TableCell>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button variant="ghost" className="text-white">
+															<MoreHorizontal className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuItem>
+															<PencilRuler className="h-4 w-4 mr-2" /> Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem>
+															<ReceiptText className="h-4 w-4 mr-2" /> Details
+														</DropdownMenuItem>
+														<DropdownMenuItem>
+															<PowerOff className="h-4 w-4 mr-2" /> Deactivate
+														</DropdownMenuItem>
+														<DropdownMenuItem>
+															<Trash className="h-4 w-4 mr-2" /> Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
 										</TableRow>
 									))
 								)}
-								;
 							</TableBody>
 						</Table>
 					</div>

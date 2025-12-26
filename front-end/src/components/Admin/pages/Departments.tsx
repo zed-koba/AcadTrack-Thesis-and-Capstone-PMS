@@ -1,7 +1,36 @@
+import { apiUrl } from '@/components/Routes/http';
 import DepartmentsDashboard from '../DepartmentsComponents/DepartmentsDashboard';
 import DepartmentsTable from '../DepartmentsComponents/DepartmentsTable';
+import { useEffect, useState } from 'react';
 
 const Departments = () => {
+	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	const fetchDepartments = async () => {
+		try {
+			const res = await fetch(`${apiUrl}/departments`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+			});
+			if (!res.ok) throw new Error('Failed to fetch data');
+			const result = await res.json();
+			if (result.status === 200) {
+				setDepartments(result.data);
+			}
+			// Handle the fetched data as needed
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+	useEffect(() => {
+		fetchDepartments();
+	}, []);
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
@@ -12,8 +41,12 @@ const Departments = () => {
 					</span>
 				</div>
 			</div>
-			<DepartmentsDashboard />
-			<DepartmentsTable />
+			<DepartmentsDashboard departments={departments} />
+			<DepartmentsTable
+				departments={departments}
+				loading={loading}
+				refresh={fetchDepartments}
+			/>
 		</>
 	);
 };

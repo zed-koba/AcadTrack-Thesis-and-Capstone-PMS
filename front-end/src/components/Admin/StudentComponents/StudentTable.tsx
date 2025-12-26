@@ -20,6 +20,8 @@ import {
 	ReceiptText,
 	Trash,
 	ArrowUpDown,
+	MoreHorizontal,
+	PowerOff,
 } from 'lucide-react';
 
 import {
@@ -37,6 +39,12 @@ import StudentAdd from './StudentAdd';
 import StudentEdit from './StudentEdit';
 import StudentDetails from './StudentDetails';
 import StudentDelete from './StudentDelete';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type SortField = keyof StudentProps;
 type SortDirection = 'asc' | 'desc';
@@ -307,44 +315,47 @@ const StudentTable = () => {
 												{student.year_level === 3 ? '3rd Year' : '4th Year'}
 											</TableCell>
 											<TableCell>{formatDate(student.created_at)}</TableCell>
-											<TableCell className="text-right flex gap-2 justify-end items-center">
-												<Button
-													className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"
-													aria-label="Edit"
-													title="Edit"
-													onClick={() => {
-														setSelectedStudent(student);
-														setOpen(true);
-														setClickedButton('edit');
-													}}
-												>
-													<PencilRuler size={16} />
-												</Button>
-												<Button
-													className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
-													aria-label="Details"
-													title="Details"
-													onClick={() => {
-														setSelectedStudent(student);
-														setOpen(true);
-														setClickedButton('details');
-													}}
-												>
-													<ReceiptText size={16} />
-												</Button>
-												<Button
-													className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
-													aria-label="Delete"
-													title="Delete"
-													onClick={() => {
-														setSelectedStudent(student);
-														setStudentId(student.id);
-														setOpen(true);
-														setClickedButton('delete');
-													}}
-												>
-													<Trash size={24} />
-												</Button>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button variant="ghost" className="text-white">
+															<MoreHorizontal className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuItem
+															onClick={() => {
+																setSelectedStudent(student);
+																setOpen(true);
+																setClickedButton('edit');
+															}}
+														>
+															<PencilRuler className="h-4 w-4 mr-2" /> Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => {
+																setSelectedStudent(student);
+																setOpen(true);
+																setClickedButton('details');
+															}}
+														>
+															<ReceiptText className="h-4 w-4 mr-2" /> Details
+														</DropdownMenuItem>
+														<DropdownMenuItem>
+															<PowerOff className="h-4 w-4 mr-2" /> Deactivate
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => {
+																setSelectedStudent(student);
+																setStudentId(student.id);
+																setOpen(true);
+																setClickedButton('delete');
+															}}
+														>
+															<Trash className="h-4 w-4 mr-2" /> Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
 											</TableCell>
 										</TableRow>
 									))

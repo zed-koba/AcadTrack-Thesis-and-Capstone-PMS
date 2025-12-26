@@ -22,6 +22,8 @@ import {
 	ReceiptText,
 	Trash,
 	ArrowUpDown,
+	MoreHorizontal,
+	PowerOff,
 } from 'lucide-react';
 import ProponentsAdd from './ProponentsAdd';
 import ProponetsEdit from './ProponentsEdit';
@@ -36,7 +38,12 @@ import {
 	PaginationPrevious,
 } from '@/components/ui/pagination';
 import { formatDate } from '@/components/functions/functions';
-import { toast } from 'sonner';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
@@ -283,44 +290,47 @@ const ProponentsTable = () => {
 											</TableCell>
 											<TableCell>{formatDate(proponent.created_at)}</TableCell>
 											<TableCell>{formatDate(proponent.updated_at)}</TableCell>
-											<TableCell className="text-right flex gap-2 justify-end items-center">
-												<Button
-													className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"
-													aria-label="Edit"
-													title="Edit"
-													onClick={() => {
-														setSelectedProponent(proponent);
-														setOpen(true);
-														setClickedButton('edit');
-													}}
-												>
-													<PencilRuler size={16} />
-												</Button>
-												<Button
-													className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
-													aria-label="Details"
-													title="Details"
-													onClick={() => {
-														setSelectedProponent(proponent);
-														setOpen(true);
-														setClickedButton('details');
-													}}
-												>
-													<ReceiptText size={16} />
-												</Button>
-												<Button
-													className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
-													aria-label="Delete"
-													title="Delete"
-													onClick={() => {
-														setSelectedProponent(proponent);
-														setProponetId(proponent.id);
-														setOpen(true);
-														setClickedButton('delete');
-													}}
-												>
-													<Trash size={24} />
-												</Button>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button variant="ghost" className="text-white">
+															<MoreHorizontal className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuItem
+															onClick={() => {
+																setSelectedProponent(proponent);
+																setOpen(true);
+																setClickedButton('edit');
+															}}
+														>
+															<PencilRuler className="h-4 w-4 mr-2" /> Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => {
+																setSelectedProponent(proponent);
+																setOpen(true);
+																setClickedButton('details');
+															}}
+														>
+															<ReceiptText className="h-4 w-4 mr-2" /> Details
+														</DropdownMenuItem>
+														<DropdownMenuItem>
+															<PowerOff className="h-4 w-4 mr-2" /> Deactivate
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => {
+																setSelectedProponent(proponent);
+																setProponetId(proponent.id);
+																setOpen(true);
+																setClickedButton('delete');
+															}}
+														>
+															<Trash className="h-4 w-4 mr-2" /> Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
 											</TableCell>
 										</TableRow>
 									))
