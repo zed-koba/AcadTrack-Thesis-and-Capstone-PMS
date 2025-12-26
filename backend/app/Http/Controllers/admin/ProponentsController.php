@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
-use App\Models\Proponents;
-use App\Models\ProponentsDetails;
+use App\Models\admin\Proponents;
+use App\Models\admin\ProponentsDetails;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;

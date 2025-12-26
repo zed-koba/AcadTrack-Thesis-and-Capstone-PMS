@@ -1,4 +1,5 @@
 import DepartmentsDashboard from '../DepartmentsComponents/DepartmentsDashboard';
+import DepartmentsTable from '../DepartmentsComponents/DepartmentsTable';
 
 const Departments = () => {
 	return (
@@ -12,6 +13,7 @@ const Departments = () => {
 				</div>
 			</div>
 			<DepartmentsDashboard />
+			<DepartmentsTable />
 		</>
 	);
 };

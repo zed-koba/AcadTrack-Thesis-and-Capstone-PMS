@@ -103,10 +103,15 @@ const StudentAdd = ({ onSuccess }: Props) => {
 						errorMessages.forEach((message) => toast.error(message))
 					);
 					return;
+				} else if (result.status == 500) {
+					toast.error(result.message);
+					console.log(result.error);
+					return;
 				}
 				if (!res.ok) {
+					console.log(result.status);
 					console.log('Failed to fetch data ' + JSON.stringify(payLoad));
-					return JSON.stringify(payLoad);
+					return;
 				}
 				form.reset();
 				toast.success('Sucessfully added proponent');

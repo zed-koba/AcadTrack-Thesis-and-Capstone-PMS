@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\admin\AccountsController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
+use App\Http\Controllers\admin\DepartmentsController;;
 use App\Http\Controllers\StudentsController;
 
 // Route::get('/user', function (Request $request) {
@@ -28,3 +28,8 @@ Route::get('students', [StudentsController::class, 'getData']);
 Route::post('students/add', [StudentsController::class, 'storeStudent']);
 Route::put('students/edit/{id}', [StudentsController::class, 'updateStudent']);
 Route::delete('students/delete/{id}', [StudentsController::class, 'deleteStudent']);
+
+
+//Departments Routes
+Route::get('departments', [DepartmentsController::class, 'getDepartments']);
+Route::post('departments/add', [DepartmentsController::class, 'storeDepartment']);

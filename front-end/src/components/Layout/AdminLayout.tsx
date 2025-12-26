@@ -15,8 +15,8 @@ const AdminLayout = () => {
 		{ label: 'Dashboard', to: '/Admin', icon: <LayoutDashboard /> },
 		{ label: 'Proponents', to: '/Admin/Proponents', icon: <LibraryBig /> },
 		{ label: 'Students', to: '/Admin/Students', icon: <UserRound /> },
-		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
 		{ label: 'Departments', to: '/Admin/Departments', icon: <Building2 /> },
+		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
 	];
 	return (
 		<div className="flex content-start relative">

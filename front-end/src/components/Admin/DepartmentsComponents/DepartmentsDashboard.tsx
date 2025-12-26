@@ -5,10 +5,10 @@ const DepartmentsDashboard = () => {
 		{
 			label: 'Total Departments',
 			value: 15,
-			icon: <Building2 />,
+			icon: <Building2 size={16} />,
 		},
-		{ label: 'Active ', value: 2, icon: <CircleCheckBig /> },
-		{ label: 'Inactive ', value: 1, icon: <CircleX /> },
+		{ label: 'Active ', value: 2, icon: <CircleCheckBig size={16} /> },
+		{ label: 'Inactive ', value: 1, icon: <CircleX size={16} /> },
 	];
 	return (
 		<>
@@ -20,7 +20,7 @@ const DepartmentsDashboard = () => {
 								<span className="font-medium text-sm text-white">
 									{dashboard.label}
 								</span>
-								<span className="font-medium text-md text-muted-foreground">
+								<span className="font-medium text-muted-foreground">
 									{dashboard.icon}
 								</span>
 							</div>

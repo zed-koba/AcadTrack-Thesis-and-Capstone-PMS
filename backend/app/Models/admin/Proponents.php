@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\admin;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\ProponentsDetails;
+use App\Models\admin\ProponentsDetails;
 
 class Proponents extends Model
 {
