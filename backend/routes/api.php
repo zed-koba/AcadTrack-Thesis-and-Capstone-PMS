@@ -3,7 +3,10 @@
 use App\Http\Controllers\admin\AccountsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
-use App\Http\Controllers\admin\DepartmentsController;;
+use App\Http\Controllers\admin\DepartmentsController;
+use App\Http\Controllers\admin\RoleController;
+
+;
 use App\Http\Controllers\StudentsController;
 
 // Route::get('/user', function (Request $request) {
@@ -33,3 +36,8 @@ Route::delete('students/delete/{id}', [StudentsController::class, 'deleteStudent
 //Departments Routes
 Route::get('departments', [DepartmentsController::class, 'getDepartments']);
 Route::post('departments/add', [DepartmentsController::class, 'storeDepartment']);
+Route::post('departments/edit/{id}', [DepartmentsController::class,'updateDepartment']);
+
+
+//Roles Routes
+Route::get('roles', [RoleController::class, 'getRoles']);

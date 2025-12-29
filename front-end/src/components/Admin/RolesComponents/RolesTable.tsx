@@ -21,11 +21,6 @@ import {
 	Trash,
 } from 'lucide-react';
 import { useState } from 'react';
-import type {
-	DepartmentProps,
-	DepartmentTableProps,
-} from '../interface/department';
-import DepartmentAdd from './DepartmentAdd';
 import { formatDate } from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -42,11 +37,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import DepartmentEdit from './DepartmentEdit';
-import DepartmentDelete from './DepartmentDelete';
-import DepartmentDetails from './DepartmentDetails';
+import type { RolesProps, RolesTableProps } from '../interface/roles';
 
-type SortField = keyof DepartmentProps;
+type SortField = keyof RolesProps;
 type SortDirection = 'asc' | 'desc';
 const SortButton = ({
 	field,
@@ -69,17 +62,12 @@ const SortButton = ({
 );
 
 const ITEMS_PER_PAGE = 10;
-const DepartmentsTable = ({
-	departments,
-	loading,
-	refresh,
-}: DepartmentTableProps) => {
+const RolesTable = ({ roles, loading, refresh }: RolesTableProps) => {
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [sortField, setSortField] = useState<SortField>('created_at');
 	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
 	const [currentPage, setCurrentPage] = useState(1);
-	const [selectedDepartment, setSelectedDepartment] =
-		useState<DepartmentProps | null>(null);
+	const [selectedRole, setSelectedRole] = useState<RolesProps | null>(null);
 	const [open, setOpen] = useState(false);
 	const [clickedButton, setClickedButton] = useState<string>('');
 	const handleSort = (field: SortField) => {
@@ -91,18 +79,16 @@ const DepartmentsTable = ({
 		}
 	};
 
-	const filteredDepartments = departments.filter((department) => {
+	const filteredRoles = roles.filter((role) => {
 		const searchLower = searchTerm.toLowerCase();
 		return (
-			department.name.toLowerCase().includes(searchLower) ||
-			department.code.toLowerCase().includes(searchLower) ||
-			department.status.toLowerCase().includes(searchLower) ||
-			formatDate(department.created_at).toLowerCase().includes(searchLower) ||
-			formatDate(department.updated_at).toLowerCase().includes(searchLower)
+			role.name.toLowerCase().includes(searchLower) ||
+			formatDate(role.created_at).toLowerCase().includes(searchLower) ||
+			formatDate(role.updated_at).toLowerCase().includes(searchLower)
 		);
 	});
 
-	const sortedDepartments = [...filteredDepartments].sort((a, b) => {
+	const sortedRoles = [...filteredRoles].sort((a, b) => {
 		const aValue = a[sortField];
 		const bValue = b[sortField];
 
@@ -111,9 +97,9 @@ const DepartmentsTable = ({
 		return sortDirection === 'asc' ? comparison : -comparison;
 	});
 
-	const totalPage = Math.ceil(sortedDepartments.length / ITEMS_PER_PAGE);
+	const totalPage = Math.ceil(sortedRoles.length / ITEMS_PER_PAGE);
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-	const paginationProps = sortedDepartments.slice(
+	const paginationProps = sortedRoles.slice(
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
@@ -142,12 +128,12 @@ const DepartmentsTable = ({
 								<Search />
 							</InputGroupAddon>
 							<InputGroupAddon align="inline-end">
-								{searchTerm.length > 1 ? filteredDepartments.length : 0} results
+								{searchTerm.length > 1 ? filteredRoles.length : 0} results
 							</InputGroupAddon>
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<DepartmentAdd onSuccess={refresh} />
+						{/* <DepartmentAdd onSuccess={refresh} /> */}
 					</div>
 				</div>
 				<div className="rounded-lg border bg-card mt-3 shadow-sm">
@@ -157,13 +143,10 @@ const DepartmentsTable = ({
 								<TableRow>
 									<TableHead className="text-left pl-4">
 										<SortButton
-											label="Department Name"
+											label="Role Name"
 											field="name"
 											onSort={handleSort}
 										/>
-									</TableHead>
-									<TableHead className="text-left">
-										<SortButton label="Code" field="code" onSort={handleSort} />
 									</TableHead>
 									<TableHead className="text-left">
 										<SortButton
@@ -174,8 +157,15 @@ const DepartmentsTable = ({
 									</TableHead>
 									<TableHead className="text-left">
 										<SortButton
-											label="Dependencies"
-											field="dependencies"
+											label="Scope"
+											field="globalRole"
+											onSort={handleSort}
+										/>
+									</TableHead>
+									<TableHead className="text-left">
+										<SortButton
+											label="Assigned"
+											field="assigned"
 											onSort={handleSort}
 										/>
 									</TableHead>
@@ -225,37 +215,32 @@ const DepartmentsTable = ({
 										</TableCell>
 									</TableRow>
 								) : (
-									paginationProps.map((department) => (
-										<TableRow
-											key={department.id}
-											className="text-muted-foreground"
-										>
+									paginationProps.map((role) => (
+										<TableRow key={role.id} className="text-muted-foreground">
 											<TableCell className="text-left pl-3 text-white font-medium">
-												{department.name}
-											</TableCell>
-											<TableCell className="text-left">
-												<Badge variant="outline">{department.code}</Badge>
+												{role.name}
 											</TableCell>
 											<TableCell className="text-left max-w-[200px] truncate">
-												{department.description === null
+												{role.description === null
 													? '-'
-													: department.description.trim() === ''
+													: role.description.trim() === ''
 													? '-'
-													: department.description}
+													: role.description}
 											</TableCell>
 											<TableCell className="text-left">
-												{department.programs_count} programs,{' '}
-												{department.advisers_count} advisers,{' '}
-												{department.roles_count} roles
+												<Badge variant="outline">{role.globalRole}</Badge>
 											</TableCell>
 											<TableCell className="text-left">
-												{getStatusBadge(department.status)}
+												{role.assigned}
 											</TableCell>
 											<TableCell className="text-left">
-												{formatDate(department.created_at)}
+												{getStatusBadge(role.status)}
 											</TableCell>
 											<TableCell className="text-left">
-												{formatDate(department.updated_at)}
+												{formatDate(role.created_at)}
+											</TableCell>
+											<TableCell className="text-left">
+												{formatDate(role.updated_at)}
 											</TableCell>
 											<TableCell>
 												<DropdownMenu>
@@ -268,7 +253,7 @@ const DepartmentsTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setOpen(true);
-																setSelectedDepartment(department);
+																setSelectedRole(role);
 																setClickedButton('edit');
 															}}
 														>
@@ -277,7 +262,7 @@ const DepartmentsTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setOpen(true);
-																setSelectedDepartment(department);
+																setSelectedRole(role);
 																setClickedButton('details');
 															}}
 														>
@@ -287,7 +272,7 @@ const DepartmentsTable = ({
 															className="text-red-500"
 															onClick={() => {
 																setOpen(true);
-																setSelectedDepartment(department);
+																setSelectedRole(role);
 																setClickedButton('delete');
 															}}
 														>
@@ -300,7 +285,7 @@ const DepartmentsTable = ({
 										</TableRow>
 									))
 								)}
-								{selectedDepartment &&
+								{/* {selectedDepartment &&
 									(clickedButton === 'edit' ? (
 										<DepartmentEdit
 											department={selectedDepartment}
@@ -323,7 +308,7 @@ const DepartmentsTable = ({
 										/>
 									) : (
 										''
-									))}
+									))} */}
 							</TableBody>
 						</Table>
 					</div>
@@ -332,8 +317,8 @@ const DepartmentsTable = ({
 					<div className="flex justify-between items-center pt-3">
 						<p className="text-muted-foreground text-base font-semibold w-full">
 							Showing {startIndex + 1} to{' '}
-							{Math.min(startIndex + ITEMS_PER_PAGE, sortedDepartments.length)}{' '}
-							of {sortedDepartments.length} departments
+							{Math.min(startIndex + ITEMS_PER_PAGE, sortedRoles.length)} of{' '}
+							{sortedRoles.length} departments
 						</p>
 						<Pagination className="justify-end">
 							<PaginationContent>
@@ -377,4 +362,4 @@ const DepartmentsTable = ({
 	);
 };
 
-export default DepartmentsTable;
+export default RolesTable;

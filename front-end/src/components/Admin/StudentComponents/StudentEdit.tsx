@@ -44,7 +44,7 @@ const studentSchema = z.object({
 	semester: z.number().min(1, 'Must select a semester').max(2),
 	thesis_title: z.string().min(1, 'Thesis Title is required'),
 	year_Level: z.number().min(1, 'Must select a year level').max(4),
-	facebook_profile: z.string().optional(),
+	facebook_profile: z.string().optional().nullable(),
 });
 const StudentEdit = ({
 	open,
@@ -64,7 +64,7 @@ const StudentEdit = ({
 		semester: student.semester,
 		thesis_title: student.thesis_title,
 		year_Level: student.year_level,
-		facebook_profile: student.facebook_profile,
+		facebook_profile: student.facebook_profile ?? '',
 	};
 
 	const form = useForm({
@@ -105,6 +105,10 @@ const StudentEdit = ({
 					);
 					setLoading(false);
 					return;
+				} else if (result.status == 500) {
+					toast.error(result.message);
+					console.log(result.error);
+					return;
 				}
 				if (!res.ok) {
 					console.log('Failed to fetch data' + JSON.stringify({ value }));
@@ -112,8 +116,11 @@ const StudentEdit = ({
 					return JSON.stringify({ value });
 				}
 				form.reset();
-				toast.success('Successfully updated proponent');
-				console.log('CALLED');
+				if (result.status == 200) {
+					toast.success(result.message);
+					setOpen(false);
+					onSuccess?.();
+				}
 				setOpen(false);
 				onSuccess?.();
 				setLoading(false);

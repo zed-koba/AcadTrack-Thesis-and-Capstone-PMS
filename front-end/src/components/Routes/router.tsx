@@ -11,6 +11,7 @@ import AdviserLayout from '../Layout/AdviserLayout';
 import AdviserConsultation from '../Adviser/pages/AdviserConsultation';
 import Adviser from '../Admin/pages/Adviser';
 import Departments from '../Admin/pages/Departments';
+import Roles from '../Admin/pages/Roles';
 
 export const router = createBrowserRouter([
 	{
@@ -30,6 +31,7 @@ export const router = createBrowserRouter([
 			{ path: 'Students', element: <AdminStudents /> },
 			{ path: 'Adviser', element: <Adviser /> },
 			{ path: 'Departments', element: <Departments /> },
+			{ path: 'Roles', element: <Roles /> },
 		],
 	},
 	{

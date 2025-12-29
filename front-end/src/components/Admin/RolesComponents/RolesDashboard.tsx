@@ -1,18 +1,15 @@
-import { Building2, CircleCheckBig, CircleX } from 'lucide-react';
-import type { DepartmentsDashboardProps } from '../interface/department';
+import { CircleCheckBig, CircleX, Globe2, UserCog } from 'lucide-react';
+import type { RolesDashboardProps } from '../interface/roles';
 
-const DepartmentsDashboard = ({
-	departments = [],
-}: DepartmentsDashboardProps) => {
-	const activeCount = departments.filter((d) => d.status === 'active').length;
-	const inactiveCount = departments.filter(
-		(d) => d.status === 'inactive'
-	).length;
+const RolesDashboard = ({ roles = [] }: RolesDashboardProps) => {
+	const activeCount = roles.filter((r) => r.status === 'active').length;
+	const inactiveCount = roles.filter((r) => r.status === 'inactive').length;
+	const globalRoles = roles.filter((r) => r.globalRole === true).length;
 	const dashboards = [
 		{
 			label: 'Total Departments',
-			value: departments.length,
-			icon: <Building2 size={16} />,
+			value: roles.length,
+			icon: <UserCog size={16} />,
 		},
 		{
 			label: 'Active ',
@@ -20,11 +17,12 @@ const DepartmentsDashboard = ({
 			icon: <CircleCheckBig size={16} />,
 		},
 		{ label: 'Inactive ', value: inactiveCount, icon: <CircleX size={16} /> },
+		{ label: 'Global Roles', value: globalRoles, icon: <Globe2 size={16} /> },
 	];
 	return (
 		<>
 			<div className="grid grid-row-2 gap-4 mt-5">
-				<div className="grid md:grid-cols-3 gap-2">
+				<div className="grid md:grid-cols-4 gap-2">
 					{dashboards.map((dashboard) => (
 						<div className="border rounded-lg p-6 flex flex-col justify-start items-start bg-card text-white shadow-sm gap-5">
 							<div className="flex justify-between w-full space-y-0">
@@ -46,4 +44,4 @@ const DepartmentsDashboard = ({
 	);
 };
 
-export default DepartmentsDashboard;
+export default RolesDashboard;

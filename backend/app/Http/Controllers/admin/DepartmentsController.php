@@ -5,8 +5,6 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Departments;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\StoreDepartmentsRequest;
-use App\Http\Requests\UpdateDepartmentsRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -36,7 +34,7 @@ class DepartmentsController extends Controller
             'description' => 'nullable|string',
             'status' => 'in:active,inactive|required',
         ];
-        $validator = Validator::make(request()->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json([
                 'status'=> 422,
@@ -71,22 +69,43 @@ class DepartmentsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Departments $departments)
+    public function updateDepartment(Request $request, $id)
     {
-        //
+        $rules = [
+            'name' => 'required|string|unique:departments,name,' . $id,
+            'code' => 'required|string|unique:departments,code,' . $id,
+            'description' => 'nullable|string',
+            'status' => 'in:active,inactive|required',
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status'=> 422,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $department = Departments::find($id);
+            $department->update($request->only(['name', 'code', 'description', 'status']));
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Department updated successfully',
+                'data' => $department,
+            ], 200);
+
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to update department',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateDepartmentsRequest $request, Departments $departments)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Departments $departments)
     {
         //

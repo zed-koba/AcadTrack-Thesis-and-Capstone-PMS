@@ -6,7 +6,8 @@ import {
 	Glasses,
 	LayoutDashboard,
 	LibraryBig,
-	UserRound,
+	UserCog,
+	Users,
 } from 'lucide-react';
 import { Toaster } from 'sonner';
 
@@ -14,8 +15,9 @@ const AdminLayout = () => {
 	const navItem: NavItem[] = [
 		{ label: 'Dashboard', to: '/Admin', icon: <LayoutDashboard /> },
 		{ label: 'Proponents', to: '/Admin/Proponents', icon: <LibraryBig /> },
-		{ label: 'Students', to: '/Admin/Students', icon: <UserRound /> },
+		{ label: 'Students', to: '/Admin/Students', icon: <Users /> },
 		{ label: 'Departments', to: '/Admin/Departments', icon: <Building2 /> },
+		{ label: 'Roles', to: '/Admin/Roles', icon: <UserCog /> },
 		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
 	];
 	return (

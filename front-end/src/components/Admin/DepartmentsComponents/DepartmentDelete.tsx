@@ -13,20 +13,22 @@ import { Spinner } from '@/components/ui/spinner';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { StudentDeleteProps } from '../interface/student';
+import type { DepartmentDeleteProps } from '../interface/department';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
-const StudentDelete = ({
+const DepartmentDelete = ({
 	open,
 	setOpen,
-	student_id,
+	department,
 	onSuccess,
-}: StudentDeleteProps) => {
+}: DepartmentDeleteProps) => {
 	const [loading, setLoading] = useState(false);
 	const handleDelete = async () => {
-		if (!student_id) return;
+		if (!department) return;
 		setLoading(true);
 		try {
-			const res = await fetch(`${apiUrl}/students/delete/${student_id}`, {
+			const res = await fetch(`${apiUrl}/students/delete/${department.id}`, {
 				method: 'DELETE',
 				headers: {
 					'Content-type': 'application/json',
@@ -46,7 +48,8 @@ const StudentDelete = ({
 				return;
 			}
 			if (!res.ok) {
-				toast.error('Failed to delete the student');
+				console.log(result.status);
+				console.log('Failed to fetch data ');
 				return;
 			}
 			if (result.status == 200) {
@@ -59,6 +62,11 @@ const StudentDelete = ({
 			console.log(error);
 		}
 	};
+	const hasDeps =
+		department.roles_count > 0 ||
+		department.advisers_count > 0 ||
+		department.programs_count > 0;
+
 	return (
 		<>
 			<AlertDialog open={open} onOpenChange={setOpen}>
@@ -67,7 +75,41 @@ const StudentDelete = ({
 						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 						<AlertDialogDescription>
 							This action cannot be undone. This will permanently delete the
-							student and remove your data from the servers.
+							department and remove your data from the servers.
+							{hasDeps && (
+								<div className="space-y-3 pt-2">
+									<p className="font-medium text-white">
+										This department has dependencies. Select what to delete
+									</p>
+									{department.programs_count > 0 && (
+										<div className="space-y-2">
+											<Checkbox id="delete-programs" />
+											<Label htmlFor="delete-programs" className="text-sm">
+												Delete {department.programs_count} program
+												{department.programs_count !== 1 ? 's' : ''}
+											</Label>
+										</div>
+									)}
+									{department.roles_count > 0 && (
+										<div className="space-y-2">
+											<Checkbox id="delete-programs" />
+											<Label htmlFor="delete-programs" className="text-sm">
+												Delete {department.roles_count} role
+												{department.roles_count !== 1 ? 's' : ''}
+											</Label>
+										</div>
+									)}
+									{department.advisers_count > 0 && (
+										<div className="space-y-2">
+											<Checkbox id="delete-programs" />
+											<Label htmlFor="delete-programs" className="text-sm">
+												Delete {department.advisers_count} adviser
+												{department.advisers_count !== 1 ? 's' : ''}
+											</Label>
+										</div>
+									)}
+								</div>
+							)}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -89,4 +131,4 @@ const StudentDelete = ({
 	);
 };
 
-export default StudentDelete;
+export default DepartmentDelete;

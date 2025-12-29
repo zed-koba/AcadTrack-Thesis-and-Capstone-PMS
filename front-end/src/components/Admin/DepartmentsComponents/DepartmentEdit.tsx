@@ -1,11 +1,6 @@
 import { apiUrl } from '@/components/Routes/http';
 import { Button } from '@/components/ui/button';
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,29 +14,31 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 import { useForm } from '@tanstack/react-form';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRightToLine } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
+import type { DepartmentEditProps } from '../interface/department';
 
 const departmentSchema = z.object({
 	name: z.string().min(2, 'Department is required').max(100),
 	code: z.string().min(2, 'Code is required').max(10).toUpperCase(),
-	description: z.string().max(500).optional(),
+	description: z.string().max(500).optional().nullable(),
 	status: z.enum(['active', 'inactive']),
 });
-type Props = {
-	onSuccess?: () => void;
-};
-const DepartmentAdd = ({ onSuccess }: Props) => {
-	const [open, setOpen] = useState(false);
+const DepartmentEdit = ({
+	open,
+	setOpen,
+	department,
+	onSuccess,
+}: DepartmentEditProps) => {
 	const [loading, setLoading] = useState(false);
 	type formValues = z.infer<typeof departmentSchema>;
 	const defaultValues: formValues = {
-		name: '',
-		code: '',
-		description: '',
-		status: 'active',
+		name: department.name,
+		code: department.code,
+		description: department.description ?? '',
+		status: department.status as 'active' | 'inactive',
 	};
 	const form = useForm({
 		defaultValues,
@@ -54,11 +51,13 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 			const payLoad = {
 				name: value.name,
 				code: value.code,
-				description: value.description,
+				description:
+					value.description ?? ''.trim() === '' ? null : value.description,
 				status: value.status,
 			};
+			console.log(value.status);
 			try {
-				const res = await fetch(`${apiUrl}/departments/add`, {
+				const res = await fetch(`${apiUrl}/departments/edit/${department.id}`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -86,11 +85,15 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 					return;
 				}
 				form.reset();
-				if (result.status == 201) {
+				if (result.status == 200) {
 					toast.success(result.message);
+					console.log(result);
 					setOpen(false);
 					onSuccess?.();
 				}
+				setOpen(false);
+				onSuccess?.();
+				setLoading(false);
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -98,23 +101,26 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 			}
 		},
 	});
-
+	useEffect(() => {
+		if (department) {
+			form.reset({
+				name: department.name,
+				code: department.code,
+				description: department.description,
+				status: department.status as 'active' | 'inactive',
+			});
+		}
+	}, [form, department]);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogTrigger asChild>
-					<Button variant="primary">
-						<Plus />
-						Add Department
-					</Button>
-				</DialogTrigger>
 				<DialogContent className="text-white">
 					<DialogHeader className="gap-0!">
 						<DialogTitle className="font-medium text-lg">
-							Add New Department
+							Edit Department: {department.name}
 						</DialogTitle>
 						<DialogDescription className="text-sm text-muted-foreground">
-							Please fill in the details below to add a new department.
+							Update the details of this department.
 						</DialogDescription>
 					</DialogHeader>
 					<form
@@ -191,7 +197,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 											<Textarea
 												id={field.name}
 												name={field.name}
-												value={field.state.value}
+												value={field.state.value ?? ''}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
@@ -253,12 +259,12 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 								<Button
 									className="cursor-pointer"
 									type="submit"
-									variant="primary"
+									variant="edit"
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Add Department'}
-									{loading ? '' : <Plus />}
+									{loading ? 'Adding...' : 'Update Department'}
+									{loading ? '' : <ArrowRightToLine />}
 								</Button>
 							</div>
 						</div>
@@ -269,4 +275,4 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 	);
 };
 
-export default DepartmentAdd;
+export default DepartmentEdit;
