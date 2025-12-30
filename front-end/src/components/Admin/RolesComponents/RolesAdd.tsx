@@ -6,6 +6,8 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTrigger,
+	DialogDescription,
+	DialogTitle,
 } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -19,7 +21,6 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 import { useForm } from '@tanstack/react-form';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -32,12 +33,12 @@ const roleSchema = z
 		name: z.string().min(2, 'Department is required').max(100),
 		globalRole: z.boolean(),
 		description: z.string().max(500).optional(),
-		selectedDepartmentsId: z.number(),
+		selectedDepartmentId: z.number(),
 		status: z.enum(['active', 'inactive']),
 	})
-	.refine((data) => data.globalRole || data.selectedDepartmentsId > 0, {
+	.refine((data) => data.globalRole || data.selectedDepartmentId > 0, {
 		message: 'Select one department or make the role global',
-		path: ['selectedDepartmentsId'],
+		path: ['selectedDepartmentId'],
 	});
 
 const RolesAdd = ({ departments, onSuccess }: RolesAddProps) => {
@@ -48,7 +49,7 @@ const RolesAdd = ({ departments, onSuccess }: RolesAddProps) => {
 	const defaultValues: formValues = {
 		name: '',
 		globalRole: true,
-		selectedDepartmentsId: 0,
+		selectedDepartmentId: 0,
 		description: '',
 		status: 'active',
 	};
@@ -65,7 +66,7 @@ const RolesAdd = ({ departments, onSuccess }: RolesAddProps) => {
 				globalRole: value.globalRole ? 1 : 0,
 				assigned: 0,
 				department_id:
-					value.globalRole === true ? null : value.selectedDepartmentsId,
+					value.globalRole === true ? null : value.selectedDepartmentId,
 				description: value.description,
 				status: value.status,
 			};
@@ -86,7 +87,6 @@ const RolesAdd = ({ departments, onSuccess }: RolesAddProps) => {
 							toast.error(message);
 						})
 					);
-					console.log(payLoad);
 					return;
 				} else if (result.status == 500) {
 					toast.error(result.message);
@@ -233,7 +233,7 @@ const RolesAdd = ({ departments, onSuccess }: RolesAddProps) => {
 							/>
 							{!globalRole && (
 								<form.Field
-									name="selectedDepartmentsId"
+									name="selectedDepartmentId"
 									children={(field) => {
 										const isInvalid =
 											field.state.meta.isTouched && !field.state.meta.isValid;

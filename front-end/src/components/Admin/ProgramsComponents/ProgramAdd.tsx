@@ -24,17 +24,29 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
+import type { ProgramAddProps } from '../interface/programs';
 
-const departmentSchema = z.object({
-	name: z.string().min(2, 'Department is required').max(100),
-	code: z.string().min(2, 'Code is required').max(10).toUpperCase(),
-	description: z.string().max(500).optional(),
-	status: z.enum(['active', 'inactive']),
-});
-type Props = {
-	onSuccess?: () => void;
-};
-const DepartmentAdd = ({ onSuccess }: Props) => {
+const departmentSchema = z
+	.object({
+		name: z
+			.string()
+			.min(2, 'Program name must be at least 2 character')
+			.max(100),
+		code: z
+			.string()
+			.min(2, 'Program code must be at least 2 characters')
+			.max(10)
+			.toUpperCase(),
+		description: z.string().max(300).optional(),
+		selectedDepartmentId: z.number(),
+		status: z.enum(['active', 'inactive']),
+	})
+	.refine((data) => data.selectedDepartmentId > 0, {
+		message: 'Please select a department',
+		path: ['selectedDepartmentId'],
+	});
+
+const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	type formValues = z.infer<typeof departmentSchema>;
@@ -42,6 +54,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 		name: '',
 		code: '',
 		description: '',
+		selectedDepartmentId: 0,
 		status: 'active',
 	};
 	const form = useForm({
@@ -55,14 +68,16 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 			const payLoad = {
 				name: value.name,
 				code: value.code,
+				department_id: value.selectedDepartmentId,
 				description: value.description,
 				status: value.status,
 			};
 			try {
-				const res = await fetch(`${apiUrl}/departments/add`, {
+				const res = await fetch(`${apiUrl}/programs/add`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
+						Accept: 'application/json',
 					},
 					body: JSON.stringify(payLoad),
 				});
@@ -79,6 +94,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 				} else if (result.status == 500) {
 					toast.error(result.message);
 					console.log(result.error);
+					console.log(payLoad);
 					return;
 				}
 				if (!res.ok) {
@@ -94,6 +110,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 				}
 			} catch (error) {
 				console.log(error);
+				console.log(payLoad);
 			} finally {
 				setLoading(false);
 			}
@@ -106,16 +123,16 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 				<DialogTrigger asChild>
 					<Button variant="primary">
 						<Plus />
-						Add Department
+						Add Program
 					</Button>
 				</DialogTrigger>
 				<DialogContent className="text-white">
 					<DialogHeader className="gap-0!">
 						<DialogTitle className="font-medium text-lg">
-							Add New Department
+							Add New Program
 						</DialogTitle>
 						<DialogDescription className="text-sm text-muted-foreground">
-							Please fill in the details below to add a new department.
+							Fill in the details to create a new academic program.
 						</DialogDescription>
 					</DialogHeader>
 					<form
@@ -132,9 +149,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Department Name
-											</FieldLabel>
+											<FieldLabel htmlFor={field.name}>Program Name</FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}
@@ -142,7 +157,9 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={'Ex. College of Computer Studies'}
+												placeholder={
+													'Ex. Bachelor of Science in Computer Science'
+												}
 												autoComplete="off"
 											/>
 											{isInvalid && (
@@ -169,9 +186,47 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={'Ex. CCS'}
+												placeholder={'Ex. BSCS'}
 												autoComplete="off"
 											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="selectedDepartmentId"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Department</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={
+													field.state.value ? String(field.state.value) : ''
+												}
+												onValueChange={(v) => field.handleChange(Number(v))}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
+												>
+													<SelectValue placeholder="Select Department" />
+												</SelectTrigger>
+												<SelectContent>
+													{departments?.map((dept) => (
+														<SelectItem key={dept.id} value={String(dept.id)}>
+															{dept.name}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
 											{isInvalid && (
 												<FieldError errors={field.state.meta.errors} />
 											)}
@@ -196,9 +251,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={
-													'Brief description about the department...'
-												}
+												placeholder={'Brief description about the program...'}
 												autoComplete="off"
 												className="resize-none w-full"
 											/>
@@ -259,7 +312,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Add Department'}
+									{loading ? 'Adding...' : 'Add Program'}
 									{loading ? '' : <Plus />}
 								</Button>
 							</div>
@@ -271,4 +324,4 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 	);
 };
 
-export default DepartmentAdd;
+export default ProgramAdd;

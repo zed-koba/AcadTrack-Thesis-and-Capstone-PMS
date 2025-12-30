@@ -7,7 +7,7 @@ const RolesDashboard = ({ roles = [] }: RolesDashboardProps) => {
 	const globalRoles = roles.filter((r) => r.globalRole === 1).length;
 	const dashboards = [
 		{
-			label: 'Total Departments',
+			label: 'Total Roles',
 			value: roles.length,
 			icon: <UserCog size={16} />,
 		},

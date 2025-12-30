@@ -4,6 +4,7 @@ use App\Http\Controllers\admin\AccountsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
 use App\Http\Controllers\admin\DepartmentsController;
+use App\Http\Controllers\admin\ProgramsController;
 use App\Http\Controllers\admin\RoleController;
 
 ;
@@ -36,9 +37,15 @@ Route::delete('students/delete/{id}', [StudentsController::class, 'deleteStudent
 //Departments Routes
 Route::get('departments', [DepartmentsController::class, 'getDepartments']);
 Route::post('departments/add', [DepartmentsController::class, 'storeDepartment']);
-Route::post('departments/edit/{id}', [DepartmentsController::class,'updateDepartment']);
+Route::put('departments/edit/{id}', [DepartmentsController::class,'updateDepartment']);
 
 
 //Roles Routes
 Route::get('roles', [RoleController::class, 'getRoles']);
 Route::post('roles/add', [RoleController::class,'storeRole']);
+Route::put('roles/edit/{id}', [RoleController::class,'updateRole']);
+
+//Programs Routes
+Route::get('programs', [ProgramsController::class,'getPrograms']);
+Route::post('programs/add', [ProgramsController::class,'storeProgram']);
+Route::put('programs/edit/{id}', [ProgramsController::class,'updateProgram']);

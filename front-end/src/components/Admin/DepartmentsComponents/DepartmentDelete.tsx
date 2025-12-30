@@ -76,11 +76,13 @@ const DepartmentDelete = ({
 						<AlertDialogDescription>
 							This action cannot be undone. This will permanently delete the
 							department and remove your data from the servers.
-							{hasDeps && (
-								<div className="space-y-3 pt-2">
-									<p className="font-medium text-white">
-										This department has dependencies. Select what to delete
-									</p>
+						</AlertDialogDescription>
+						{hasDeps && (
+							<div className="space-y-3 pt-2">
+								<p className="font-medium text-sm text-white">
+									This department has dependencies. Select what to delete
+								</p>
+								<div className="grid gap-2 text-muted-foreground">
 									{department.programs_count > 0 && (
 										<div className="space-y-2">
 											<Checkbox id="delete-programs" />
@@ -91,7 +93,7 @@ const DepartmentDelete = ({
 										</div>
 									)}
 									{department.roles_count > 0 && (
-										<div className="space-y-2">
+										<div className="space-y-0 gap-3 items-center flex flex-row">
 											<Checkbox id="delete-programs" />
 											<Label htmlFor="delete-programs" className="text-sm">
 												Delete {department.roles_count} role
@@ -109,8 +111,8 @@ const DepartmentDelete = ({
 										</div>
 									)}
 								</div>
-							)}
-						</AlertDialogDescription>
+							</div>
+						)}
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel className="cursor-pointer">

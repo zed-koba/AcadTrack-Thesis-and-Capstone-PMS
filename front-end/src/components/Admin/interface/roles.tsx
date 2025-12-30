@@ -20,17 +20,20 @@ export type RolesAddProps = {
 	departments: DepartmentRolesProps[];
 	onSuccess?: () => void;
 };
+
 export type RolesEditProps = {
 	open: boolean;
+	departments: DepartmentRolesProps[];
 	setOpen: (open: boolean) => void;
-	roles: RolesProps;
+	role: RolesProps;
 	onSuccess?: () => void;
 };
 
 export type RolesDetailsProps = {
 	open: boolean;
+	department: DepartmentRolesProps | null;
 	setOpen: (open: boolean) => void;
-	roles: RolesProps;
+	role: RolesProps;
 };
 
 export type RolesDashboardProps = {

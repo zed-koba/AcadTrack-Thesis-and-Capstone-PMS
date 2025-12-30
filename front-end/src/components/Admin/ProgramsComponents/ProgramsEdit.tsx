@@ -4,7 +4,6 @@ import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
-	DialogTrigger,
 	DialogDescription,
 	DialogTitle,
 } from '@/components/ui/dialog';
@@ -20,29 +19,47 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from '@tanstack/react-form';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRightToLine } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
+import type { ProgramEditProps } from '../interface/programs';
 
-const departmentSchema = z.object({
-	name: z.string().min(2, 'Department is required').max(100),
-	code: z.string().min(2, 'Code is required').max(10).toUpperCase(),
-	description: z.string().max(500).optional(),
-	status: z.enum(['active', 'inactive']),
-});
-type Props = {
-	onSuccess?: () => void;
-};
-const DepartmentAdd = ({ onSuccess }: Props) => {
-	const [open, setOpen] = useState(false);
+const departmentSchema = z
+	.object({
+		name: z
+			.string()
+			.min(2, 'Program name must be at least 2 character')
+			.max(100),
+		code: z
+			.string()
+			.min(2, 'Program code must be at least 2 characters')
+			.max(10)
+			.toUpperCase(),
+		description: z.string().max(300).optional().nullable(),
+		selectedDepartmentId: z.number(),
+		status: z.enum(['active', 'inactive']),
+	})
+	.refine((data) => data.selectedDepartmentId > 0, {
+		message: 'Please select a department',
+		path: ['selectedDepartmentId'],
+	});
+
+const ProgramEdit = ({
+	open,
+	setOpen,
+	program,
+	departments,
+	onSuccess,
+}: ProgramEditProps) => {
 	const [loading, setLoading] = useState(false);
 	type formValues = z.infer<typeof departmentSchema>;
 	const defaultValues: formValues = {
-		name: '',
-		code: '',
-		description: '',
-		status: 'active',
+		name: program.name,
+		code: program.code,
+		description: program.description ?? '',
+		selectedDepartmentId: program.department_id,
+		status: program.status as 'active' | 'inactive',
 	};
 	const form = useForm({
 		defaultValues,
@@ -55,14 +72,16 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 			const payLoad = {
 				name: value.name,
 				code: value.code,
+				department_id: value.selectedDepartmentId,
 				description: value.description,
 				status: value.status,
 			};
 			try {
-				const res = await fetch(`${apiUrl}/departments/add`, {
-					method: 'POST',
+				const res = await fetch(`${apiUrl}/programs/edit/${program.id}`, {
+					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						Accept: 'application/json',
 					},
 					body: JSON.stringify(payLoad),
 				});
@@ -79,6 +98,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 				} else if (result.status == 500) {
 					toast.error(result.message);
 					console.log(result.error);
+					console.log(payLoad);
 					return;
 				}
 				if (!res.ok) {
@@ -87,35 +107,40 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 					return;
 				}
 				form.reset();
-				if (result.status == 201) {
+				if (result.status == 200) {
 					toast.success(result.message);
 					setOpen(false);
 					onSuccess?.();
 				}
 			} catch (error) {
 				console.log(error);
+				console.log(payLoad);
 			} finally {
 				setLoading(false);
 			}
 		},
 	});
-
+	useEffect(() => {
+		if (program) {
+			form.reset({
+				name: program.name,
+				description: program.description,
+				code: program.code,
+				selectedDepartmentId: program.department_id,
+				status: program.status as 'active' | 'inactive',
+			});
+		}
+	}, [form, program]);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogTrigger asChild>
-					<Button variant="primary">
-						<Plus />
-						Add Department
-					</Button>
-				</DialogTrigger>
 				<DialogContent className="text-white">
 					<DialogHeader className="gap-0!">
 						<DialogTitle className="font-medium text-lg">
-							Add New Department
+							Edit Program
 						</DialogTitle>
 						<DialogDescription className="text-sm text-muted-foreground">
-							Please fill in the details below to add a new department.
+							Update the program details below.
 						</DialogDescription>
 					</DialogHeader>
 					<form
@@ -132,9 +157,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Department Name
-											</FieldLabel>
+											<FieldLabel htmlFor={field.name}>Program Name</FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}
@@ -142,7 +165,9 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={'Ex. College of Computer Studies'}
+												placeholder={
+													'Ex. Bachelor of Science in Computer Science'
+												}
 												autoComplete="off"
 											/>
 											{isInvalid && (
@@ -169,12 +194,47 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={'Ex. CCS'}
+												placeholder={'Ex. BSCS'}
 												autoComplete="off"
 											/>
 											{isInvalid && (
 												<FieldError errors={field.state.meta.errors} />
 											)}
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="selectedDepartmentId"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Department</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={
+													field.state.value ? String(field.state.value) : ''
+												}
+												onValueChange={(v) => field.handleChange(Number(v))}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
+												>
+													<SelectValue placeholder="Select Department" />
+												</SelectTrigger>
+												<SelectContent>
+													{departments?.map((dept) => (
+														<SelectItem key={dept.id} value={String(dept.id)}>
+															{dept.name}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
 										</Field>
 									);
 								}}
@@ -196,9 +256,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={
-													'Brief description about the department...'
-												}
+												placeholder={'Brief description about the program...'}
 												autoComplete="off"
 												className="resize-none w-full"
 											/>
@@ -255,12 +313,12 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 								<Button
 									className="cursor-pointer"
 									type="submit"
-									variant="primary"
+									variant="edit"
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Add Department'}
-									{loading ? '' : <Plus />}
+									{loading ? 'Adding...' : 'Update Program'}
+									{loading ? '' : <ArrowRightToLine />}
 								</Button>
 							</div>
 						</div>
@@ -271,4 +329,4 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 	);
 };
 
-export default DepartmentAdd;
+export default ProgramEdit;

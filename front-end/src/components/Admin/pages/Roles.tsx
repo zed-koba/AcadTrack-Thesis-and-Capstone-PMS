@@ -4,7 +4,7 @@ import RolesDashboard from '../RolesComponents/RolesDashboard';
 import type { RolesProps, DepartmentRolesProps } from '../interface/roles';
 import RolesTable from '../RolesComponents/RolesTable';
 
-const Departments = () => {
+const Roles = () => {
 	const [roles, setRoles] = useState<RolesProps[]>([]);
 	const [departments, setDepartments] = useState<DepartmentRolesProps[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -55,4 +55,4 @@ const Departments = () => {
 	);
 };
 
-export default Departments;
+export default Roles;

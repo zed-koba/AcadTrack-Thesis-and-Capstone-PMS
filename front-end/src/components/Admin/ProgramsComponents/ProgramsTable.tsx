@@ -13,7 +13,6 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import {
-	Globe,
 	MoreHorizontal,
 	PencilRuler,
 	ReceiptText,
@@ -37,45 +36,47 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-	type DepartmentRolesProps,
-	type RolesProps,
-	type RolesTableProps,
-} from '../interface/roles';
-import RolesAdd from './RolesAdd';
-import RolesEdit from './RolesEdit';
-import RoleDetails from './RolesDetails';
 
-type SortField = keyof RolesProps;
+import type {
+	DepartmentProgramsProps,
+	ProgramsProps,
+	ProgramsTableProps,
+} from '../interface/programs';
+import ProgramAdd from './ProgramAdd';
+import ProgramEdit from './ProgramsEdit';
+
+type SortField = keyof ProgramsProps;
 type SortDirection = 'asc' | 'desc';
 
 const ITEMS_PER_PAGE = 10;
-const RolesTable = ({
+const ProgramsTable = ({
 	departments,
-	roles,
+	programs,
 	loading,
 	refresh,
-}: RolesTableProps) => {
+}: ProgramsTableProps) => {
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [sortField, setSortField] = useState<SortField>('created_at');
 	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
 	const [currentPage, setCurrentPage] = useState(1);
-	const [selectedRole, setSelectedRole] = useState<RolesProps | null>(null);
+	const [selectedProgram, setSelectedProgram] = useState<ProgramsProps | null>(
+		null
+	);
 	const [open, setOpen] = useState(false);
 	const [clickedButton, setClickedButton] = useState<string>('');
-	const [roleDepartment, setRoleDepartment] =
-		useState<DepartmentRolesProps | null>(null);
+	const [programDepartment, setProgramDepartment] =
+		useState<DepartmentProgramsProps | null>(null);
 
-	const filteredRoles = roles.filter((role) => {
+	const filteredPrograms = programs.filter((prog) => {
 		const searchLower = searchTerm.toLowerCase();
 		return (
-			role.name.toLowerCase().includes(searchLower) ||
-			formatDate(role.created_at).toLowerCase().includes(searchLower) ||
-			formatDate(role.updated_at).toLowerCase().includes(searchLower)
+			prog.name.toLowerCase().includes(searchLower) ||
+			formatDate(prog.created_at).toLowerCase().includes(searchLower) ||
+			formatDate(prog.updated_at).toLowerCase().includes(searchLower)
 		);
 	});
 
-	const sortedRoles = [...filteredRoles].sort((a, b) => {
+	const sortedPrograms = [...filteredPrograms].sort((a, b) => {
 		const aValue = a[sortField];
 		const bValue = b[sortField];
 
@@ -84,9 +85,9 @@ const RolesTable = ({
 		return sortDirection === 'asc' ? comparison : -comparison;
 	});
 
-	const totalPage = Math.ceil(sortedRoles.length / ITEMS_PER_PAGE);
+	const totalPage = Math.ceil(sortedPrograms.length / ITEMS_PER_PAGE);
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-	const paginationProps = sortedRoles.slice(
+	const paginationProps = sortedPrograms.slice(
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
@@ -120,12 +121,12 @@ const RolesTable = ({
 								<Search />
 							</InputGroupAddon>
 							<InputGroupAddon align="inline-end">
-								{searchTerm.length > 1 ? filteredRoles.length : 0} results
+								{searchTerm.length > 1 ? filteredPrograms.length : 0} results
 							</InputGroupAddon>
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<RolesAdd departments={departments} onSuccess={refresh} />
+						<ProgramAdd departments={departments} onSuccess={refresh} />
 					</div>
 				</div>
 				<div className="rounded-lg border bg-card mt-3 shadow-sm">
@@ -134,16 +135,19 @@ const RolesTable = ({
 							<TableHeader>
 								<TableRow className="text-muted-foreground">
 									<TableHead className="text-muted-foreground text-left pl-4">
-										Role Name
+										Program Name
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left max-w-[300px]">
 										Description
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
-										Scope
+										Code
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
-										Assigned
+										Department
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left">
+										Students
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
 										Status
@@ -179,39 +183,35 @@ const RolesTable = ({
 										</TableCell>
 									</TableRow>
 								) : (
-									paginationProps.map((role) => (
-										<TableRow key={role.id} className="text-muted-foreground">
+									paginationProps.map((prog) => (
+										<TableRow key={prog.id} className="text-muted-foreground">
 											<TableCell className="text-left pl-3 text-white font-medium">
-												{role.name}
+												{prog.name}
 											</TableCell>
 											<TableCell className="text-left max-w-[200px] truncate">
-												{role.description === null
+												{prog.description === null
 													? '-'
-													: role.description.trim() === ''
+													: prog.description.trim() === ''
 													? '-'
-													: role.description}
+													: prog.description}
 											</TableCell>
 											<TableCell className="text-left">
-												<Badge variant="outline">
-													{role.globalRole === 1 ? (
-														<Globe />
-													) : (
-														getCodeBadge(role.department_id)?.code
-													)}
-													{role.globalRole === 1 ? 'Global' : ''}
-												</Badge>
+												<Badge variant="outline">{prog.code}</Badge>
+											</TableCell>
+											<TableCell className="text-left text-white">
+												{getCodeBadge(prog.department_id).name}
+											</TableCell>
+											<TableCell className="text-left text-white">
+												{prog.students_count}
 											</TableCell>
 											<TableCell className="text-left">
-												{role.assigned}
+												{getStatusBadge(prog.status)}
 											</TableCell>
 											<TableCell className="text-left">
-												{getStatusBadge(role.status)}
+												{formatDate(prog.created_at)}
 											</TableCell>
 											<TableCell className="text-left">
-												{formatDate(role.created_at)}
-											</TableCell>
-											<TableCell className="text-left">
-												{formatDate(role.updated_at)}
+												{formatDate(prog.updated_at)}
 											</TableCell>
 											<TableCell>
 												<DropdownMenu>
@@ -224,7 +224,7 @@ const RolesTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setOpen(true);
-																setSelectedRole(role);
+																setSelectedProgram(prog);
 																setClickedButton('edit');
 															}}
 														>
@@ -233,9 +233,9 @@ const RolesTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setOpen(true);
-																setSelectedRole(role);
-																setRoleDepartment(
-																	getCodeBadge(role.department_id)
+																setSelectedProgram(prog);
+																setProgramDepartment(
+																	getCodeBadge(prog.department_id)
 																);
 																setClickedButton('details');
 															}}
@@ -246,7 +246,7 @@ const RolesTable = ({
 															className="text-red-500"
 															onClick={() => {
 																setOpen(true);
-																setSelectedRole(role);
+																setSelectedProgram(prog);
 																setClickedButton('delete');
 															}}
 														>
@@ -259,23 +259,23 @@ const RolesTable = ({
 										</TableRow>
 									))
 								)}
-								{selectedRole &&
+								{selectedProgram &&
 									(clickedButton === 'edit' ? (
-										<RolesEdit
-											role={selectedRole}
+										<ProgramEdit
+											program={selectedProgram}
 											departments={departments}
 											open={open}
 											setOpen={setOpen}
 											onSuccess={refresh}
 										/>
-									) : clickedButton === 'details' ? (
-										<RoleDetails
-											role={selectedRole}
-											department={roleDepartment}
-											open={open}
-											setOpen={setOpen}
-										/>
 									) : (
+										// ) : clickedButton === 'details' ? (
+										// 	<RoleDetails
+										// 		role={selectedRole}
+										// 		department={roleDepartment}
+										// 		open={open}
+										// 		setOpen={setOpen}
+										// 	/>
 										''
 									))}
 							</TableBody>
@@ -286,8 +286,8 @@ const RolesTable = ({
 					<div className="flex justify-between items-center pt-3">
 						<p className="text-muted-foreground text-base font-semibold w-full">
 							Showing {startIndex + 1} to{' '}
-							{Math.min(startIndex + ITEMS_PER_PAGE, sortedRoles.length)} of{' '}
-							{sortedRoles.length} roles
+							{Math.min(startIndex + ITEMS_PER_PAGE, sortedPrograms.length)} of{' '}
+							{sortedPrograms.length} programs
 						</p>
 						<Pagination className="justify-end">
 							<PaginationContent>
@@ -331,4 +331,4 @@ const RolesTable = ({
 	);
 };
 
-export default RolesTable;
+export default ProgramsTable;

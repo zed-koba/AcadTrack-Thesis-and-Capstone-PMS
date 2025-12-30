@@ -1,6 +1,12 @@
 import { apiUrl } from '@/components/Routes/http';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogDescription,
+	DialogTitle,
+} from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,7 +18,6 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 import { useForm } from '@tanstack/react-form';
 import { ArrowRightToLine } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -58,9 +63,10 @@ const DepartmentEdit = ({
 			console.log(value.status);
 			try {
 				const res = await fetch(`${apiUrl}/departments/edit/${department.id}`, {
-					method: 'POST',
+					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						Accept: 'application/json',
 					},
 					body: JSON.stringify(payLoad),
 				});
@@ -205,6 +211,7 @@ const DepartmentEdit = ({
 													'Brief description about the department...'
 												}
 												autoComplete="off"
+												className="resize-none"
 											/>
 											{isInvalid && (
 												<FieldError errors={field.state.meta.errors} />

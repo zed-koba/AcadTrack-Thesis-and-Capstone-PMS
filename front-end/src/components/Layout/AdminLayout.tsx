@@ -4,6 +4,7 @@ import type { NavItem } from '../interface/type';
 import {
 	Building2,
 	Glasses,
+	GraduationCap,
 	LayoutDashboard,
 	LibraryBig,
 	UserCog,
@@ -18,6 +19,7 @@ const AdminLayout = () => {
 		{ label: 'Students', to: '/Admin/Students', icon: <Users /> },
 		{ label: 'Departments', to: '/Admin/Departments', icon: <Building2 /> },
 		{ label: 'Roles', to: '/Admin/Roles', icon: <UserCog /> },
+		{ label: 'Programs', to: '/Admin/Programs', icon: <GraduationCap /> },
 		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
 	];
 	return (

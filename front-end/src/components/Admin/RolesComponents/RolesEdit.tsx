@@ -1,15 +1,16 @@
 import { apiUrl } from '@/components/Routes/http';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
-	DialogTrigger,
 	DialogDescription,
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
 	Select,
 	SelectContent,
@@ -19,50 +20,67 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import {} from '@radix-ui/react-dialog';
 import { useForm } from '@tanstack/react-form';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRightToLine } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
+import type { RolesEditProps } from '../interface/roles';
 
-const departmentSchema = z.object({
-	name: z.string().min(2, 'Department is required').max(100),
-	code: z.string().min(2, 'Code is required').max(10).toUpperCase(),
-	description: z.string().max(500).optional(),
-	status: z.enum(['active', 'inactive']),
-});
-type Props = {
-	onSuccess?: () => void;
-};
-const DepartmentAdd = ({ onSuccess }: Props) => {
-	const [open, setOpen] = useState(false);
+const roleSchema = z
+	.object({
+		name: z.string().min(2, 'Department is required').max(100),
+		globalRole: z.boolean(),
+		description: z.string().max(500).optional(),
+		selectedDepartmentId: z.number(),
+		status: z.enum(['active', 'inactive']),
+	})
+	.refine((data) => data.globalRole || data.selectedDepartmentId > 0, {
+		message: 'Select one department or make the role global',
+		path: ['selectedDepartmentId'],
+	});
+
+const RolesEdit = ({
+	departments,
+	role,
+	open,
+	setOpen,
+	onSuccess,
+}: RolesEditProps) => {
 	const [loading, setLoading] = useState(false);
-	type formValues = z.infer<typeof departmentSchema>;
+	const [globalRole, setGlobalRole] = useState(false);
+	type formValues = z.infer<typeof roleSchema>;
 	const defaultValues: formValues = {
-		name: '',
-		code: '',
-		description: '',
-		status: 'active',
+		name: role.name,
+		globalRole: role.globalRole ? true : false,
+		selectedDepartmentId: role.department_id === null ? 0 : role.department_id,
+		description: role.description ?? '',
+		status: role.status as 'active' | 'inactive',
 	};
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onChange: departmentSchema,
-			onSubmit: departmentSchema,
+			onChange: roleSchema,
+			onSubmit: roleSchema,
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
 			const payLoad = {
 				name: value.name,
-				code: value.code,
+				globalRole: value.globalRole ? 1 : 0,
+				assigned: 0,
+				department_id:
+					value.globalRole === true ? null : value.selectedDepartmentId,
 				description: value.description,
 				status: value.status,
 			};
 			try {
-				const res = await fetch(`${apiUrl}/departments/add`, {
-					method: 'POST',
+				const res = await fetch(`${apiUrl}/roles/edit/${role.id}`, {
+					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						Accept: 'application/json',
 					},
 					body: JSON.stringify(payLoad),
 				});
@@ -87,7 +105,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 					return;
 				}
 				form.reset();
-				if (result.status == 201) {
+				if (result.status == 200) {
 					toast.success(result.message);
 					setOpen(false);
 					onSuccess?.();
@@ -99,23 +117,27 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 			}
 		},
 	});
-
+	useEffect(() => {
+		if (role) {
+			form.reset({
+				name: role.name,
+				description: role.description,
+				globalRole: role.globalRole ? true : false,
+				selectedDepartmentId: role.department_id,
+				status: role.status as 'active' | 'inactive',
+			});
+		}
+	}, [form, role]);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogTrigger asChild>
-					<Button variant="primary">
-						<Plus />
-						Add Department
-					</Button>
-				</DialogTrigger>
-				<DialogContent className="text-white">
+				<DialogContent className="text-white sm:max-w-[500px]">
 					<DialogHeader className="gap-0!">
 						<DialogTitle className="font-medium text-lg">
-							Add New Department
+							Edit Role: {role.name}
 						</DialogTitle>
 						<DialogDescription className="text-sm text-muted-foreground">
-							Please fill in the details below to add a new department.
+							Update the capstone/thesis role details below
 						</DialogDescription>
 					</DialogHeader>
 					<form
@@ -132,9 +154,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Department Name
-											</FieldLabel>
+											<FieldLabel htmlFor={field.name}>Role Name</FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}
@@ -142,34 +162,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={'Ex. College of Computer Studies'}
-												autoComplete="off"
-											/>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
-							<form.Field
-								name="code"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Department Code
-											</FieldLabel>
-											<Input
-												id={field.name}
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												aria-invalid={isInvalid}
-												placeholder={'Ex. CCS'}
+												placeholder={'Ex. System Analyst'}
 												autoComplete="off"
 											/>
 											{isInvalid && (
@@ -184,6 +177,7 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 								children={(field) => {
 									const isInvalid =
 										field.state.meta.isTouched && !field.state.meta.isValid;
+
 									return (
 										<Field data-invalid={isInvalid} orientation="responsive">
 											<FieldLabel htmlFor={field.name}>
@@ -197,10 +191,11 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
 												placeholder={
-													'Brief description about the department...'
+													'Describe the responsibilities of this role...'
 												}
 												autoComplete="off"
-												className="resize-none w-full"
+												className="resize-none overflow-hidden whitespace-pre-wrap 
+												w-full wrap-break-words"
 											/>
 											{isInvalid && (
 												<FieldError errors={field.state.meta.errors} />
@@ -209,6 +204,86 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 									);
 								}}
 							/>
+							<form.Field
+								name="globalRole"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									setGlobalRole(field.state.value);
+									return (
+										<Field data-invalid={isInvalid} orientation="responsive">
+											<Label className="flex flex-row items-start space-y-0 rounded-md border p-4">
+												<Checkbox
+													id={field.name}
+													checked={field.state.value}
+													onCheckedChange={(v) => field.handleChange(!!v)}
+												/>
+												<div className="grid gap-1.5 font-normal">
+													<Label
+														htmlFor={field.name}
+														className="leading-none font-medium"
+													>
+														Global Role
+													</Label>
+													<Label
+														className="text-sm text-muted-foreground font-normal"
+														htmlFor={field.name}
+													>
+														This role will be available across all departments
+													</Label>
+												</div>
+											</Label>
+
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+							{!globalRole && (
+								<form.Field
+									name="selectedDepartmentId"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<Field data-invalid={isInvalid} orientation="responsive">
+												<FieldLabel htmlFor={field.name}>
+													Applicable Departments
+												</FieldLabel>
+												<Select
+													name={field.name}
+													defaultValue={
+														field.state.value ? String(field.state.value) : ''
+													}
+													onValueChange={(v) => {
+														field.handleChange(Number(v));
+													}}
+												>
+													<SelectTrigger
+														className="w-auto"
+														aria-invalid={isInvalid}
+														id={field.name}
+													>
+														<SelectValue placeholder="Select Department" />
+													</SelectTrigger>
+													<SelectContent>
+														{departments?.map((dept) => (
+															<SelectItem key={dept.id} value={String(dept.id)}>
+																{dept.name}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</Field>
+										);
+									}}
+								/>
+							)}
 							<form.Field
 								name="status"
 								children={(field) => {
@@ -255,12 +330,12 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 								<Button
 									className="cursor-pointer"
 									type="submit"
-									variant="primary"
+									variant="edit"
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Add Department'}
-									{loading ? '' : <Plus />}
+									{loading ? 'Adding...' : 'Update Role'}
+									{loading ? '' : <ArrowRightToLine />}
 								</Button>
 							</div>
 						</div>
@@ -271,4 +346,4 @@ const DepartmentAdd = ({ onSuccess }: Props) => {
 	);
 };
 
-export default DepartmentAdd;
+export default RolesEdit;
