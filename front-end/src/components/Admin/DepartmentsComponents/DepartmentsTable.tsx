@@ -13,7 +13,6 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import {
-	ArrowUpDown,
 	MoreHorizontal,
 	PencilRuler,
 	ReceiptText,
@@ -48,25 +47,6 @@ import DepartmentDetails from './DepartmentDetails';
 
 type SortField = keyof DepartmentProps;
 type SortDirection = 'asc' | 'desc';
-const SortButton = ({
-	field,
-	label,
-	onSort,
-}: {
-	field: SortField;
-	label: string;
-	onSort: (field: SortField) => void;
-}) => (
-	<Button
-		variant="ghost"
-		size="sm"
-		className="-ml-3 h-8 font-semibold text-muted-foreground"
-		onClick={() => onSort(field)}
-	>
-		{label}
-		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm" />
-	</Button>
-);
 
 const ITEMS_PER_PAGE = 10;
 const DepartmentsTable = ({
@@ -82,14 +62,6 @@ const DepartmentsTable = ({
 		useState<DepartmentProps | null>(null);
 	const [open, setOpen] = useState(false);
 	const [clickedButton, setClickedButton] = useState<string>('');
-	const handleSort = (field: SortField) => {
-		if (sortField === field) {
-			setSortDrection(sortDirection === 'asc' ? 'desc' : 'asc');
-		} else {
-			setSortField(field);
-			setSortDrection('asc');
-		}
-	};
 
 	const filteredDepartments = departments.filter((department) => {
 		const searchLower = searchTerm.toLowerCase();
@@ -155,52 +127,28 @@ const DepartmentsTable = ({
 						<Table className="w-full">
 							<TableHeader>
 								<TableRow>
-									<TableHead className="text-left pl-4">
-										<SortButton
-											label="Department Name"
-											field="name"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left pl-4">
+										Department Name
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton label="Code" field="code" onSort={handleSort} />
+									<TableHead className="text-muted-foreground text-left">
+										Code
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Description"
-											field="description"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left max-w-[300px]">
+										Description
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Dependencies"
-											field="dependencies"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Dependencies
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Status"
-											field="status"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Status
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Created At"
-											field="created_at"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Created At
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Updated At"
-											field="updated_at"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Updated At
 									</TableHead>
-									<TableHead className="text-center text-muted-foreground">
+									<TableHead className="text-muted-foreground text-center">
 										Actions
 									</TableHead>
 								</TableRow>

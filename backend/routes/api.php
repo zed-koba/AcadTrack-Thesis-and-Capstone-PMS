@@ -41,3 +41,4 @@ Route::post('departments/edit/{id}', [DepartmentsController::class,'updateDepart
 
 //Roles Routes
 Route::get('roles', [RoleController::class, 'getRoles']);
+Route::post('roles/add', [RoleController::class,'storeRole']);

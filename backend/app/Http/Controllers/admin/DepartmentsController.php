@@ -45,16 +45,15 @@ class DepartmentsController extends Controller
         DB::beginTransaction();
         try {
             $department = Departments::create([
-                'name' => request()->name,
-                'code' => request()->code,
-                'description' => request()->description,
-                'status' => request()->status,
+                'name' => $request->name,
+                'code' => $request->code,
+                'description' => $request->description,
+                'status' => $request->status,
             ]);
             DB::commit();
             return response()->json([
                 'status' => 201,
                 'message' => 'Department added successfully',
-                'data' => $department,
             ], 201);
 
         }catch(\Exception $e){

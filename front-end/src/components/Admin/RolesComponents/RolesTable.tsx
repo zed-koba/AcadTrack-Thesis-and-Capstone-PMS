@@ -13,7 +13,7 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import {
-	ArrowUpDown,
+	Globe,
 	MoreHorizontal,
 	PencilRuler,
 	ReceiptText,
@@ -38,31 +38,18 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { RolesProps, RolesTableProps } from '../interface/roles';
+import RolesAdd from './RolesAdd';
 
 type SortField = keyof RolesProps;
 type SortDirection = 'asc' | 'desc';
-const SortButton = ({
-	field,
-	label,
-	onSort,
-}: {
-	field: SortField;
-	label: string;
-	onSort: (field: SortField) => void;
-}) => (
-	<Button
-		variant="ghost"
-		size="sm"
-		className="-ml-3 h-8 font-semibold text-muted-foreground"
-		onClick={() => onSort(field)}
-	>
-		{label}
-		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm" />
-	</Button>
-);
 
 const ITEMS_PER_PAGE = 10;
-const RolesTable = ({ roles, loading, refresh }: RolesTableProps) => {
+const RolesTable = ({
+	departments,
+	roles,
+	loading,
+	refresh,
+}: RolesTableProps) => {
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [sortField, setSortField] = useState<SortField>('created_at');
 	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
@@ -70,14 +57,6 @@ const RolesTable = ({ roles, loading, refresh }: RolesTableProps) => {
 	const [selectedRole, setSelectedRole] = useState<RolesProps | null>(null);
 	const [open, setOpen] = useState(false);
 	const [clickedButton, setClickedButton] = useState<string>('');
-	const handleSort = (field: SortField) => {
-		if (sortField === field) {
-			setSortDrection(sortDirection === 'asc' ? 'desc' : 'asc');
-		} else {
-			setSortField(field);
-			setSortDrection('asc');
-		}
-	};
 
 	const filteredRoles = roles.filter((role) => {
 		const searchLower = searchTerm.toLowerCase();
@@ -114,6 +93,11 @@ const RolesTable = ({ roles, loading, refresh }: RolesTableProps) => {
 			</Badge>
 		);
 	};
+	const getCodeBadge = (id: number) => {
+		const findCode = departments.find((c) => c.id === id);
+
+		return findCode?.code;
+	};
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -133,64 +117,36 @@ const RolesTable = ({ roles, loading, refresh }: RolesTableProps) => {
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						{/* <DepartmentAdd onSuccess={refresh} /> */}
+						<RolesAdd departments={departments} onSuccess={refresh} />
 					</div>
 				</div>
 				<div className="rounded-lg border bg-card mt-3 shadow-sm">
 					<div className="w-auto overflow-x-auto">
 						<Table className="w-full">
 							<TableHeader>
-								<TableRow>
-									<TableHead className="text-left pl-4">
-										<SortButton
-											label="Role Name"
-											field="name"
-											onSort={handleSort}
-										/>
+								<TableRow className="text-muted-foreground">
+									<TableHead className="text-muted-foreground text-left pl-4">
+										Role Name
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Description"
-											field="description"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left max-w-[300px]">
+										Description
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Scope"
-											field="globalRole"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Scope
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Assigned"
-											field="assigned"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Assigned
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Status"
-											field="status"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Status
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Created At"
-											field="created_at"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left w-[150px]">
+										Created At
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Updated At"
-											field="updated_at"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left w-[150px]">
+										Updated At
 									</TableHead>
-									<TableHead className="text-center text-muted-foreground">
+									<TableHead className="text-center text-muted-foreground w-[70px]">
 										Actions
 									</TableHead>
 								</TableRow>
@@ -228,7 +184,14 @@ const RolesTable = ({ roles, loading, refresh }: RolesTableProps) => {
 													: role.description}
 											</TableCell>
 											<TableCell className="text-left">
-												<Badge variant="outline">{role.globalRole}</Badge>
+												<Badge variant="outline">
+													{role.globalRole === 1 ? (
+														<Globe />
+													) : (
+														getCodeBadge(role.department_id)
+													)}
+													{role.globalRole === 1 ? 'Global' : ''}
+												</Badge>
 											</TableCell>
 											<TableCell className="text-left">
 												{role.assigned}

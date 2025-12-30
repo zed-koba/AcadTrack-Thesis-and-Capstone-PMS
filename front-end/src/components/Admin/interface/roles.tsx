@@ -2,7 +2,7 @@ export type RolesProps = {
 	id: number;
 	name: string;
 	description: string;
-	globalRole: boolean;
+	globalRole: number;
 	assigned: number;
 	department_id: number;
 	status: string;
@@ -10,6 +10,16 @@ export type RolesProps = {
 	updated_at: string;
 };
 
+export type DepartmentRolesProps = {
+	id: number;
+	name: string;
+	code: string;
+};
+
+export type RolesAddProps = {
+	departments: DepartmentRolesProps[];
+	onSuccess?: () => void;
+};
 export type RolesEditProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
@@ -29,6 +39,7 @@ export type RolesDashboardProps = {
 
 export type RolesTableProps = {
 	roles: RolesProps[];
+	departments: DepartmentRolesProps[];
 	loading: boolean;
 	refresh: () => void;
 };

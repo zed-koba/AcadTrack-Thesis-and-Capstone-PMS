@@ -13,7 +13,7 @@ class Departments extends Model
     /** @use HasFactory<\Database\Factories\DepartmentsFactory> */
     use HasFactory;
     protected $table = 'departments';
-    protected $fillable = ['name', 'code', 'description', 'status'];
+    protected $fillable = ['name', 'code', 'description', 'status', 'department_id'];
     public function roles() {
         return $this->hasMany(Role::class, 'department_id');
     }

@@ -1,11 +1,12 @@
 import { apiUrl } from '@/components/Routes/http';
 import { useEffect, useState } from 'react';
 import RolesDashboard from '../RolesComponents/RolesDashboard';
-import type { RolesProps } from '../interface/roles';
+import type { RolesProps, DepartmentRolesProps } from '../interface/roles';
 import RolesTable from '../RolesComponents/RolesTable';
 
 const Departments = () => {
 	const [roles, setRoles] = useState<RolesProps[]>([]);
+	const [departments, setDepartments] = useState<DepartmentRolesProps[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	const fetchRoles = async () => {
@@ -20,7 +21,8 @@ const Departments = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 			const result = await res.json();
 			if (result.status === 200) {
-				setRoles(result.data);
+				setRoles(result.roles);
+				setDepartments(result.departments);
 			}
 			// Handle the fetched data as needed
 		} catch (error) {
@@ -43,7 +45,12 @@ const Departments = () => {
 				</div>
 			</div>
 			<RolesDashboard roles={roles} />
-			<RolesTable roles={roles} loading={loading} refresh={fetchRoles} />
+			<RolesTable
+				departments={departments}
+				roles={roles}
+				loading={loading}
+				refresh={fetchRoles}
+			/>
 		</>
 	);
 };

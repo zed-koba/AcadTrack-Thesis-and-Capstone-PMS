@@ -4,7 +4,7 @@ import type { RolesDashboardProps } from '../interface/roles';
 const RolesDashboard = ({ roles = [] }: RolesDashboardProps) => {
 	const activeCount = roles.filter((r) => r.status === 'active').length;
 	const inactiveCount = roles.filter((r) => r.status === 'inactive').length;
-	const globalRoles = roles.filter((r) => r.globalRole === true).length;
+	const globalRoles = roles.filter((r) => r.globalRole === 1).length;
 	const dashboards = [
 		{
 			label: 'Total Departments',

@@ -11,6 +11,7 @@ export type DepartmentProps = {
 	roles_count: number;
 	advisers_count: number;
 };
+
 export type DepartmentsDashboardProps = {
 	departments?: DepartmentProps[];
 };
