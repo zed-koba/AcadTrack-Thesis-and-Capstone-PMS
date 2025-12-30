@@ -7,35 +7,34 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/components/functions/functions';
-import type { RolesDetailsProps } from '../interface/roles';
+import type { ProgramsDetailsProps } from '../interface/programs';
 
-const RoleDetails = ({
+const ProgramDetails = ({
 	open,
 	setOpen,
 	department,
-	role,
-}: RolesDetailsProps) => {
+	program,
+}: ProgramsDetailsProps) => {
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogContent className="text-white">
 					<DialogHeader>
-						<DialogTitle>{role.name}</DialogTitle>
+						<DialogTitle>{program.name}</DialogTitle>
 						<DialogDescription>
 							Overview and key information about the role.
 						</DialogDescription>
 					</DialogHeader>
 					<div className="flex flex-col gap-3 text-base">
 						<h2 className="text-lg font-semibold">Overview Details: </h2>
-						<p>Name: {role.name}</p>
-						<p>Description: {role.description}</p>
-						<p>
-							Department: {role.globalRole ? 'Global Role' : department?.name}
-						</p>
-						<p>Assigned Students: {role.assigned}</p>
-						<p>Status: {role.status}</p>
-						<p>Created At: {formatDate(role.created_at)}</p>
-						<p>Last Update: {formatDate(role.updated_at)}</p>
+						<p>Name: {program.name}</p>
+						<p>Code: {program.code}</p>
+						<p>Description: {program.description}</p>
+						<p>Department: {department?.name}</p>
+
+						<p>Status: {program.status}</p>
+						<p>Created At: {formatDate(program.created_at)}</p>
+						<p>Last Update: {formatDate(program.updated_at)}</p>
 
 						<div className="flex justify-end pt-2 text-white gap-3">
 							<Button
@@ -54,4 +53,4 @@ const RoleDetails = ({
 	);
 };
 
-export default RoleDetails;
+export default ProgramDetails;

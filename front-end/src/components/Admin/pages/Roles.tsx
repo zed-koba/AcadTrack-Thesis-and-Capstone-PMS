@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import RolesDashboard from '../RolesComponents/RolesDashboard';
 import type { RolesProps, DepartmentRolesProps } from '../interface/roles';
 import RolesTable from '../RolesComponents/RolesTable';
+import { Spinner } from '@/components/ui/spinner';
 
 const Roles = () => {
 	const [roles, setRoles] = useState<RolesProps[]>([]);
@@ -44,13 +45,21 @@ const Roles = () => {
 					</span>
 				</div>
 			</div>
-			<RolesDashboard roles={roles} />
-			<RolesTable
-				departments={departments}
-				roles={roles}
-				loading={loading}
-				refresh={fetchRoles}
-			/>
+			{loading ? (
+				<div className="w-full h-full flex justify-center items-center text-muted-foreground">
+					<Spinner className="size-8" />
+				</div>
+			) : (
+				<>
+					<RolesDashboard roles={roles} />
+					<RolesTable
+						departments={departments}
+						roles={roles}
+						loading={loading}
+						refresh={fetchRoles}
+					/>
+				</>
+			)}
 		</>
 	);
 };

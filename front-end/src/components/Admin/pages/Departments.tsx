@@ -2,6 +2,8 @@ import { apiUrl } from '@/components/Routes/http';
 import DepartmentsDashboard from '../DepartmentsComponents/DepartmentsDashboard';
 import DepartmentsTable from '../DepartmentsComponents/DepartmentsTable';
 import { useEffect, useState } from 'react';
+import { Spinner } from '@/components/ui/spinner';
+import type { DepartmentProps } from '../interface/department';
 
 const Departments = () => {
 	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
@@ -41,12 +43,21 @@ const Departments = () => {
 					</span>
 				</div>
 			</div>
-			<DepartmentsDashboard departments={departments} />
-			<DepartmentsTable
-				departments={departments}
-				loading={loading}
-				refresh={fetchDepartments}
-			/>
+			{loading ? (
+				<div className="w-full h-full flex justify-center items-center text-muted-foreground">
+					<Spinner className="size-8" />
+				</div>
+			) : (
+				<>
+					{' '}
+					<DepartmentsDashboard departments={departments} />
+					<DepartmentsTable
+						departments={departments}
+						loading={loading}
+						refresh={fetchDepartments}
+					/>
+				</>
+			)}
 		</>
 	);
 };

@@ -44,6 +44,7 @@ import type {
 } from '../interface/programs';
 import ProgramAdd from './ProgramAdd';
 import ProgramEdit from './ProgramsEdit';
+import ProgramDetails from './ProgramDetails';
 
 type SortField = keyof ProgramsProps;
 type SortDirection = 'asc' | 'desc';
@@ -268,14 +269,14 @@ const ProgramsTable = ({
 											setOpen={setOpen}
 											onSuccess={refresh}
 										/>
+									) : clickedButton === 'details' ? (
+										<ProgramDetails
+											program={selectedProgram}
+											department={programDepartment}
+											open={open}
+											setOpen={setOpen}
+										/>
 									) : (
-										// ) : clickedButton === 'details' ? (
-										// 	<RoleDetails
-										// 		role={selectedRole}
-										// 		department={roleDepartment}
-										// 		open={open}
-										// 		setOpen={setOpen}
-										// 	/>
 										''
 									))}
 							</TableBody>
@@ -287,7 +288,7 @@ const ProgramsTable = ({
 						<p className="text-muted-foreground text-base font-semibold w-full">
 							Showing {startIndex + 1} to{' '}
 							{Math.min(startIndex + ITEMS_PER_PAGE, sortedPrograms.length)} of{' '}
-							{sortedPrograms.length} programs
+							{sortedPrograms.length} departments
 						</p>
 						<Pagination className="justify-end">
 							<PaginationContent>
