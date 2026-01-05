@@ -31,7 +31,6 @@ const Students = () => {
 				setDepartments(result.departments);
 				setRoles(result.roles);
 				setPrograms(result.programs);
-				console.log(result.students);
 			}
 		} catch (error) {
 			console.log(error);
@@ -42,6 +41,7 @@ const Students = () => {
 	useEffect(() => {
 		fetchStudents();
 	}, []);
+
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">

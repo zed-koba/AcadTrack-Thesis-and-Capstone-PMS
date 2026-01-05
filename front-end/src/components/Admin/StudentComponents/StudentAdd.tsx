@@ -28,32 +28,33 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from '@/components/ui/field';
-import type { StudentAdd } from '../interface/student';
+import type { StudentAddProps } from '../interface/student';
 
-const studentSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
-	student_id: z.string().min(1, 'Student ID is required'),
-	role: z.string().min(1, 'Role is required'),
-	mobile_num: z
-		.string()
-		.regex(/^(09\d{9}|\+639\d{9})$/, {
-			message: 'Invalid mobile number format',
-		})
-		.optional(),
-	program: z.string().min(1, 'Program is required'),
-	section: z.string().min(1, 'Section is required'),
-	semester: z.number().min(1, 'Must select a semester').max(2),
-	thesis_title: z.string().min(1, 'Thesis Title is required'),
-	year_Level: z.number().min(1, 'Must select a year level').max(4),
-	facebook_profile: z.string().optional(),
-});
+const studentSchema = z
+	.object({
+		name: z.string().min(1, 'Name is required'),
+		student_id: z.string().min(1, 'Student ID is required'),
+		role: z.number().min(1, 'Role is required'),
+		mobile_num: z.string().optional().nullable(),
+		selectedDepartmentId: z.number(),
+		program: z.number().min(1, 'Program is required'),
+		section: z.string().min(1, 'Section is required'),
+		semester: z.number().min(1, 'Must select a semester').max(2),
+		thesis_title: z.string().min(1, 'Thesis Title is required'),
+		year_Level: z.number().min(1, 'Must select a year level').max(4),
+		facebook_profile: z.string().optional(),
+	})
+	.refine((data) => data.selectedDepartmentId > 0, {
+		message: 'Select a department',
+		path: ['selectedDepartmentId'],
+	});
 
 const StudentAdd = ({
 	roles,
 	departments,
 	programs,
 	onSuccess,
-}: StudentAdd) => {
+}: StudentAddProps) => {
 	const [open, setOpen] = useState(false);
 	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -61,15 +62,16 @@ const StudentAdd = ({
 	type formValues = z.infer<typeof studentSchema>;
 	const defaultValues: formValues = {
 		student_id: '',
-		program: '',
+		program: 0,
 		section: '',
 		name: '',
-		role: '',
+		role: 0,
 		mobile_num: '',
 		semester: 0,
 		thesis_title: '',
 		year_Level: 0,
 		facebook_profile: '',
+		selectedDepartmentId: 0,
 	};
 	const form = useForm({
 		defaultValues,
@@ -80,16 +82,17 @@ const StudentAdd = ({
 		onSubmit: async ({ value }) => {
 			setLoading(true);
 			const payLoad = {
-				student_id: value.student_id,
-				role: value.role,
-				year_level: value.year_Level,
 				name: value.name,
+				student_id: value.student_id,
+				department_id: value.selectedDepartmentId,
+				program_id: value.program,
+				section: value.section,
 				mobile_num: value.mobile_num,
 				semester: value.semester,
-				thesis_title: value.thesis_title,
-				program: value.program,
-				section: value.section,
 				facebook_profile: value.facebook_profile,
+				year_level: value.year_Level,
+				thesis_title: value.thesis_title,
+				role_id: value.role === 0 ? null : value.role,
 			};
 			try {
 				const res = await fetch(`${apiUrl}/students/add`, {
@@ -118,9 +121,11 @@ const StudentAdd = ({
 					return;
 				}
 				form.reset();
-				toast.success('Sucessfully added proponent');
-				setOpen(false);
-				onSuccess?.();
+				if (result.status == 201) {
+					toast.success(result.message);
+					setOpen(false);
+					onSuccess?.();
+				}
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -128,6 +133,15 @@ const StudentAdd = ({
 			}
 		},
 	});
+	const [selectedDepartmentId, setSelectedDepartmentId] = useState(0);
+
+	const filteredPrograms = programs.filter(
+		(p) => p.department_id === selectedDepartmentId
+	);
+
+	const filteredRoles = roles.filter(
+		(r) => r.department_id === selectedDepartmentId
+	);
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
@@ -283,7 +297,7 @@ const StudentAdd = ({
 													aria-invalid={isInvalid}
 													id={field.name}
 												>
-													<SelectValue placeholder="Select Semester" />
+													<SelectValue placeholder="Select Year Level" />
 												</SelectTrigger>
 												<SelectContent>
 													<SelectItem value="3">3rd Year</SelectItem>
@@ -299,30 +313,80 @@ const StudentAdd = ({
 							/>
 						</div>
 						<form.Field
-							name="program"
+							name="selectedDepartmentId"
 							children={(field) => {
 								const isInvalid =
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Program:</FieldLabel>
+										<FieldLabel htmlFor={field.name}>Departments:</FieldLabel>
 										<Select
 											name={field.name}
-											defaultValue={field.state.value}
-											onValueChange={(v) => field.handleChange(v)}
+											defaultValue={
+												field.state.value ? String(field.state.value) : ''
+											}
+											onValueChange={(v) => {
+												field.handleChange(Number(v));
+												setSelectedDepartmentId(Number(v));
+											}}
 										>
 											<SelectTrigger
 												className="w-auto"
 												aria-invalid={isInvalid}
 												id={field.name}
 											>
-												<SelectValue placeholder="Select Program" />
+												<SelectValue placeholder="Select a Department" />
 											</SelectTrigger>
 											<SelectContent>
-												<SelectItem value="BSCS">BSCS</SelectItem>
-												<SelectItem value="BSIT">BSIT</SelectItem>
-												<SelectItem value="BSCpE">BSCpE</SelectItem>
-												<SelectItem value="BSIS">BSIS</SelectItem>
+												{departments?.map((dept) => (
+													<SelectItem key={dept.id} value={String(dept.id)}>
+														{dept.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<form.Field
+							name="program"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Programs:</FieldLabel>
+										<Select
+											name={field.name}
+											defaultValue={
+												field.state.value ? String(field.state.value) : ''
+											}
+											onValueChange={(v) => field.handleChange(Number(v))}
+											disabled={selectedDepartmentId === 0 ? true : false}
+										>
+											<SelectTrigger
+												className="w-auto"
+												aria-invalid={isInvalid}
+												id={field.name}
+											>
+												<SelectValue
+													placeholder={
+														selectedDepartmentId === 0
+															? 'Select a department first'
+															: 'Select a program'
+													}
+												/>
+											</SelectTrigger>
+											<SelectContent>
+												{filteredPrograms.map((prog) => (
+													<SelectItem key={prog.id} value={String(prog.id)}>
+														{prog.name}
+													</SelectItem>
+												))}
 											</SelectContent>
 										</Select>
 										{isInvalid && (
@@ -368,26 +432,32 @@ const StudentAdd = ({
 											<FieldLabel htmlFor={field.name}>Role:</FieldLabel>
 											<Select
 												name={field.name}
-												defaultValue={field.state.value}
-												onValueChange={(v) => field.handleChange(v)}
+												defaultValue={
+													field.state.value ? String(field.state.value) : ''
+												}
+												onValueChange={(v) => field.handleChange(Number(v))}
+												disabled={selectedDepartmentId === 0 ? true : false}
 											>
 												<SelectTrigger
 													className="w-auto"
 													aria-invalid={isInvalid}
 													id={field.name}
 												>
-													<SelectValue placeholder="Select Role" />
+													<SelectValue
+														placeholder={
+															selectedDepartmentId === 0
+																? 'Select a department'
+																: 'Select a role'
+														}
+													/>
 												</SelectTrigger>
 												<SelectContent>
-													<SelectItem value="not assigned">
-														Not Assigned
-													</SelectItem>
-													<SelectItem value="programmer">Programmer</SelectItem>
-													<SelectItem value="user interface">UI</SelectItem>
-													<SelectItem value="database">Database</SelectItem>
-													<SelectItem value="system analyst">
-														System Analyst
-													</SelectItem>
+													<SelectItem value="0">Not Assigned</SelectItem>
+													{filteredRoles.map((role) => (
+														<SelectItem key={role.id} value={String(role.id)}>
+															{role.name}
+														</SelectItem>
+													))}
 												</SelectContent>
 											</Select>
 											{isInvalid && (

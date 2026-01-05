@@ -375,11 +375,11 @@ const AdviserEdit = ({
 								<Button
 									className="cursor-pointer"
 									type="submit"
-									variant="primary"
+									variant="edit"
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Add Program'}
+									{loading ? 'Adding...' : 'Update Adviser'}
 									{loading ? '' : <Plus />}
 								</Button>
 							</div>

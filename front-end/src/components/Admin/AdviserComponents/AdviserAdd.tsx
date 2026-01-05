@@ -365,7 +365,7 @@ const AdviserAdd = ({ departments, onSuccess }: AdviserAddProps) => {
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Add Program'}
+									{loading ? 'Adding...' : 'Add Adviser'}
 									{loading ? '' : <Plus />}
 								</Button>
 							</div>

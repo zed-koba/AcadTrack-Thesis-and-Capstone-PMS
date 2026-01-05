@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('propsdetails_id');
             $table->string('foreign_proponents_id');
             $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
-            $table->string('name');
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

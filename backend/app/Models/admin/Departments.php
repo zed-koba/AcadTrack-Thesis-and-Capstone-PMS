@@ -26,4 +26,8 @@ class Departments extends Model
     public function programs():HasMany {
         return $this->hasMany(Programs::class, 'department_id');
     }
+
+    public function students():HasMany {
+        return $this->hasMany(Students::class,'department_id');
+    }
 }

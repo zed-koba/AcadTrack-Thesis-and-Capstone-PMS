@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\admin\Proponents;
 use App\Models\admin\ProponentsDetails;
 use App\Http\Controllers\Controller;
+use App\Models\admin\Advisers;
+use App\Models\admin\Programs;
+use App\Models\admin\Students;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
@@ -15,10 +18,15 @@ class ProponentsController extends Controller
   public function getProponents()
   {
     $proponents = Proponents::with('details')->orderBy('created_at', 'DESC')->get();
-
+    $advisers = Advisers::where('status', 'active')->get();
+    $programs = Programs::where('status','active')->get();
+    $students = Students::orderBy('created_at', 'DESC')->get();
     return response()->json([
       'status' => 200,
-      'data' => $proponents,
+      'proponents' => $proponents,
+      'programs' => $programs,
+      'advisers' => $advisers,
+      'students' => $students,
     ],200);
   }
 
@@ -28,10 +36,9 @@ class ProponentsController extends Controller
       'academic_yr' => 'required|string',
       'semester' => 'required|integer',
       'title' => 'required|string',
-      'adviser' => 'required|string',
-      'program' => 'required',
-      'details' => 'array|max:4',
-      'details.*.name' => 'string',
+      'adviser_id' => 'required|integer',
+      'program_id' => 'required|integer',
+      'students_id' => 'array|nullable',
     ];
     $validator = Validator::make($request->all(), $rules);
     if ($validator->fails()) {
@@ -49,14 +56,14 @@ class ProponentsController extends Controller
         'academic_yr' => $request->academic_yr,
         'semester' => (int) $request->semester,
         'title' => $request->title,
-        'adviser' => $request->adviser,
-        'program' => $request->program,
+        'adviser_id' => $request->adviser,
+        'program_id' => $request->program,
       ]);
-      if (isset($request->details)) {
-        foreach ($request->details as $detail) {
-          ProponentsDetails::create([
+      if (isset($request->students_id)) {
+        foreach ($request->students_id as $student) {
+          ProponentsDetails::create(attributes: [
             'foreign_proponents_id' => $proponents->proponents_id,
-            'name' => $detail['name'],
+            'student_id' => $student,
           ]);
         }
       }

@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('advisers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->longText('description')->nullable();
-            $table->boolean('globalRole')->default(false);
-            $table->integer('assigned')->default(0);
-            $table->foreignId('department_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
+            $table->string('contact_number')->nullable();
+            $table->foreignId('department_id')->nullable()->constrained();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->timestamps();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('advisers');
     }
 };

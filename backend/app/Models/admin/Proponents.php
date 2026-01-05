@@ -15,8 +15,8 @@ class Proponents extends Model
         'academic_yr', 
         'semester', 
         'title', 
-        'adviser', 
-        'program'];
+        'adviser_id', 
+        'program_id'];
 
     public function details():HasMany {
         return $this->hasMany(ProponentsDetails::class, 'foreign_proponents_id', 'proponents_id');

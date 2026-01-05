@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/pagination';
 import { formatDate } from '@/components/functions/functions';
 
-import type { StudentProps, StudentsTable } from '../interface/student';
+import type { StudentProps, StudentsTableProps } from '../interface/student';
 import StudentAdd from './StudentAdd';
 import StudentEdit from './StudentEdit';
 import StudentDetails from './StudentDetails';
@@ -56,7 +56,7 @@ const StudentTable = ({
 	programs,
 	loading,
 	refresh,
-}: StudentsTable) => {
+}: StudentsTableProps) => {
 	const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
 		null
 	);
@@ -80,9 +80,6 @@ const StudentTable = ({
 		return (
 			stud.name.toLowerCase().includes(searchLower) ||
 			stud.student_id.toLowerCase().includes(searchLower) ||
-			stud.mobile_num.toLowerCase().includes(searchLower) ||
-			stud.role.toLowerCase().includes(searchLower) ||
-			stud.program.toLowerCase().includes(searchLower) ||
 			stud.section.toLowerCase().includes(searchLower) ||
 			semesterLabel.toLowerCase().includes(searchLower) ||
 			yearLevelLabel.toLowerCase().includes(searchLower) ||
@@ -109,7 +106,17 @@ const StudentTable = ({
 		startIndex + ITEMS_PER_PAGE
 	);
 
-	const getBadges = (label: string) => {};
+	const getBadges = (id: number, type: string) => {
+		const findRole = roles.find((r) => r.id === id);
+		const findProgram = programs.find((p) => p.id === id);
+		const findDepartment = departments.find((d) => d.id === id);
+		if (type === 'role')
+			return <Badge variant="outline">{findRole?.name}</Badge>;
+		if (type === 'program')
+			return <Badge variant="outline">{findProgram?.code}</Badge>;
+		if (type === 'department')
+			return <Badge variant="outline">{findDepartment?.code}</Badge>;
+	};
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -129,7 +136,12 @@ const StudentTable = ({
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<StudentAdd onSuccess={refresh} />
+						<StudentAdd
+							roles={roles}
+							departments={departments}
+							programs={programs}
+							onSuccess={refresh}
+						/>
 					</div>
 				</div>
 				<div className="mb-4 flex items-center justify-between">
@@ -155,13 +167,13 @@ const StudentTable = ({
 										Thesis Title
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
+										Department
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left">
 										Program
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
 										Section
-									</TableHead>
-									<TableHead className="text-muted-foreground text-left">
-										Mobile Number
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
 										Semester
@@ -209,19 +221,20 @@ const StudentTable = ({
 												{student.name}
 											</TableCell>
 											<TableCell className="text-white text-center capitalize">
-												<Badge variant="outline">{student.role}</Badge>{' '}
+												{getBadges(student.role_id, 'role')}
 											</TableCell>
 											<TableCell className="text-left text-white">
 												{student.thesis_title}
 											</TableCell>
 											<TableCell className="text-left text-white">
-												{student.program}
+												{getBadges(student.department_id, 'department')}
+											</TableCell>
+											<TableCell className="text-left text-white">
+												{getBadges(student.program_id, 'program')}
 											</TableCell>
 											<TableCell className="text-left text-white">
 												{student.section}
 											</TableCell>
-
-											<TableCell>{student.mobile_num}</TableCell>
 											<TableCell className="text-white">
 												{student.semester === 1
 													? '1st Semester'
@@ -280,6 +293,9 @@ const StudentTable = ({
 									(clickedButton === 'edit' ? (
 										<StudentEdit
 											student={selectedStudent}
+											roles={roles}
+											departments={departments}
+											programs={programs}
 											open={open}
 											setOpen={setOpen}
 											onSuccess={refresh}

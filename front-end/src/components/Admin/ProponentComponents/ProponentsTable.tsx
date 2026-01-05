@@ -14,7 +14,10 @@ import {
 	InputGroupInput,
 	InputGroupAddon,
 } from '@/components/ui/input-group';
-import type { ProponentsProps } from '../interface/proponent';
+import type {
+	ProponentsProps,
+	ProponentsTableProps,
+} from '../interface/proponent';
 
 import {
 	Search,
@@ -67,50 +70,23 @@ const SortButton = ({
 		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm font-semibold" />
 	</Button>
 );
-const ProponentsTable = () => {
-	const [proponents, setProponents] = useState<ProponentsProps[]>([]);
+const ProponentsTable = ({
+	students,
+	proponents,
+	advisers,
+	programs,
+	loading,
+	refresh,
+}: ProponentsTableProps) => {
 	const [selectedProponent, setSelectedProponent] =
 		useState<ProponentsProps | null>(null);
 	const [open, setOpen] = useState(false);
-	const [loading, setLoading] = useState(true);
 	const [proponentId, setProponetId] = useState<number | null>(null);
 	const [clickedButton, setClickedButton] = useState<string | null>(null);
 	const [sortField, setSortField] = useState<SortField>('created_at');
 	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
-
-	const fetchData = async () => {
-		try {
-			const res = await fetch(`${apiUrl}/proponents`, {
-				method: 'GET',
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
-				},
-			});
-			if (!res.ok) throw new Error('Failed to fetch data');
-
-			const data = await res.json();
-			setProponents(data.data);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	};
-	useEffect(() => {
-		fetchData();
-	}, []);
-
-	const handleSort = (field: SortField) => {
-		if (sortField === field) {
-			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-		} else {
-			setSortField(field);
-			setSortDirection('asc');
-		}
-	};
 
 	const filteredProponents = proponents.filter((props) => {
 		const searchLower = searchTerm.toLowerCase();
@@ -171,7 +147,12 @@ const ProponentsTable = () => {
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<ProponentsAdd onSuccess={fetchData} />
+						<ProponentsAdd
+							students={students}
+							advisers={advisers}
+							programs={programs}
+							refresh={refresh}
+						/>
 					</div>
 				</div>
 				<div className="mb-4 flex items-center justify-between">
@@ -183,62 +164,30 @@ const ProponentsTable = () => {
 					<div className="w-auto overflow-x-auto">
 						<Table className="w-full">
 							<TableHeader>
-								<TableRow>
-									<TableHead className="text-left pl-5">
-										<SortButton
-											field="proponents_id"
-											label="Proponent ID"
-											onSort={handleSort}
-										/>
+								<TableRow className="text-muted-foreground">
+									<TableHead className="text-left pl-4 text-muted-foreground">
+										Proponent ID
 									</TableHead>
-									<TableHead>
-										<SortButton
-											field="title"
-											label="Title"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Title
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											field="academic_yr"
-											label="Academic Year"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Academic Year
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											field="semester"
-											label="Semester"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Semester
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											field="program"
-											label="Program"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Program
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											field="adviser"
-											label="Adviser"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Adviser
 									</TableHead>
-									<TableHead>
-										<SortButton
-											field="created_at"
-											label="Created At"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Created At
 									</TableHead>
-									<TableHead>
-										<SortButton
-											field="updated_at"
-											label="Updated At"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground">
+										Updated At
 									</TableHead>
 									<TableHead className="text-center text-muted-foreground">
 										Actions
@@ -341,7 +290,7 @@ const ProponentsTable = () => {
 											open={open}
 											setOpen={setOpen}
 											proponent={selectedProponent}
-											onSuccess={fetchData}
+											onSuccess={refresh}
 										/>
 									) : clickedButton === 'details' ? (
 										<ProponentDetails

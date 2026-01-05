@@ -1,9 +1,9 @@
 export type StudentProps = {
 	id: number;
 	student_id: string;
-	role: string;
+	role_id: number;
 	mobile_num: string;
-	program: string;
+	program_id: number;
 	section: string;
 	semester: number;
 	year_level: number;
@@ -33,16 +33,17 @@ export type ProgramsStudentsProps = {
 	code: string;
 	department_id: number;
 };
-export type StudentsTable = {
+export type StudentsTableProps = {
 	students: StudentProps[];
 	departments: DepartmentStudentsProps[];
+	programs: ProgramsStudentsProps[];
 	roles: RolesStudentsProps[];
 
 	loading: boolean;
 	refresh?: () => void;
 };
 
-export type StudentAdd = {
+export type StudentAddProps = {
 	programs: ProgramsStudentsProps[];
 	departments: DepartmentStudentsProps[];
 	roles: RolesStudentsProps[];
@@ -52,6 +53,9 @@ export type StudentEditProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	student: StudentProps;
+	programs: ProgramsStudentsProps[];
+	departments: DepartmentStudentsProps[];
+	roles: RolesStudentsProps[];
 	onSuccess?: () => void;
 };
 

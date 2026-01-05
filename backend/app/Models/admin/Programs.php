@@ -4,6 +4,7 @@ namespace App\Models\admin;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Programs extends Model
 {
@@ -13,4 +14,9 @@ class Programs extends Model
     public function department():BelongsTo {
         return $this->belongsTo(Departments::class, 'department_id');
     }
+
+    public function students():HasMany {
+        return $this->hasMany(Students::class,'program_id');
+    }
+
 }

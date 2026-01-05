@@ -47,19 +47,20 @@ class AdvisersController extends Controller
 
         DB::beginTransaction();
         try {
-            $advisers = Advisers::create([
-                'name' => $request->name,
-                'account_id' => 1,
-                'contact_number' => $request->contact_number,
-                'department_id' => $request->department_id,
-                'status' => $request->status,
-            ]);
             $account = Accounts::create([
                 'email' => $request->email,
                 'password' => '123',
                 'status' => 'pending',
                 'role' => 'adviser',
             ]);
+            $advisers = Advisers::create([
+                'name' => $request->name,
+                'account_id' => $account->id,
+                'contact_number' => $request->contact_number,
+                'department_id' => $request->department_id,
+                'status' => $request->status,
+            ]);
+            
             DB::commit();
             return response()->json([
                 'status' => 201,

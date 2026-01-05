@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\admin\Departments;
 use App\Models\admin\Programs;
 use App\Models\admin\Role;
-use App\Models\Students;
+use App\Models\admin\Students;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -32,19 +32,19 @@ class StudentsController extends Controller
         $rules = [
             'name' => 'required',
             'student_id' => 'required|unique:students,student_id',
-            'program' => 'required',
+            'department_id' => 'nullable|integer',
+            'program_id' => 'nullable|integer',
             'section' => 'required',
             'mobile_num' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|max:11',
             'semester' => 'required',
             'facebook_profile' => 'nullable',
             'year_level' => 'required',
             'thesis_title' => 'nullable',
-            'role' => 'in:not assigned,programmer,database,user interface,system analyst|required',
+            'role_id' => 'integer|nullable',
 
         ];
         $messages = [
             'student_id.unique' => 'Student ID already exists',
-            'role.in' => 'Selected role is invalid',
             'mobile_num.regex' => 'Mobile number format is invalid',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -59,28 +59,33 @@ class StudentsController extends Controller
         }
         try {
             DB::beginTransaction();
-            $student = new Students();
-            $student->name = $request->name;
-            $student->student_id = $request->student_id;
-            $student->program = $request->program;
-            $student->section = $request->section;
-            $student->mobile_num = $request->mobile_num;
-            $student->semester = $request->semester;
-            $student->facebook_profile = $request->facebook_profile;
-            $student->year_level = $request->year_level;
-            $student->thesis_title = $request->thesis_title;
-            $student->role = $request->role;
-            $student->save();
+            $student = Students::create([
+                'name' => $request->name,
+                'student_id' => $request->student_id,
+                'department_id' => $request->department_id,
+                'program_id' => $request->program_id,
+                'section' => $request->section,
+                'mobile_num' => $request->mobile_num,
+                'semester' => $request->semester,
+                'facebook_profile' => $request->facebook_profile,
+                "year_level" => $request->year_level,
+                "thesis_title" => $request->thesis_title,
+                "role_id" => $request->role_id,
+
+            ]);
+            
             DB::commit();
             return response()->json([
-                'status' => 200,
+                'status' => 201,
                 'message' => 'Successfully added student',
-            ]);
+    
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 500,
                 'message' => 'An error occurred while registering the account.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -90,19 +95,19 @@ class StudentsController extends Controller
         $rules = [
             'name' => 'required',
             'student_id' => 'required|unique:students,student_id,' . $id,
-            'program' => 'required',
+            'department_id' => 'nullable|integer',
+            'program_id' => 'nullable|integer',
             'section' => 'required',
             'mobile_num' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|max:11',
             'semester' => 'required',
             'facebook_profile' => 'nullable',
             'year_level' => 'required',
             'thesis_title' => 'nullable',
-            'role' => 'in:not assigned,programmer,database,user interface,system analyst|required',
+            'role_id' => 'integer|nullable',
 
         ];
         $messages = [
             'student_id.unique' => 'Student ID already exists',
-            'role.in' => 'Selected role is invalid',
             'mobile_num.regex' => 'Mobile number format is invalid',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -118,7 +123,7 @@ class StudentsController extends Controller
         try {
             DB::beginTransaction();
             $student = Students::find($id);
-            $student->update($request->only(['name', 'student_id', 'program', 'section', 'mobile_num', 'semester', 'facebook_profile', 'year_level', 'thesis_title', 'role']));
+            $student->update($request->only(['name', 'student_id','department_id', 'program_id', 'section', 'mobile_num', 'semester', 'facebook_profile', 'year_level', 'thesis_title', 'role_id']));
 
             DB::commit();
             return response()->json([

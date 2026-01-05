@@ -15,14 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('student_id', 20)->unique();
-            $table->string('program', 6);
+            $table->foreignId('department_id')->nullable()->constrained();
+            $table->foreignId('program_id')->nullable()->constrained();
             $table->string('section');
             $table->string('mobile_num')->nullable();
             $table->integer('semester');
             $table->string('facebook_profile')->nullable();
             $table->integer('year_level');
             $table->string('thesis_title')->nullable();
-            $table->enum('role', ['not assigned', 'programmer', 'database', 'user interface', 'system analyst'])->default('not assigned');
+            $table->foreignId('role_id')->nullable()->constrained();
             $table->timestamps();
         });
     }
