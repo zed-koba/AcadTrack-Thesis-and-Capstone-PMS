@@ -180,7 +180,7 @@ const ProgramsTable = ({
 											colSpan={9}
 											className="-ml-3 h-8 text-white text-center"
 										>
-											No departments found
+											No programs found
 										</TableCell>
 									</TableRow>
 								) : (

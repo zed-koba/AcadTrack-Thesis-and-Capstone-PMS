@@ -7,8 +7,7 @@ import {
 	TableCell,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import { apiUrl } from '@/components/Routes/http';
+import { useState } from 'react';
 import {
 	InputGroup,
 	InputGroupInput,
@@ -19,7 +18,6 @@ import {
 	PencilRuler,
 	ReceiptText,
 	Trash,
-	ArrowUpDown,
 	MoreHorizontal,
 	PowerOff,
 } from 'lucide-react';
@@ -34,7 +32,7 @@ import {
 } from '@/components/ui/pagination';
 import { formatDate } from '@/components/functions/functions';
 
-import type { StudentProps } from '../interface/student';
+import type { StudentProps, StudentsTable } from '../interface/student';
 import StudentAdd from './StudentAdd';
 import StudentEdit from './StudentEdit';
 import StudentDetails from './StudentDetails';
@@ -45,36 +43,23 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 type SortField = keyof StudentProps;
 type SortDirection = 'asc' | 'desc';
 const ITEMS_PER_PAGE = 10;
-const SortButton = ({
-	field,
-	label,
-	onSort,
-}: {
-	field: SortField;
-	label: string;
-	onSort: (field: SortField) => void;
-}) => (
-	<Button
-		variant="ghost"
-		size="sm"
-		className="-ml-3 h-8 font-semibold text-muted-foreground"
-		onClick={() => onSort(field)}
-	>
-		{label}
-		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm" />
-	</Button>
-);
 
-const StudentTable = () => {
-	const [students, setAccounts] = useState<StudentProps[]>([]);
+const StudentTable = ({
+	students,
+	departments,
+	roles,
+	programs,
+	loading,
+	refresh,
+}: StudentsTable) => {
 	const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
 		null
 	);
-	const [loading, setLoading] = useState(true);
 	const [studentId, setStudentId] = useState<number | null>(null);
 	const [clickedButton, setClickedButton] = useState<string | null>(null);
 	const [sortField, setSortField] = useState<SortField>('created_at');
@@ -82,37 +67,7 @@ const StudentTable = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [open, setOpen] = useState(false);
-
-	const fetchStudents = async () => {
-		try {
-			const res = await fetch(`${apiUrl}/students`, {
-				method: 'GET',
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
-				},
-			});
-			if (!res.ok) throw new Error('Failed to fetch data');
-			const data = await res.json();
-			setAccounts(data.data);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	};
-	useEffect(() => {
-		fetchStudents();
-	}, []);
-	const handleSort = (field: SortField) => {
-		if (sortField === field) {
-			setSortDrection(sortDirection === 'asc' ? 'desc' : 'asc');
-		} else {
-			setSortField(field);
-			setSortDrection('asc');
-		}
-	};
-
+	//console.log(students);
 	const filteredStudents = students.filter((stud) => {
 		const searchLower = searchTerm.toLowerCase();
 		const yearLevelLabel = stud.year_level === 3 ? '3rd Year' : '4th Year';
@@ -153,6 +108,8 @@ const StudentTable = () => {
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
+
+	const getBadges = (label: string) => {};
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -172,7 +129,7 @@ const StudentTable = () => {
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<StudentAdd onSuccess={fetchStudents} />
+						<StudentAdd onSuccess={refresh} />
 					</div>
 				</div>
 				<div className="mb-4 flex items-center justify-between">
@@ -180,72 +137,40 @@ const StudentTable = () => {
 						Total Students: {students.length}
 					</p>
 				</div>
-				<div className="rounded-lg border bg-card">
+				<div className="rounded-lg border bg-card mt-3 shadow-sm">
 					<div className="w-auto overflow-x-auto">
 						<Table className="w-full">
 							<TableHeader>
 								<TableRow>
-									<TableHead className="text-left">
-										<SortButton
-											label="Student ID"
-											field="student_id"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-left text-muted-foreground pl-4">
+										Student ID
 									</TableHead>
-									<TableHead>
-										<SortButton label="Name" field="name" onSort={handleSort} />
+									<TableHead className="text-muted-foreground text-left">
+										Name
 									</TableHead>
-									<TableHead className="text-center">
-										<SortButton label="Role" field="role" onSort={handleSort} />
+									<TableHead className="text-muted-foreground text-left">
+										Role
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Thesis Title"
-											field="thesis_title"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left max-w-[300px]">
+										Thesis Title
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Program"
-											field="program"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Program
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Section"
-											field="section"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Section
 									</TableHead>
-									<TableHead className="text-center">
-										<SortButton
-											label="Mobile Number"
-											field="mobile_num"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Mobile Number
 									</TableHead>
-									<TableHead className="text-center">
-										<SortButton
-											label="Semester"
-											field="semester"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Semester
 									</TableHead>
-									<TableHead className="text-center">
-										<SortButton
-											label="Year Level"
-											field="year_level"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Year Level
 									</TableHead>
-									<TableHead>
-										<SortButton
-											label="Created At"
-											field="created_at"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Created At
 									</TableHead>
 									<TableHead className="text-center text-muted-foreground">
 										Actions
@@ -273,45 +198,36 @@ const StudentTable = () => {
 									</TableRow>
 								) : (
 									paginationProps.map((student) => (
-										<TableRow key={student.id} className="text-white">
-											<TableCell className="text-left">
+										<TableRow
+											key={student.id}
+											className="text-muted-foreground"
+										>
+											<TableCell className="text-left pl-3 text-white">
 												{student.student_id}
 											</TableCell>
-											<TableCell>{student.name}</TableCell>
-											<TableCell className="text-center capitalize">
-												<div
-													className={`text-base ${
-														student.role == 'programmer'
-															? 'bg-destructive'
-															: student.role == 'database'
-															? 'bg-green-400'
-															: student.role == 'user interface'
-															? 'bg-amber-400'
-															: student.role == 'system analyst'
-															? 'bg-blue-400'
-															: 'bg-pending'
-													} px-2 py-0.5 border-none rounded-4xl text-sm text-white font-semibold flex items-center justify-center `}
-												>
-													{student.role}
-												</div>
+											<TableCell className="text-white">
+												{student.name}
 											</TableCell>
-											<TableCell className="text-left">
+											<TableCell className="text-white text-center capitalize">
+												<Badge variant="outline">{student.role}</Badge>{' '}
+											</TableCell>
+											<TableCell className="text-left text-white">
 												{student.thesis_title}
 											</TableCell>
-											<TableCell className="text-left">
+											<TableCell className="text-left text-white">
 												{student.program}
 											</TableCell>
-											<TableCell className="text-left">
+											<TableCell className="text-left text-white">
 												{student.section}
 											</TableCell>
 
 											<TableCell>{student.mobile_num}</TableCell>
-											<TableCell>
+											<TableCell className="text-white">
 												{student.semester === 1
 													? '1st Semester'
 													: '2nd Semester'}
 											</TableCell>
-											<TableCell>
+											<TableCell className="text-white">
 												{student.year_level === 3 ? '3rd Year' : '4th Year'}
 											</TableCell>
 											<TableCell>{formatDate(student.created_at)}</TableCell>
@@ -366,7 +282,7 @@ const StudentTable = () => {
 											student={selectedStudent}
 											open={open}
 											setOpen={setOpen}
-											onSuccess={fetchStudents}
+											onSuccess={refresh}
 										/>
 									) : clickedButton === 'details' ? (
 										<StudentDetails
@@ -379,7 +295,7 @@ const StudentTable = () => {
 											student_id={studentId}
 											open={open}
 											setOpen={setOpen}
-											onSuccess={fetchStudents}
+											onSuccess={refresh}
 										/>
 									))}
 							</TableBody>

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('advisers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->string('contact_number')->nullable();
             $table->foreignId('department_id')->constrained()->cascadeOnDelete();
             $table->enum('status', ['active', 'inactive'])->default('inactive');

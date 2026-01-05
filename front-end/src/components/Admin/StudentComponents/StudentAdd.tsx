@@ -28,6 +28,7 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from '@/components/ui/field';
+import type { StudentAdd } from '../interface/student';
 
 const studentSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
@@ -46,10 +47,13 @@ const studentSchema = z.object({
 	year_Level: z.number().min(1, 'Must select a year level').max(4),
 	facebook_profile: z.string().optional(),
 });
-type Props = {
-	onSuccess?: () => void;
-};
-const StudentAdd = ({ onSuccess }: Props) => {
+
+const StudentAdd = ({
+	roles,
+	departments,
+	programs,
+	onSuccess,
+}: StudentAdd) => {
 	const [open, setOpen] = useState(false);
 	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -294,42 +298,41 @@ const StudentAdd = ({ onSuccess }: Props) => {
 								}}
 							/>
 						</div>
-						<div className="grid grid-cols-3 gap-4">
-							<form.Field
-								name="program"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Program:</FieldLabel>
-											<Select
-												name={field.name}
-												defaultValue={field.state.value}
-												onValueChange={(v) => field.handleChange(v)}
+						<form.Field
+							name="program"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Program:</FieldLabel>
+										<Select
+											name={field.name}
+											defaultValue={field.state.value}
+											onValueChange={(v) => field.handleChange(v)}
+										>
+											<SelectTrigger
+												className="w-auto"
+												aria-invalid={isInvalid}
+												id={field.name}
 											>
-												<SelectTrigger
-													className="w-auto"
-													aria-invalid={isInvalid}
-													id={field.name}
-												>
-													<SelectValue placeholder="Select Program" />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectItem value="BSCS">BSCS</SelectItem>
-													<SelectItem value="BSIT">BSIT</SelectItem>
-													<SelectItem value="BSCpE">BSCpE</SelectItem>
-													<SelectItem value="BSIS">BSIS</SelectItem>
-												</SelectContent>
-											</Select>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
-
+												<SelectValue placeholder="Select Program" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="BSCS">BSCS</SelectItem>
+												<SelectItem value="BSIT">BSIT</SelectItem>
+												<SelectItem value="BSCpE">BSCpE</SelectItem>
+												<SelectItem value="BSIS">BSIS</SelectItem>
+											</SelectContent>
+										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<div className="grid grid-cols-2 gap-4">
 							<form.Field
 								name="section"
 								children={(field) => {

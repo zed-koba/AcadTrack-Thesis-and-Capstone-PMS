@@ -19,7 +19,7 @@ class ProponentsController extends Controller
     return response()->json([
       'status' => 200,
       'data' => $proponents,
-    ]);
+    ],200);
   }
 
   public function storeProponent(Request $request)

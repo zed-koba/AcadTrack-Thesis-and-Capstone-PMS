@@ -1,21 +1,14 @@
 import { CircleCheckBig, CircleX, UserCog, Users2 } from 'lucide-react';
-import type { ProgramsDashboardProps } from '../interface/programs';
+import type { AdviserDashboardProps } from '../interface/adviser';
 
-const ProgramsDashboard = ({ programs = [] }: ProgramsDashboardProps) => {
-	const activeCount = programs.filter((r) => r.status === 'active').length;
-	const inactiveCount = programs.filter((r) => r.status === 'inactive').length;
-	const mostStudents =
-		programs.length === 0
-			? undefined
-			: programs.reduce(
-					(prev, curr) =>
-						curr.students_count > prev.students_count ? curr : prev,
-					programs[0]
-			  );
+const AdvisersDashboard = ({ advisers = [] }: AdviserDashboardProps) => {
+	const activeCount = advisers.filter((r) => r.status === 'active').length;
+	const inactiveCount = advisers.filter((r) => r.status === 'inactive').length;
+
 	const dashboards = [
 		{
 			label: 'Total Programs',
-			value: programs.length,
+			value: advisers.length,
 			icon: <UserCog size={16} />,
 		},
 		{
@@ -24,16 +17,11 @@ const ProgramsDashboard = ({ programs = [] }: ProgramsDashboardProps) => {
 			icon: <CircleCheckBig size={16} />,
 		},
 		{ label: 'Inactive ', value: inactiveCount, icon: <CircleX size={16} /> },
-		{
-			label: 'Most Students Enrolled',
-			value: mostStudents?.code,
-			icon: <Users2 size={16} />,
-		},
 	];
 	return (
 		<>
 			<div className="grid grid-row-2 gap-4 mt-5">
-				<div className="grid md:grid-cols-4 gap-2">
+				<div className="grid md:grid-cols-3 gap-2">
 					{dashboards.map((dashboard, index) => (
 						<div className="border rounded-lg p-6 flex flex-col justify-start items-start bg-card text-white shadow-sm gap-5">
 							<div className="flex justify-between w-full space-y-0">
@@ -52,13 +40,7 @@ const ProgramsDashboard = ({ programs = [] }: ProgramsDashboardProps) => {
 										: 'font-semibold text-3xl'
 								} text-white`}
 							>
-								{programs.length === 0 ? 'No Program' : dashboard.value}
-								{index === dashboards.length - 1 && (
-									<div className="text-muted-foreground font-normal text-sm">
-										{programs.length === 0 ? '' : mostStudents?.students_count}{' '}
-										Students
-									</div>
-								)}
+								{dashboard.value}
 							</span>
 						</div>
 					))}
@@ -68,4 +50,4 @@ const ProgramsDashboard = ({ programs = [] }: ProgramsDashboardProps) => {
 	);
 };
 
-export default ProgramsDashboard;
+export default AdvisersDashboard;

@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\admin;
 
+use App\Models\admin\Advisers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Accounts extends Model
 {
@@ -24,4 +26,8 @@ class Accounts extends Model
         'password',
         'remember_token',
     ];
+
+    public function adviser(): HasOne {
+        return $this->hasOne(Advisers::class, 'account_id');
+    }
 }

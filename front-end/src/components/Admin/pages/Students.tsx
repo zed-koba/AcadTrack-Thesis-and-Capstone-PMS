@@ -1,6 +1,47 @@
+import { apiUrl } from '@/components/Routes/http';
+import {
+	type DepartmentStudentsProps,
+	type ProgramsStudentsProps,
+	type RolesStudentsProps,
+	type StudentProps,
+} from '../interface/student';
 import StudentTable from '../StudentComponents/StudentTable';
+import { useState, useEffect } from 'react';
+import { Spinner } from '@/components/ui/spinner';
 
 const Students = () => {
+	const [loading, setLoading] = useState(true);
+	const [students, setStudents] = useState<StudentProps[]>([]);
+	const [departments, setDepartments] = useState<DepartmentStudentsProps[]>([]);
+	const [roles, setRoles] = useState<RolesStudentsProps[]>([]);
+	const [programs, setPrograms] = useState<ProgramsStudentsProps[]>([]);
+	const fetchStudents = async () => {
+		try {
+			const res = await fetch(`${apiUrl}/students`, {
+				method: 'GET',
+				headers: {
+					'Content-type': 'application/json',
+					Accept: 'application/json',
+				},
+			});
+			if (!res.ok) throw new Error('Failed to fetch data');
+			const result = await res.json();
+			if (result.status === 200) {
+				setStudents(result.students);
+				setDepartments(result.departments);
+				setRoles(result.roles);
+				setPrograms(result.programs);
+				console.log(result.students);
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+	useEffect(() => {
+		fetchStudents();
+	}, []);
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
@@ -11,7 +52,22 @@ const Students = () => {
 					</span>
 				</div>
 			</div>
-			<StudentTable />
+			{loading ? (
+				<div className="w-full h-full flex justify-center items-center text-muted-foreground">
+					<Spinner className="size-8" />
+				</div>
+			) : (
+				<>
+					<StudentTable
+						students={students}
+						roles={roles}
+						programs={programs}
+						departments={departments}
+						loading={loading}
+						refresh={fetchStudents}
+					/>
+				</>
+			)}
 		</>
 	);
 };

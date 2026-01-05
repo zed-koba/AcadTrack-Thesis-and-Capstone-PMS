@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\AccountsController;
+use App\Http\Controllers\admin\AdvisersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
 use App\Http\Controllers\admin\DepartmentsController;
@@ -49,3 +50,8 @@ Route::put('roles/edit/{id}', [RoleController::class,'updateRole']);
 Route::get('programs', [ProgramsController::class,'getPrograms']);
 Route::post('programs/add', [ProgramsController::class,'storeProgram']);
 Route::put('programs/edit/{id}', [ProgramsController::class,'updateProgram']);
+
+
+//Advisers Routes
+Route::get('advisers', [AdvisersController::class,  'getAdvisers']);
+Route::post('advisers/add', [AdvisersController::class,'storeAdviser']);

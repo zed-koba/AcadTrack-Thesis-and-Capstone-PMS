@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\admin\Departments;
+use App\Models\admin\Programs;
+use App\Models\admin\Role;
 use App\Models\Students;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,10 +15,16 @@ class StudentsController extends Controller
     public function getData()
     {
         $students = Students::orderBy('created_at', 'DESC')->get();
+        $departments = Departments::where('status', 'active')->orderBy('created_at','DESC')->get();
+        $roles = Role::where('status', 'active')->get();
+        $programs = Programs::where('status', 'active')->get();
         return response()->json([
             'status' => 200,
-            'data' => $students,
-        ]);
+            'students' => $students,
+            'departments' => $departments,
+            'roles' => $roles,
+            'programs' => $programs,
+        ], 200);
     }
 
     public function storeStudent(Request $request)

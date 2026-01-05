@@ -4,7 +4,6 @@ import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
-	DialogTrigger,
 	DialogDescription,
 	DialogTitle,
 } from '@/components/ui/dialog';
@@ -18,26 +17,32 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
 import { useForm } from '@tanstack/react-form';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { CircleAlert, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
-import type { ProgramAddProps } from '../interface/programs';
+import {
+	NAME_SUFFIX,
+	parseName,
+	type AdviserEditProps,
+} from '../interface/adviser';
+import { Tooltip, TooltipContent } from '@/components/ui/tooltip';
+import { TooltipTrigger } from '@radix-ui/react-tooltip';
 
-const programSchema = z
+const adviserSchema = z
 	.object({
-		name: z
+		first_name: z
 			.string()
-			.min(2, 'Program name must be at least 2 character')
-			.max(100),
-		code: z
-			.string()
-			.min(2, 'Program code must be at least 2 characters')
-			.max(10)
+			.min(2, 'First name must be at least 2 characters')
 			.toUpperCase(),
-		description: z.string().max(300).optional(),
+		last_name: z
+			.string()
+			.min(2, 'Last name must be at least 2 characters')
+			.toUpperCase(),
+		suffix: z.string().optional(),
+		email: z.email('Invalid email address'),
+		contact_number: z.string().optional(),
 		selectedDepartmentId: z.number(),
 		status: z.enum(['active', 'inactive']),
 	})
@@ -46,35 +51,47 @@ const programSchema = z
 		path: ['selectedDepartmentId'],
 	});
 
-const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
-	const [open, setOpen] = useState(false);
+const AdviserEdit = ({
+	open,
+	setOpen,
+	adviser,
+	departments,
+	onSuccess,
+}: AdviserEditProps) => {
 	const [loading, setLoading] = useState(false);
-	type formValues = z.infer<typeof programSchema>;
+	type formValues = z.infer<typeof adviserSchema>;
 	const defaultValues: formValues = {
-		name: '',
-		code: '',
-		description: '',
-		selectedDepartmentId: 0,
-		status: 'active',
+		first_name: parseName(adviser.name).first_name,
+		last_name: parseName(adviser.name).last_name,
+		suffix: parseName(adviser.name).suffix,
+		email: adviser.account.email,
+		contact_number: adviser.contact_number,
+		selectedDepartmentId: adviser.department_id,
+		status: adviser.status as 'active' | 'inactive',
 	};
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onChange: programSchema,
-			onSubmit: programSchema,
+			onChange: adviserSchema,
+			onSubmit: adviserSchema,
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
 			const payLoad = {
-				name: value.name,
-				code: value.code,
+				name:
+					value.first_name +
+					' ' +
+					value.last_name +
+					' ' +
+					(value.suffix === 'none' ? '' : value.suffix),
+				contact_number: value.contact_number,
 				department_id: value.selectedDepartmentId,
-				description: value.description,
+				email: value.email,
 				status: value.status,
 			};
 			try {
-				const res = await fetch(`${apiUrl}/programs/add`, {
-					method: 'POST',
+				const res = await fetch(`${apiUrl}/advisers/edit/${adviser.id}`, {
+					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
 						Accept: 'application/json',
@@ -116,23 +133,29 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 			}
 		},
 	});
-
+	useEffect(() => {
+		if (adviser) {
+			form.reset({
+				first_name: parseName(adviser.name).first_name,
+				last_name: parseName(adviser.name).last_name,
+				suffix: parseName(adviser.name).suffix,
+				email: adviser.account.email,
+				contact_number: adviser.contact_number,
+				selectedDepartmentId: adviser.department_id,
+				status: adviser.status as 'active' | 'inactive',
+			});
+		}
+	}, [form, adviser]);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogTrigger asChild>
-					<Button variant="primary">
-						<Plus />
-						Add Program
-					</Button>
-				</DialogTrigger>
 				<DialogContent className="text-white">
 					<DialogHeader className="gap-0!">
 						<DialogTitle className="font-medium text-lg">
-							Add New Program
+							Edit Adviser
 						</DialogTitle>
 						<DialogDescription className="text-sm text-muted-foreground">
-							Fill in the details to create a new academic program.
+							Update the adviser details below.
 						</DialogDescription>
 					</DialogHeader>
 					<form
@@ -142,14 +165,115 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 						}}
 					>
 						<div className="grid grid-row-5 grid-cols-1 min-w-0 gap-4 mt-2">
+							<div className="grid grid-cols-[1fr_1fr_100px] min-w-0 gap-1">
+								<form.Field
+									name="first_name"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<Field data-invalid={isInvalid}>
+												<FieldLabel htmlFor={field.name}>First Name</FieldLabel>
+												<Input
+													id={field.name}
+													name={field.name}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+													aria-invalid={isInvalid}
+													placeholder={'Ex. Nathan'}
+													autoComplete="off"
+												/>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</Field>
+										);
+									}}
+								/>
+								<form.Field
+									name="last_name"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<Field data-invalid={isInvalid}>
+												<FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
+												<Input
+													id={field.name}
+													name={field.name}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+													aria-invalid={isInvalid}
+													placeholder={'Ex. Pabingwit'}
+													autoComplete="off"
+												/>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</Field>
+										);
+									}}
+								/>
+								<form.Field
+									name="suffix"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<Field data-invalid={isInvalid}>
+												<FieldLabel htmlFor={field.name}>
+													Suffix
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<CircleAlert
+																size={14}
+																className="text-muted-foreground"
+															/>
+														</TooltipTrigger>
+														<TooltipContent>Optional</TooltipContent>
+													</Tooltip>
+												</FieldLabel>
+												<Select
+													name={field.name}
+													defaultValue={field.state.value}
+													onValueChange={(v) =>
+														field.handleChange(v === 'none' ? '' : v)
+													}
+												>
+													<SelectTrigger
+														className="w-auto"
+														aria-invalid={isInvalid}
+														id={field.name}
+													>
+														<SelectValue placeholder="Select Suffix" />
+														<SelectContent>
+															<SelectItem value="none">None</SelectItem>
+															{NAME_SUFFIX.map((suffix) => (
+																<SelectItem key={suffix} value={suffix}>
+																	{suffix}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</SelectTrigger>
+												</Select>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</Field>
+										);
+									}}
+								/>
+							</div>
 							<form.Field
-								name="name"
+								name="email"
 								children={(field) => {
 									const isInvalid =
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Program Name</FieldLabel>
+											<FieldLabel htmlFor={field.name}>Email</FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}
@@ -157,36 +281,7 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder={
-													'Ex. Bachelor of Science in Computer Science'
-												}
-												autoComplete="off"
-											/>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
-							<form.Field
-								name="code"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Department Code
-											</FieldLabel>
-											<Input
-												id={field.name}
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												aria-invalid={isInvalid}
-												placeholder={'Ex. BSCS'}
+												placeholder={'Ex. john.fritz@gmail.com'}
 												autoComplete="off"
 											/>
 											{isInvalid && (
@@ -227,34 +322,6 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 													))}
 												</SelectContent>
 											</Select>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
-							<form.Field
-								name="description"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid} orientation="responsive">
-											<FieldLabel htmlFor={field.name}>
-												Description (Optional)
-											</FieldLabel>
-											<Textarea
-												id={field.name}
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												aria-invalid={isInvalid}
-												placeholder={'Brief description about the program...'}
-												autoComplete="off"
-												className="resize-none w-full"
-											/>
 											{isInvalid && (
 												<FieldError errors={field.state.meta.errors} />
 											)}
@@ -324,4 +391,4 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 	);
 };
 
-export default ProgramAdd;
+export default AdviserEdit;

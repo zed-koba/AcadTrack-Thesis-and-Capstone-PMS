@@ -5,6 +5,7 @@ namespace App\Models\admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\admin\ProponentsDetails;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Proponents extends Model
 {
@@ -17,7 +18,7 @@ class Proponents extends Model
         'adviser', 
         'program'];
 
-    public function details() {
+    public function details():HasMany {
         return $this->hasMany(ProponentsDetails::class, 'foreign_proponents_id', 'proponents_id');
     }
 

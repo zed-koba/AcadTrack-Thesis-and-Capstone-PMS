@@ -1,27 +1,27 @@
-import {
-	Table,
-	TableHeader,
-	TableRow,
-	TableHead,
-	TableBody,
-	TableCell,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import { apiUrl } from '@/components/Routes/http';
 import {
 	InputGroup,
-	InputGroupInput,
 	InputGroupAddon,
+	InputGroupInput,
 } from '@/components/ui/input-group';
 import {
-	Search,
+	Table,
+	TableHead,
+	TableHeader,
+	TableCell,
+	TableBody,
+	TableRow,
+} from '@/components/ui/table';
+import {
+	MoreHorizontal,
 	PencilRuler,
 	ReceiptText,
+	Search,
 	Trash,
-	ArrowUpDown,
 } from 'lucide-react';
-
+import { useState } from 'react';
+import { formatDate } from '@/components/functions/functions';
+import { Badge } from '@/components/ui/badge';
 import {
 	Pagination,
 	PaginationContent,
@@ -30,108 +30,85 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from '@/components/ui/pagination';
-import { formatDate } from '@/components/functions/functions';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-import type { StudentProps } from '../interface/student';
+import type {
+	AdviserProps,
+	AdvisersTableProps,
+	DepartmentAdviserProps,
+} from '../interface/adviser';
+import AdviserAdd from './AdviserAdd';
+import AdviserEdit from './AdviserEdit';
 
-type SortField = keyof StudentProps;
+type SortField = keyof AdviserProps;
 type SortDirection = 'asc' | 'desc';
-const ITEMS_PER_PAGE = 10;
-const SortButton = ({
-	field,
-	label,
-	onSort,
-}: {
-	field: SortField;
-	label: string;
-	onSort: (field: SortField) => void;
-}) => (
-	<Button
-		variant="ghost"
-		size="sm"
-		className="-ml-3 h-8 font-semibold text-muted-foreground"
-		onClick={() => onSort(field)}
-	>
-		{label}
-		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm" />
-	</Button>
-);
 
-const AdviserTable = () => {
-	const [advisers, setAdvisers] = useState<StudentProps[]>([]);
-	const [selectedAdviser, setSelectedAdviser] = useState<StudentProps | null>(
+const ITEMS_PER_PAGE = 10;
+const AdviserTable = ({
+	advisers,
+	departments,
+	loading,
+	refresh,
+}: AdvisersTableProps) => {
+	const [searchTerm, setSearchTerm] = useState<string>('');
+	const [sortField, setSortField] = useState<SortField>('created_at');
+	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
+	const [currentPage, setCurrentPage] = useState(1);
+	const [selectedAdviser, setSelectedAdviser] = useState<AdviserProps | null>(
 		null
 	);
-	const [loading, setLoading] = useState(true);
-	const [studentId, setStudentId] = useState<number | null>(null);
-	const [clickedButton, setClickedButton] = useState<string | null>(null);
-	const [sortField, setSortField] = useState<SortField>('created_at');
-	const [sortDirection, setSortDrection] = useState<SortDirection>('desc');
-	const [searchTerm, setSearchTerm] = useState('');
-	const [currentPage, setCurrentPage] = useState(1);
 	const [open, setOpen] = useState(false);
+	const [clickedButton, setClickedButton] = useState<string>('');
+	const [adviserDepartment, setAdviserDepartment] =
+		useState<DepartmentAdviserProps | null>(null);
 
-	const fetchAdvisers = async () => {
-		try {
-			const res = await fetch(`${apiUrl}/accounts`, {
-				method: 'GET',
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
-				},
-			});
-			if (!res.ok) throw new Error('Failed to fetch data');
-			const data = await res.json();
-			//setAdvisers(data.data);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	};
-	useEffect(() => {
-		fetchAdvisers();
-	}, []);
-	const handleSort = (field: SortField) => {
-		if (sortField === field) {
-			setSortDrection(sortDirection === 'asc' ? 'desc' : 'asc');
-		} else {
-			setSortField(field);
-			setSortDrection('asc');
-		}
-	};
-
-	const filteredStudents = advisers.filter((stud) => {
+	const filteredAdvisers = advisers.filter((adv) => {
 		const searchLower = searchTerm.toLowerCase();
 		return (
-			stud.id.toString().includes(searchLower) ||
-			stud.student_id.toLowerCase().includes(searchLower) ||
-			stud.email.toLowerCase().includes(searchLower) ||
-			stud.role.toLowerCase().includes(searchLower) ||
-			stud.program.toLowerCase().includes(searchLower) ||
-			stud.section.toLowerCase().includes(searchLower) ||
-			stud.status.toLowerCase().includes(searchLower) ||
-			formatDate(stud.created_at).toLowerCase().includes(searchLower) ||
-			formatDate(stud.updated_at).toLowerCase().includes(searchLower)
+			adv.name.toLowerCase().includes(searchLower) ||
+			adv.account.email.toLowerCase().includes(searchLower) ||
+			adv.contact_number.toLowerCase().includes(searchLower) ||
+			formatDate(adv.created_at).toLowerCase().includes(searchLower) ||
+			formatDate(adv.updated_at).toLowerCase().includes(searchLower)
 		);
 	});
 
-	const sortedAccounts = [...filteredStudents].sort((a, b) => {
+	const sortedPrograms = [...filteredAdvisers].sort((a, b) => {
 		const aValue = a[sortField];
 		const bValue = b[sortField];
 
 		if (aValue === undefined || bValue === undefined) return 0;
-
 		const comparison = aValue.toString().localeCompare(bValue.toString());
 		return sortDirection === 'asc' ? comparison : -comparison;
 	});
 
-	const totalPage = Math.ceil(sortedAccounts.length / ITEMS_PER_PAGE);
+	const totalPage = Math.ceil(sortedPrograms.length / ITEMS_PER_PAGE);
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-	const paginationProps = sortedAccounts.slice(
+	const paginationProps = sortedPrograms.slice(
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
+	const getStatusBadge = (status: string) => {
+		return status === 'active' ? (
+			<Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+				Active
+			</Badge>
+		) : (
+			<Badge variant="secondary" className="bg-muted text-muted-foreground">
+				Inactive
+			</Badge>
+		);
+	};
+	const getCodeBadge = (id: number) => {
+		const findCode = departments.find((c) => c.id === id);
+
+		return findCode ?? { id: 0, name: 'Unknown', code: '' };
+	};
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -146,80 +123,44 @@ const AdviserTable = () => {
 								<Search />
 							</InputGroupAddon>
 							<InputGroupAddon align="inline-end">
-								{searchTerm.length > 1 ? filteredStudents.length : 0} results
+								{searchTerm.length > 1 ? filteredAdvisers.length : 0} results
 							</InputGroupAddon>
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						{/* <StudentAdd onSuccess={fetchAdvisers} /> */}
+						<AdviserAdd departments={departments} onSuccess={refresh} />
 					</div>
 				</div>
-				<div className="mb-4 flex items-center justify-between">
-					<p className="text-muted-foreground ">
-						Total Students: {advisers.length}
-					</p>
-				</div>
-				<div className="rounded-lg border bg-card">
+				<div className="rounded-lg border bg-card mt-3 shadow-sm">
 					<div className="w-auto overflow-x-auto">
 						<Table className="w-full">
 							<TableHeader>
-								<TableRow>
-									<TableHead className="text-center">
-										<SortButton label="#" field="id" onSort={handleSort} />
+								<TableRow className="text-muted-foreground">
+									<TableHead className="text-muted-foreground text-left pl-4">
+										Adviser Name
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Student ID"
-											field="student_id"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left max-w-[200px]">
+										Email
 									</TableHead>
-									<TableHead>
-										<SortButton
-											label="Email"
-											field="email"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Department
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton label="Role" field="role" onSort={handleSort} />
+									<TableHead className="text-muted-foreground text-left">
+										Groups Handled
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Program"
-											field="program"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Capacity
 									</TableHead>
-									<TableHead className="text-left">
-										<SortButton
-											label="Section"
-											field="section"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left">
+										Status
 									</TableHead>
-									<TableHead className="text-center">
-										<SortButton
-											label="Status"
-											field="status"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left w-[150px]">
+										Created At
 									</TableHead>
-									<TableHead>
-										<SortButton
-											label="Created At"
-											field="created_at"
-											onSort={handleSort}
-										/>
+									<TableHead className="text-muted-foreground text-left w-[150px]">
+										Updated At
 									</TableHead>
-									<TableHead>
-										<SortButton
-											label="Updated At"
-											field="updated_at"
-											onSort={handleSort}
-										/>
-									</TableHead>
-									<TableHead className="text-center text-muted-foreground">
+									<TableHead className="text-center text-muted-foreground w-[70px]">
 										Actions
 									</TableHead>
 								</TableRow>
@@ -229,7 +170,7 @@ const AdviserTable = () => {
 									<TableRow>
 										<TableCell
 											colSpan={9}
-											className="-ml-3 h-8 text-white text-left"
+											className="-ml-3 h-8 text-white text-center"
 										>
 											Loading...
 										</TableCell>
@@ -240,72 +181,101 @@ const AdviserTable = () => {
 											colSpan={9}
 											className="-ml-3 h-8 text-white text-center"
 										>
-											No students found
+											No advisers found
 										</TableCell>
 									</TableRow>
 								) : (
-									paginationProps.map((adviser) => (
-										<TableRow key={adviser.id} className="text-white">
-											<TableCell className="text-center">
-												{adviser.id}
+									paginationProps.map((adv) => (
+										<TableRow key={adv.id} className="text-muted-foreground">
+											<TableCell className="text-left pl-3 text-white font-medium">
+												{adv.name}
+											</TableCell>
+											<TableCell className="text-left max-w-[200px] text-white truncate">
+												{adv.account.email}
 											</TableCell>
 											<TableCell className="text-left">
-												{adviser.student_id}
+												<Badge variant="outline">
+													{getCodeBadge(adv.department_id).name}
+												</Badge>
 											</TableCell>
-											<TableCell>{adviser.email}</TableCell>
-											<TableCell className="text-left">
-												{adviser.role}
-											</TableCell>
-											<TableCell className="text-left">
-												{adviser.program}
-											</TableCell>
-											<TableCell className="text-left">
-												{adviser.section}
+											<TableCell className="text-left text-white">0</TableCell>
+											<TableCell className="text-left text-white">
+												0/5
 											</TableCell>
 											<TableCell className="text-left">
-												<div
-													className={`text-base ${
-														adviser.status == 'approved'
-															? 'bg-approved'
-															: adviser.status == 'pending'
-															? 'bg-pending'
-															: 'bg-destructive'
-													} px-3 py-0.5 border-none rounded-4xl text-white font-normal flex items-center justify-center `}
-												>
-													{adviser.status}
-												</div>
+												{getStatusBadge(adv.status)}
 											</TableCell>
-											<TableCell>{formatDate(adviser.created_at)}</TableCell>
-											<TableCell>{formatDate(adviser.updated_at)}</TableCell>
-											<TableCell className="text-right flex gap-2 justify-end items-center">
-												<Button
-													className="p-3 cursor-pointer hover:bg-green-600 bg-card text-green-600 hover:text-white flex justify-center items-center"
-													aria-label="Edit"
-													title="Edit"
-													onClick={() => {}}
-												>
-													<PencilRuler size={16} />
-												</Button>
-												<Button
-													className="p-3 cursor-pointer hover:bg-blue-500 bg-card text-blue-500 hover:text-white flex justify-center items-center"
-													aria-label="Details"
-													title="Details"
-													onClick={() => {}}
-												>
-													<ReceiptText size={16} />
-												</Button>
-												<Button
-													className="p-2 cursor-pointer hover:bg-red-600 bg-card text-red-600 hover:text-white flex justify-center items-center"
-													aria-label="Delete"
-													title="Delete"
-													onClick={() => {}}
-												>
-													<Trash size={24} />
-												</Button>
+											<TableCell className="text-left">
+												{formatDate(adv.created_at)}
+											</TableCell>
+											<TableCell className="text-left">
+												{formatDate(adv.updated_at)}
+											</TableCell>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button variant="ghost" className="text-white">
+															<MoreHorizontal className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuItem
+															onClick={() => {
+																setOpen(true);
+																setSelectedAdviser(adv);
+																setClickedButton('edit');
+															}}
+														>
+															<PencilRuler className="h-4 w-4 mr-2" /> Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => {
+																setOpen(true);
+																setSelectedAdviser(adv);
+																setAdviserDepartment(
+																	getCodeBadge(adv.department_id)
+																);
+																setClickedButton('details');
+															}}
+														>
+															<ReceiptText className="h-4 w-4 mr-2" /> Details
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															className="text-red-500"
+															onClick={() => {
+																setOpen(true);
+																setSelectedAdviser(adv);
+																setClickedButton('delete');
+															}}
+														>
+															<Trash className="h-4 w-4 mr-2 group-hover:text-white" />{' '}
+															Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
 											</TableCell>
 										</TableRow>
 									))
 								)}
+								{selectedAdviser &&
+									(clickedButton === 'edit' ? (
+										<AdviserEdit
+											adviser={selectedAdviser}
+											departments={departments}
+											open={open}
+											setOpen={setOpen}
+											onSuccess={refresh}
+										/>
+									) : (
+										// ) : clickedButton === 'details' ? (
+										// 	<ProgramDetails
+										// 		program={selectedProgram}
+										// 		department={programDepartment}
+										// 		open={open}
+										// 		setOpen={setOpen}
+										// 	/>
+										''
+									))}
 							</TableBody>
 						</Table>
 					</div>
@@ -314,8 +284,8 @@ const AdviserTable = () => {
 					<div className="flex justify-between items-center pt-3">
 						<p className="text-muted-foreground text-base font-semibold w-full">
 							Showing {startIndex + 1} to{' '}
-							{Math.min(startIndex + ITEMS_PER_PAGE, sortedAccounts.length)} of{' '}
-							{sortedAccounts.length} proponents
+							{Math.min(startIndex + ITEMS_PER_PAGE, sortedPrograms.length)} of{' '}
+							{sortedPrograms.length} departments
 						</p>
 						<Pagination className="justify-end">
 							<PaginationContent>
