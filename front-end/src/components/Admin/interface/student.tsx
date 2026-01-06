@@ -24,6 +24,7 @@ export type DepartmentStudentsProps = {
 export type RolesStudentsProps = {
 	id: number;
 	name: string;
+	globalRole: number;
 	department_id: number;
 };
 

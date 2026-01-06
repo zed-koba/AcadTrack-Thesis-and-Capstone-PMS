@@ -141,7 +141,7 @@ const StudentEdit = ({
 	);
 
 	const filteredRoles = roles.filter(
-		(r) => r.department_id === selectedDepartmentId
+		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1
 	);
 
 	useEffect(() => {
@@ -496,7 +496,7 @@ const StudentEdit = ({
 											<Input
 												id={field.name}
 												name={field.name}
-												value={field.state.value}
+												value={field.state.value ?? ''}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
