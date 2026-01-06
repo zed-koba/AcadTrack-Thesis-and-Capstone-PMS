@@ -30,7 +30,7 @@ import type { RolesAddProps } from '../interface/roles';
 
 const roleSchema = z
 	.object({
-		name: z.string().min(2, 'Department is required').max(100),
+		name: z.string().min(2, 'Name is required').max(100),
 		globalRole: z.boolean(),
 		description: z.string().max(500).optional(),
 		selectedDepartmentId: z.number(),

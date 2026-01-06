@@ -33,7 +33,7 @@ const studentSchema = z
 	.object({
 		name: z.string().min(1, 'Name is required'),
 		student_id: z.string().min(1, 'Student ID is required'),
-		role: z.number().min(1, 'Role is required'),
+		role: z.number().optional().nullable(),
 		mobile_num: z.string().optional().nullable(),
 		selectedDepartmentId: z.number(),
 		program: z.number().min(1, 'Program is required'),
@@ -64,7 +64,7 @@ const StudentEdit = ({
 		program: student.program_id,
 		section: student.section,
 		name: student.name,
-		role: student.role_id,
+		role: student.role_id === null ? 0 : student.role_id,
 		mobile_num: student.mobile_num,
 		semester: student.semester,
 		thesis_title: student.thesis_title,

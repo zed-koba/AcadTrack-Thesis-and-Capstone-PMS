@@ -34,7 +34,7 @@ const studentSchema = z
 	.object({
 		name: z.string().min(1, 'Name is required'),
 		student_id: z.string().min(1, 'Student ID is required'),
-		role: z.number().min(1, 'Role is required'),
+		role: z.number().optional(),
 		mobile_num: z.string().optional().nullable(),
 		selectedDepartmentId: z.number(),
 		program: z.number().min(1, 'Program is required'),

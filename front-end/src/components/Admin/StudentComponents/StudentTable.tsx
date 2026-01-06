@@ -33,9 +33,9 @@ import {
 import { formatDate } from '@/components/functions/functions';
 
 import {
-	DepartmentStudentsProps,
-	ProgramsStudentsProps,
-	RolesStudentsProps,
+	type DepartmentStudentsProps,
+	type ProgramsStudentsProps,
+	type RolesStudentsProps,
 	type StudentProps,
 	type StudentsTableProps,
 } from '../interface/student';
@@ -89,8 +89,8 @@ const StudentTable = ({
 			stud.semester === 1
 				? '1st Semester'
 				: stud.semester === 2
-				? '2nd Semester'
-				: '';
+					? '2nd Semester'
+					: '';
 		return (
 			stud.name.toLowerCase().includes(searchLower) ||
 			stud.student_id.toLowerCase().includes(searchLower) ||
@@ -124,12 +124,15 @@ const StudentTable = ({
 		const findRole = roles.find((r) => r.id === id);
 		const findProgram = programs.find((p) => p.id === id);
 		const findDepartment = departments.find((d) => d.id === id);
+		console.log(findRole);
 		if (type === 'role')
-			return <Badge variant="outline">{findRole?.name}</Badge>;
+			return <Badge variant="outline">{findRole === undefined ? "Not Assigned" : findRole?.name}</Badge>;
 		if (type === 'program')
 			return <Badge variant="outline">{findProgram?.code}</Badge>;
 		if (type === 'department')
 			return <Badge variant="outline">{findDepartment?.code}</Badge>;
+
+
 	};
 
 	const getSelectedInfo = (

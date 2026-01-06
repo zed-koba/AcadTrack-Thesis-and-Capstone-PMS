@@ -177,7 +177,7 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 									return (
 										<Field data-invalid={isInvalid}>
 											<FieldLabel htmlFor={field.name}>
-												Department Code
+												Program Code
 											</FieldLabel>
 											<Input
 												id={field.name}

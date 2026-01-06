@@ -74,6 +74,8 @@ class StudentsController extends Controller
 
             ]);
             
+            $role = Role::find($request->role_id);
+            $role->increment('assigned');
             DB::commit();
             return response()->json([
                 'status' => 201,
@@ -123,8 +125,17 @@ class StudentsController extends Controller
         try {
             DB::beginTransaction();
             $student = Students::find($id);
+            if($student->role_id != $request->role_id) {
+                $initialRole = Role::find($student->role_id);
+                $newRole = Role::find($request->role_id);
+                if($request->role_id != null) {
+                $newRole->increment('assigned');
+                }
+                if($student->role_id != null) {
+                    $initialRole->decrement('assigned');
+                }
+            } 
             $student->update($request->only(['name', 'student_id','department_id', 'program_id', 'section', 'mobile_num', 'semester', 'facebook_profile', 'year_level', 'thesis_title', 'role_id']));
-
             DB::commit();
             return response()->json([
                 'status' => 200,
@@ -135,6 +146,7 @@ class StudentsController extends Controller
             return response()->json([
                 'status' => 500,
                 'message' => 'An error occurred while updating the student.',
+                'error'=> $e->getMessage(),
             ], 500);
         }
     }

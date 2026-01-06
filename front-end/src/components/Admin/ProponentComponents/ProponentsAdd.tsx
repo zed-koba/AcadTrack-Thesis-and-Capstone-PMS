@@ -126,6 +126,7 @@ const ProponentsAdd = ({
 		},
 	});
 	const selectedAdviser = advisers.find((adv) => adv.id === selectAdviserId);
+	const acad_yr = ["A.Y 2024-2025", "A.Y 2025-2026", "A.Y 2026-2027"];
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
@@ -183,7 +184,7 @@ const ProponentsAdd = ({
 											<FieldLabel htmlFor={field.name}>
 												Academic Year
 											</FieldLabel>
-											<Input
+											{/* <Input
 												id={field.name}
 												name={field.name}
 												value={field.state.value}
@@ -192,7 +193,24 @@ const ProponentsAdd = ({
 												aria-invalid={isInvalid}
 												placeholder="Ex. 2024-2025"
 												autoComplete="off"
-											/>
+											/> */}
+
+											<Select name={field.name} onValueChange={(v) => field.handleChange(v)}>
+												<SelectTrigger
+													id={field.name}
+													className="w-auto"
+													aria-invalid={isInvalid}
+												>
+													<SelectValue placeholder="Select academic year" />
+												</SelectTrigger>
+												<SelectContent>
+													{acad_yr.map((acad) => (
+														<SelectItem
+															key={acad}
+															value={acad}>{acad}</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
 											{isInvalid && (
 												<FieldError errors={field.state.meta.errors} />
 											)}
