@@ -27,10 +27,7 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from '@/components/ui/field';
-import type {
-	ProponentsEditProps,
-	StudentsProponentsProps,
-} from '../interface/proponent';
+import type { ProponentsEditProps } from '../interface/proponent';
 import {
 	Popover,
 	PopoverContent,
@@ -50,16 +47,14 @@ import ProponentsAutoComplete from './ProponentsAutoComplete';
 const proponentSchema = z.object({
 	academic_yr: z.string().min(1, 'Title is required'),
 	title: z.string().min(1, 'Title is required'),
-	semester: z.number().min(1, 'Must select a semester').max(2),
-	program: z.number().min(1, 'Program is required'),
 	adviser: z.number().min(1, 'Adviser is required'),
-	studentsId: z.array(z.number()).optional().nullable(),
+	studentsId: z.array(z.number()).optional(),
 });
 
 const ProponentsEdit = ({
 	proponent,
 	students,
-	programs,
+	roles,
 	advisers,
 	onSuccess,
 	open,
@@ -82,9 +77,7 @@ const ProponentsEdit = ({
 	const defaultValues: formValues = {
 		academic_yr: proponent.academic_yr,
 		title: proponent.title,
-		semester: proponent.semester,
 		adviser: proponent.adviser_id,
-		program: proponent.program_id,
 		studentsId: updatedStudentsIds,
 	};
 	const form = useForm({
@@ -98,9 +91,7 @@ const ProponentsEdit = ({
 			const payLoad = {
 				academic_yr: value.academic_yr,
 				title: value.title,
-				semester: value.semester,
 				adviser_id: value.adviser,
-				program_id: value.program,
 				students_id: updatedStudentsIds,
 				deleted_ids: removedStudentsIds,
 			};
@@ -148,9 +139,7 @@ const ProponentsEdit = ({
 			form.reset({
 				academic_yr: proponent.academic_yr,
 				title: proponent.title,
-				semester: proponent.semester,
 				adviser: proponent.adviser_id,
-				program: proponent.program_id,
 				studentsId: updatedStudentsIds,
 			});
 			setUpdatedStudentsIds(studentsIds);
@@ -158,6 +147,7 @@ const ProponentsEdit = ({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form, proponent]);
+	const acad_yr = ['A.Y 2024-2025', 'A.Y 2025-2026', 'A.Y 2026-2027'];
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent className="text-white">
@@ -199,69 +189,42 @@ const ProponentsEdit = ({
 								);
 							}}
 						/>
-						<div className="grid grid-cols-2 gap-2">
-							<form.Field
-								name="academic_yr"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Academic Year
-											</FieldLabel>
-											<Input
+
+						<form.Field
+							name="academic_yr"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Academic Year</FieldLabel>
+										<Select
+											name={field.name}
+											defaultValue={field.state.value}
+											onValueChange={(v) => field.handleChange(v)}
+										>
+											<SelectTrigger
 												id={field.name}
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
+												className="w-auto"
 												aria-invalid={isInvalid}
-												placeholder="Ex. 2024-2025"
-												autoComplete="off"
-											/>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
-							<form.Field
-								name="semester"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Semester</FieldLabel>
-											<Select
-												name={field.name}
-												defaultValue={
-													field.state.value ? String(field.state.value) : ''
-												}
-												onValueChange={(v) => field.handleChange(Number(v))}
 											>
-												<SelectTrigger
-													className="w-auto"
-													aria-invalid={isInvalid}
-													id={field.name}
-												>
-													<SelectValue placeholder="Select Semester" />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectItem value="1">1st Semester</SelectItem>
-													<SelectItem value="2">2nd Semester</SelectItem>
-												</SelectContent>
-											</Select>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
-						</div>
+												<SelectValue placeholder="Select academic year" />
+											</SelectTrigger>
+											<SelectContent>
+												{acad_yr.map((acad) => (
+													<SelectItem key={acad} value={acad}>
+														{acad}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
 						<form.Field
 							name="adviser"
 							children={(field) => {
@@ -276,6 +239,7 @@ const ProponentsEdit = ({
 													variant="outline"
 													role="combobox"
 													aria-expanded={adviserOpen}
+													aria-invalid={isInvalid}
 													className={cn(
 														'w-full justify-between',
 														field.state.value === 0
@@ -334,47 +298,6 @@ const ProponentsEdit = ({
 								);
 							}}
 						/>
-						<div className="grid grid-cols-3 gap-2">
-							<div className="col-span-3">
-								<form.Field
-									name="program"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>Programs:</FieldLabel>
-												<Select
-													name={field.name}
-													defaultValue={
-														field.state.value ? String(field.state.value) : ''
-													}
-													onValueChange={(v) => field.handleChange(Number(v))}
-												>
-													<SelectTrigger
-														className="w-auto"
-														aria-invalid={isInvalid}
-														id={field.name}
-													>
-														<SelectValue placeholder="Select a program" />
-													</SelectTrigger>
-													<SelectContent>
-														{programs.map((prog) => (
-															<SelectItem key={prog.id} value={String(prog.id)}>
-																{prog.name}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-							</div>
-						</div>
 						<div className="pt-2 flex flex-col gap-4">
 							<form.Field
 								name="studentsId"
@@ -387,6 +310,7 @@ const ProponentsEdit = ({
 													Proponents:{' '}
 												</FieldLabel>
 												<ProponentsAutoComplete
+													roles={roles}
 													students={students}
 													selectedStudentsIds={updatedStudentsIds ?? []}
 													onSelectionChange={handleSelectedIds}
@@ -411,7 +335,11 @@ const ProponentsEdit = ({
 							className="cursor-pointer"
 							type="button"
 							variant="outline"
-							onClick={() => setOpen(false)}
+							onClick={() => {
+								setOpen(false);
+								form.reset();
+								onSuccess?.();
+							}}
 						>
 							Cancel
 						</Button>

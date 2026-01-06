@@ -16,8 +16,8 @@ import { Toaster } from 'sonner';
 const AdminLayout = () => {
 	const navItem: NavItem[] = [
 		{ label: 'Dashboard', to: '/Admin', icon: <LayoutDashboard /> },
-		{ label: 'Proponents', to: '/Admin/Proponents', icon: <LibraryBig /> },
-		{ label: 'Students', to: '/Admin/Students', icon: <Users /> },
+		{ label: 'Proponents', to: '/Admin/Proponents', icon: <Users /> },
+		{ label: 'Capstone Projects', to: '/Admin/Projects', icon: <LibraryBig /> },
 		{ label: 'Departments', to: '/Admin/Departments', icon: <Building2 /> },
 		{ label: 'Roles', to: '/Admin/Roles', icon: <UserCog /> },
 		{ label: 'Programs', to: '/Admin/Programs', icon: <GraduationCap /> },

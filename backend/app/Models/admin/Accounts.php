@@ -30,4 +30,12 @@ class Accounts extends Model
     public function adviser(): HasOne {
         return $this->hasOne(Advisers::class, 'account_id');
     }
+
+    public function student(): hasOne {
+        return $this->hasOne(Students::class,'account_id');
+    }
+
+    public function instructor(): hasOne {
+        return $this->hasOne(Instructors::class,'account_id');
+    }
 }

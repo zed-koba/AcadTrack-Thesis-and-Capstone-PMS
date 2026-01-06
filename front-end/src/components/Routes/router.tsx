@@ -29,8 +29,8 @@ export const router = createBrowserRouter([
 		element: <AdminLayout />,
 		children: [
 			{ index: true, element: <AdminDashboard /> },
-			{ path: 'Proponents', element: <AdminProponents /> },
-			{ path: 'Students', element: <AdminStudents /> },
+			{ path: 'Projects', element: <AdminProponents /> },
+			{ path: 'Proponents', element: <AdminStudents /> },
 			{ path: 'Adviser', element: <Adviser /> },
 			{ path: 'Instructor', element: <Instructors /> },
 			{ path: 'Departments', element: <Departments /> },

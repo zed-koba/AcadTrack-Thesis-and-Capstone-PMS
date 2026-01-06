@@ -34,9 +34,11 @@ import { formatDate } from '@/components/functions/functions';
 
 import {
 	type DepartmentStudentsProps,
+	type InstructorStudentsProps,
 	type ProgramsStudentsProps,
 	type RolesStudentsProps,
 	type StudentProps,
+	type StudentsInstructorProps,
 	type StudentsTableProps,
 } from '../interface/student';
 import StudentAdd from './StudentAdd';
@@ -53,7 +55,7 @@ import { Badge } from '@/components/ui/badge';
 
 type SortField = keyof StudentProps;
 type SortDirection = 'asc' | 'desc';
-type SelectedType = 'role' | 'program' | 'department';
+type SelectedType = 'role' | 'program' | 'department' | 'instructor';
 const ITEMS_PER_PAGE = 10;
 
 const StudentTable = ({
@@ -61,6 +63,7 @@ const StudentTable = ({
 	departments,
 	roles,
 	programs,
+	instructors,
 	loading,
 	refresh,
 }: StudentsTableProps) => {
@@ -72,6 +75,8 @@ const StudentTable = ({
 	const [selectedRole, setSelectedRole] = useState<RolesStudentsProps | null>(
 		null
 	);
+	const [selectedInstructor, setSelectedInstructor] =
+		useState<InstructorStudentsProps | null>(null);
 	const [selectedProgram, setSelectedProgram] =
 		useState<ProgramsStudentsProps | null>(null);
 	const [studentId, setStudentId] = useState<number | null>(null);
@@ -84,20 +89,10 @@ const StudentTable = ({
 	//console.log(students);
 	const filteredStudents = students.filter((stud) => {
 		const searchLower = searchTerm.toLowerCase();
-		const yearLevelLabel = stud.year_level === 3 ? '3rd Year' : '4th Year';
-		const semesterLabel =
-			stud.semester === 1
-				? '1st Semester'
-				: stud.semester === 2
-					? '2nd Semester'
-					: '';
 		return (
 			stud.name.toLowerCase().includes(searchLower) ||
 			stud.student_id.toLowerCase().includes(searchLower) ||
 			stud.section.toLowerCase().includes(searchLower) ||
-			semesterLabel.toLowerCase().includes(searchLower) ||
-			yearLevelLabel.toLowerCase().includes(searchLower) ||
-			stud.thesis_title.toLowerCase().includes(searchLower) ||
 			formatDate(stud.created_at).toLowerCase().includes(searchLower) ||
 			formatDate(stud.updated_at).toLowerCase().includes(searchLower)
 		);
@@ -126,13 +121,15 @@ const StudentTable = ({
 		const findDepartment = departments.find((d) => d.id === id);
 		console.log(findRole);
 		if (type === 'role')
-			return <Badge variant="outline">{findRole === undefined ? "Not Assigned" : findRole?.name}</Badge>;
+			return (
+				<Badge variant="outline">
+					{findRole === undefined ? 'Not Assigned' : findRole?.name}
+				</Badge>
+			);
 		if (type === 'program')
 			return <Badge variant="outline">{findProgram?.code}</Badge>;
 		if (type === 'department')
 			return <Badge variant="outline">{findDepartment?.code}</Badge>;
-
-
 	};
 
 	const getSelectedInfo = (
@@ -142,6 +139,7 @@ const StudentTable = ({
 		| RolesStudentsProps
 		| ProgramsStudentsProps
 		| DepartmentStudentsProps
+		| InstructorStudentsProps
 		| null => {
 		switch (type) {
 			case 'role':
@@ -153,10 +151,13 @@ const StudentTable = ({
 			case 'department':
 				return departments.find((d) => d.id === id) ?? null;
 
+			case 'instructor':
+				return instructors.find((i) => i.id === id) ?? null;
 			default:
 				return null;
 		}
 	};
+
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -178,6 +179,7 @@ const StudentTable = ({
 					<div className="space-y-6 text-white">
 						<StudentAdd
 							roles={roles}
+							instructors={instructors}
 							departments={departments}
 							programs={programs}
 							onSuccess={refresh}
@@ -204,7 +206,7 @@ const StudentTable = ({
 										Role
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left max-w-[300px]">
-										Thesis Title
+										Instructor
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
 										Department
@@ -264,7 +266,10 @@ const StudentTable = ({
 												{getBadges(student.role_id, 'role')}
 											</TableCell>
 											<TableCell className="text-left text-white">
-												{student.thesis_title}
+												{
+													getSelectedInfo(student.instructor_id, 'instructor')
+														?.name
+												}
 											</TableCell>
 											<TableCell className="text-left text-white">
 												{getBadges(student.department_id, 'department')}
@@ -324,6 +329,12 @@ const StudentTable = ({
 																		'program'
 																	) as ProgramsStudentsProps | null
 																);
+																setSelectedInstructor(
+																	getSelectedInfo(
+																		student.instructor_id,
+																		'instructor'
+																	) as InstructorStudentsProps | null
+																);
 															}}
 														>
 															<ReceiptText className="h-4 w-4 mr-2" /> Details
@@ -352,6 +363,7 @@ const StudentTable = ({
 										<StudentEdit
 											student={selectedStudent}
 											roles={roles}
+											instructors={instructors}
 											departments={departments}
 											programs={programs}
 											open={open}
@@ -362,6 +374,7 @@ const StudentTable = ({
 										<StudentDetails
 											student={selectedStudent}
 											program={selectedProgram}
+											instructor={selectedInstructor}
 											role={selectedRole}
 											department={selectedDepartment}
 											open={open}

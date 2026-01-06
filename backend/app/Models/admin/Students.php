@@ -17,12 +17,13 @@ class Students extends Model
         'student_id',
         'department_id',
         'program_id',
+        'account_id',
         'section',
         'mobile_num',
         'semester',
         'facebook_profile',
         'year_level',
-        'thesis_title',
+        'instructor_id',
         'role_id',
     ];
 
@@ -40,5 +41,13 @@ class Students extends Model
 
     public function proponent():HasOne {
         return $this->hasOne(ProponentsDetails::class, 'student_id');
+    }
+
+    public function instructor():HasOne {
+        return $this->hasOne(Instructors::class, 'instructor_id');
+    }
+
+    public function account(): BelongsTo {
+        return $this->belongsTo(Accounts::class, 'account_id');
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->longText('description')->nullable();
             $table->integer('students_count')->default(0);
-            $table->foreignId('department_id')->nullable()->constrained();
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->timestamps();
         });

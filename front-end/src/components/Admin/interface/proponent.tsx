@@ -8,19 +8,11 @@ export type ProponentsProps = {
 	id: number;
 	proponents_id: string;
 	academic_yr: string;
-	semester: number;
 	title: string;
 	adviser_id: number;
-	program_id: number;
 	created_at: string;
 	updated_at: string;
 	details: ProponentsDetailsProps[];
-};
-
-export type ProgramsProponentProps = {
-	id: number;
-	name: string;
-	code: string;
 };
 
 export type AdvisersProponentProps = {
@@ -42,14 +34,12 @@ export type RolesProponentsProps = {
 export type ProponentsTableProps = {
 	proponents: ProponentsProps[];
 	advisers: AdvisersProponentProps[];
-	programs: ProgramsProponentProps[];
 	students: StudentsProponentsProps[];
 	roles: RolesProponentsProps[];
 	loading: boolean;
 	refresh?: () => void;
 };
 export type ProponentAddProps = {
-	programs: ProgramsProponentProps[];
 	advisers: AdvisersProponentProps[];
 	students: StudentsProponentsProps[];
 	roles: RolesProponentsProps[];
@@ -60,6 +50,7 @@ export type ProponentsAutoCompleteProps = {
 	students: StudentsProponentsProps[];
 	selectedStudentsIds: number[];
 	initialStudents: number[];
+	roles: RolesProponentsProps[];
 	onSelectionChange: (studentIds: number[]) => void;
 	onRemovedIdsChange?: (ids: number[]) => void;
 	placeholder?: string;
@@ -69,7 +60,7 @@ export type ProponentsEditProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	proponent: ProponentsProps;
-	programs: ProgramsProponentProps[];
+	roles: RolesProponentsProps[];
 	advisers: AdvisersProponentProps[];
 	students: StudentsProponentsProps[];
 	onSuccess?: () => void;
@@ -77,7 +68,6 @@ export type ProponentsEditProps = {
 
 export type ProponentsDetails = {
 	open: boolean;
-	programs: ProgramsProponentProps | null;
 	advisers: AdvisersProponentProps | null;
 	roles: RolesProponentsProps[];
 	students: StudentsProponentsProps[];

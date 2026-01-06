@@ -8,11 +8,15 @@ export type StudentProps = {
 	semester: number;
 	year_level: number;
 	facebook_profile: string;
-	thesis_title: string;
+	instructor_id: number;
 	name: string;
 	department_id: number;
 	created_at: string;
 	updated_at: string;
+	account: {
+		id: number;
+		email: string;
+	};
 };
 
 export type DepartmentStudentsProps = {
@@ -39,15 +43,20 @@ export type StudentsTableProps = {
 	departments: DepartmentStudentsProps[];
 	programs: ProgramsStudentsProps[];
 	roles: RolesStudentsProps[];
-
+	instructors: InstructorStudentsProps[];
 	loading: boolean;
 	refresh?: () => void;
 };
 
+export type InstructorStudentsProps = {
+	id: number;
+	name: string;
+};
 export type StudentAddProps = {
 	programs: ProgramsStudentsProps[];
 	departments: DepartmentStudentsProps[];
 	roles: RolesStudentsProps[];
+	instructors: InstructorStudentsProps[];
 	onSuccess?: () => void;
 };
 export type StudentEditProps = {
@@ -57,6 +66,7 @@ export type StudentEditProps = {
 	programs: ProgramsStudentsProps[];
 	departments: DepartmentStudentsProps[];
 	roles: RolesStudentsProps[];
+	instructors: InstructorStudentsProps[];
 	onSuccess?: () => void;
 };
 
@@ -67,6 +77,7 @@ export type StudentDetailsProps = {
 	role: RolesStudentsProps | null;
 	program: ProgramsStudentsProps | null;
 	department: DepartmentStudentsProps | null;
+	instructor: InstructorStudentsProps | null;
 };
 
 export type StudentDeleteProps = {

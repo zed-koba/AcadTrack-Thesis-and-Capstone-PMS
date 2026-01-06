@@ -7,7 +7,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,20 @@ import {
 	FieldLabel,
 } from '@/components/ui/field';
 import type { StudentEditProps } from '../interface/student';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '@/components/ui/command';
 
 const studentSchema = z
 	.object({
@@ -39,7 +53,7 @@ const studentSchema = z
 		program: z.number().min(1, 'Program is required'),
 		section: z.string().min(1, 'Section is required'),
 		semester: z.number().min(1, 'Must select a semester').max(2),
-		thesis_title: z.string().min(1, 'Thesis Title is required'),
+		instructor: z.number().min(1, 'Thesis Title is required'),
 		year_Level: z.number().min(1, 'Must select a year level').max(4),
 		facebook_profile: z.string().optional().nullable(),
 	})
@@ -55,9 +69,13 @@ const StudentEdit = ({
 	roles,
 	departments,
 	programs,
+	instructors,
 	onSuccess,
 }: StudentEditProps) => {
 	const [loading, setLoading] = useState(false);
+	const [selectInstructorId, setSelectInstructorId] = useState(0);
+	const [instructorOpen, setInstructorOpen] = useState(false);
+
 	type formValues = z.infer<typeof studentSchema>;
 	const defaultValues: formValues = {
 		student_id: student.student_id,
@@ -67,7 +85,7 @@ const StudentEdit = ({
 		role: student.role_id === null ? 0 : student.role_id,
 		mobile_num: student.mobile_num,
 		semester: student.semester,
-		thesis_title: student.thesis_title,
+		instructor: student.instructor_id,
 		year_Level: student.year_level,
 		facebook_profile: student.facebook_profile,
 		selectedDepartmentId: student.department_id,
@@ -90,7 +108,7 @@ const StudentEdit = ({
 				semester: value.semester,
 				facebook_profile: value.facebook_profile,
 				year_level: value.year_Level,
-				thesis_title: value.thesis_title,
+				instructor_id: value.instructor,
 				role_id: value.role === 0 ? null : value.role,
 			};
 			try {
@@ -144,6 +162,9 @@ const StudentEdit = ({
 		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1
 	);
 
+	const selectedInstructor = instructors.find(
+		(i) => i.id === selectInstructorId
+	);
 	useEffect(() => {
 		if (student) {
 			form.reset({
@@ -154,7 +175,7 @@ const StudentEdit = ({
 				role: student.role_id,
 				mobile_num: student.mobile_num,
 				semester: student.semester,
-				thesis_title: student.thesis_title,
+				instructor: student.instructor_id,
 				year_Level: student.year_level,
 				facebook_profile: student.facebook_profile,
 				selectedDepartmentId: student.department_id,
@@ -232,23 +253,73 @@ const StudentEdit = ({
 							/>
 						</div>
 						<form.Field
-							name="thesis_title"
+							name="instructor"
 							children={(field) => {
 								const isInvalid =
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Thesis Title: </FieldLabel>
-										<Input
-											id={field.name}
-											name={field.name}
-											value={field.state.value}
-											onBlur={field.handleBlur}
-											onChange={(e) => field.handleChange(e.target.value)}
-											aria-invalid={isInvalid}
-											placeholder="Ex. Web-Based Thesis Management System"
-											autoComplete="off"
-										/>
+										<FieldLabel htmlFor={field.name}>Instructor</FieldLabel>
+										<Popover
+											open={instructorOpen}
+											onOpenChange={setInstructorOpen}
+										>
+											<PopoverTrigger asChild>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={instructorOpen}
+													className={cn(
+														'w-full justify-between',
+														field.state.value === 0
+															? 'text-muted-foreground'
+															: 'text-white'
+													)}
+												>
+													{selectedInstructor
+														? selectedInstructor.name
+														: 'Search and select instructor'}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-[400px] p-0" align="start">
+												<Command>
+													<CommandInput placeholder="Search adviser...." />
+													<CommandList>
+														<CommandEmpty>No instructor found.</CommandEmpty>
+														<CommandGroup>
+															{instructors.map((adv) => (
+																<CommandItem
+																	key={adv.id}
+																	value={`${adv.name} ${String(adv.id)}`}
+																	onSelect={() => {
+																		field.setValue(adv.id);
+																		setSelectInstructorId(adv.id);
+																		setInstructorOpen(false);
+																	}}
+																	className={cn(
+																		'',
+																		selectInstructorId === adv.id
+																			? 'bg-blue-600! text-white hover:bg-blue-600!'
+																			: 'hover:bg-card/50'
+																	)}
+																>
+																	<Check
+																		className={cn(
+																			'h-4 w-4',
+																			Number(field.state.value) === adv.id
+																				? 'opacity-100 text-white'
+																				: 'opacity-0'
+																		)}
+																	/>
+																	{adv.name}
+																</CommandItem>
+															))}
+														</CommandGroup>
+													</CommandList>
+												</Command>
+											</PopoverContent>
+										</Popover>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}

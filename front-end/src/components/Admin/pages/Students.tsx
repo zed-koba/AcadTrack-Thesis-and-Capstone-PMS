@@ -1,5 +1,6 @@
 import { apiUrl } from '@/components/Routes/http';
 import {
+	type StudentsInstructorProps,
 	type DepartmentStudentsProps,
 	type ProgramsStudentsProps,
 	type RolesStudentsProps,
@@ -14,6 +15,7 @@ const Students = () => {
 	const [students, setStudents] = useState<StudentProps[]>([]);
 	const [departments, setDepartments] = useState<DepartmentStudentsProps[]>([]);
 	const [roles, setRoles] = useState<RolesStudentsProps[]>([]);
+	const [instructors, setInstructors] = useState<StudentsInstructorProps[]>([]);
 	const [programs, setPrograms] = useState<ProgramsStudentsProps[]>([]);
 	const fetchStudents = async () => {
 		try {
@@ -28,6 +30,7 @@ const Students = () => {
 			const result = await res.json();
 			if (result.status === 200) {
 				setStudents(result.students);
+				setInstructors(result.instructors);
 				setDepartments(result.departments);
 				setRoles(result.roles);
 				setPrograms(result.programs);
@@ -63,6 +66,7 @@ const Students = () => {
 						roles={roles}
 						programs={programs}
 						departments={departments}
+						instructors={instructors}
 						loading={loading}
 						refresh={fetchStudents}
 					/>

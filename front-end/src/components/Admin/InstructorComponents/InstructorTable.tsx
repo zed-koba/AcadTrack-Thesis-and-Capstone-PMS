@@ -107,7 +107,7 @@ const InstructorTable = ({
 	const getCodeBadge = (id: number) => {
 		const findCode = departments.find((c) => c.id === id);
 
-		return findCode ?? { id: 0, name: 'Unknown', code: '' };
+		return findCode ?? { id: 0, name: 'Inactive', code: '' };
 	};
 	return (
 		<>
@@ -139,17 +139,11 @@ const InstructorTable = ({
 									<TableHead className="text-muted-foreground text-left pl-4">
 										Instructor Name
 									</TableHead>
-									{/* <TableHead className="text-muted-foreground text-left max-w-[200px]">
+									<TableHead className="text-muted-foreground text-left max-w-[200px]">
 										Email
-									</TableHead> */}
+									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
 										Department
-									</TableHead>
-									<TableHead className="text-muted-foreground text-left">
-										Groups Handled
-									</TableHead>
-									<TableHead className="text-muted-foreground text-left">
-										Capacity
 									</TableHead>
 									<TableHead className="text-muted-foreground text-left">
 										Status
@@ -190,18 +184,15 @@ const InstructorTable = ({
 											<TableCell className="text-left pl-3 text-white font-medium">
 												{adv.name}
 											</TableCell>
-											{/* <TableCell className="text-left max-w-[200px] text-white truncate">
+											<TableCell className="text-left max-w-[200px] text-white truncate">
 												{adv.account.email}
-											</TableCell> */}
+											</TableCell>
 											<TableCell className="text-left">
 												<Badge variant="outline">
 													{getCodeBadge(adv.department_id).name}
 												</Badge>
 											</TableCell>
-											<TableCell className="text-left text-white">0</TableCell>
-											<TableCell className="text-left text-white">
-												0/5
-											</TableCell>
+
 											<TableCell className="text-left">
 												{getStatusBadge(adv.status)}
 											</TableCell>

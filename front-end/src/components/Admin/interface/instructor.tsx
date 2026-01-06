@@ -9,6 +9,10 @@ export type InstructorProps = {
 	status: string;
 	created_at: string;
 	updated_at: string;
+	account: {
+		id: number;
+		email: string;
+	};
 };
 export type InstructorDetailsProps = {
 	instructor: InstructorProps | null;

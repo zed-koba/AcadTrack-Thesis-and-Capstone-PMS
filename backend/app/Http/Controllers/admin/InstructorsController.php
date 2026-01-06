@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\admin\Accounts;
 use App\Models\admin\Departments;
 use App\Models\admin\Instructors;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class InstructorsController extends Controller
     //
     public function getInstructors(Request $request)
     {
-        $instructor = Instructors::orderBy('created_at', 'DESC')->get();
+        $instructor = Instructors::with('account:id,email')->orderBy('created_at', 'DESC')->get();
         $departments = Departments::where('status', 'active')->orderBy('created_at', 'DESC')->get();
         return response()->json([
             'status' => 200,
@@ -43,8 +44,16 @@ class InstructorsController extends Controller
 
         DB::beginTransaction();
         try {
+            $account = Accounts::create([
+                'email' => $request->email,
+                'password' => '123',
+                'status' => 'pending',
+                'role' => 'instructor',
+            ]);
+            
             $instructor = Instructors::create([
                 'name' => $request->name,
+                'account_id' => $account->id,
                 'contact_number' => $request->contact_number,
                 'department_id' => $request->department_id,
                 'status' => $request->status,
@@ -59,7 +68,7 @@ class InstructorsController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => 500,
-                'message' => 'Failed to insert adviser',
+                'message' => 'Failed to insert instructor',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -87,6 +96,9 @@ class InstructorsController extends Controller
         DB::beginTransaction();
         try {
             $instructor->update($request->only(['name', 'contact_num', 'department_id', 'status']));
+            $account = Accounts::where('id', $instructor->account_id);
+            $account->update($request->only(['email']));
+
             DB::commit();
             return response()->json([
                 'status' => 201,
@@ -106,8 +118,8 @@ class InstructorsController extends Controller
     {
         DB::beginTransaction();
         try {
-            $adviser = Instructors::find($id);
-            $adviser->delete();
+            $instructor = Instructors::find($id);
+            $instructor->delete();
             DB::commit();
             return response()->json([
                 'status' => 200,

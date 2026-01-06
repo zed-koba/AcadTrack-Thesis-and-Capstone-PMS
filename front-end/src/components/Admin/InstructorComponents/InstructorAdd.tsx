@@ -38,6 +38,7 @@ const instructorSchema = z
 			.string()
 			.min(2, 'Last name must be at least 2 characters')
 			.toUpperCase(),
+		email: z.email('Invalid email address'),
 		suffix: z.string().optional(),
 		contact_number: z.string().optional(),
 		selectedDepartmentId: z.number(),
@@ -55,6 +56,7 @@ const InstructorAdd = ({ departments, onSuccess }: InstructorAddProps) => {
 	const defaultValues: formValues = {
 		first_name: '',
 		last_name: '',
+		email: '',
 		suffix: 'none',
 		contact_number: '',
 		selectedDepartmentId: 0,
@@ -76,6 +78,7 @@ const InstructorAdd = ({ departments, onSuccess }: InstructorAddProps) => {
 					' ' +
 					(value.suffix === 'none' ? '' : value.suffix),
 				contact_number: value.contact_number,
+				email: value.email,
 				department_id: value.selectedDepartmentId,
 				status: value.status,
 			};
@@ -250,7 +253,31 @@ const InstructorAdd = ({ departments, onSuccess }: InstructorAddProps) => {
 									}}
 								/>
 							</div>
-
+							<form.Field
+								name="email"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Email</FieldLabel>
+											<Input
+												id={field.name}
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder={'Ex. john.fritz@gmail.com'}
+												autoComplete="off"
+											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
 							<form.Field
 								name="selectedDepartmentId"
 								children={(field) => {

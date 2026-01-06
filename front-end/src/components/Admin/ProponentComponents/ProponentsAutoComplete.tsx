@@ -12,6 +12,7 @@ const ProponentsAutoComplete = ({
 	students,
 	selectedStudentsIds,
 	initialStudents,
+	roles,
 	onSelectionChange,
 	placeholder = 'Search students...',
 	disabled = false,
@@ -79,6 +80,12 @@ const ProponentsAutoComplete = ({
 			onRemovedIdsChange?.(updatedRemoved);
 		}
 	};
+
+	const findRole = (id: number) => {
+		const getRole = roles.find((r) => r.id === id);
+
+		return getRole ?? { id: 0, name: 'Not Assigned' };
+	};
 	return (
 		<div ref={containerRef} className="relative space-y-2">
 			<div className="relative">
@@ -98,7 +105,7 @@ const ProponentsAutoComplete = ({
 				/>
 			</div>
 			{open && searchQuery.length > 0 && (
-				<div className="absolute z-50 w-full bg-popover rounded-md shadow-lg">
+				<div className="absolute z-50 w-full bottom-full bg-popover rounded-md shadow-lg">
 					<ScrollArea className="max-h-[200px]">
 						{availableStudents.length === 0 ? (
 							<div className="p-3 text-sm text-muted-foreground text-center">
@@ -125,7 +132,8 @@ const ProponentsAutoComplete = ({
 												<div>
 													<p className="text-sm font-medium">{student.name}</p>
 													<p className="text-xs text-muted-foreground">
-														{student.student_id}
+														{student.student_id} |{' '}
+														{findRole(student.role_id).name}
 													</p>
 												</div>
 											</div>

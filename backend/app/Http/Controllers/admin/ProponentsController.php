@@ -37,10 +37,8 @@ class ProponentsController extends Controller
   {
     $rules = [
       'academic_yr' => 'required|string',
-      'semester' => 'required|integer',
       'title' => 'required|string',
       'adviser_id' => 'required|integer',
-      'program_id' => 'required|integer',
       'students_id' => 'array|nullable',
     ];
     $validator = Validator::make($request->all(), $rules);
@@ -57,10 +55,8 @@ class ProponentsController extends Controller
     try {
       $proponents = Proponents::create([
         'academic_yr' => $request->academic_yr,
-        'semester' => (int) $request->semester,
         'title' => $request->title,
         'adviser_id' => $request->adviser_id,
-        'program_id' => $request->program_id,
       ]);
       if (isset($request->students_id)) {
         foreach ($request->students_id as $student) {
@@ -75,7 +71,7 @@ class ProponentsController extends Controller
       return response()->json(
         [
           'status' => 201,
-          'message' => 'Sucessfully added Proponent',
+          'message' => 'Sucessfully added project',
           'data' => [
             'proponent' => $proponents,
             'students_id' => $request->students_id,

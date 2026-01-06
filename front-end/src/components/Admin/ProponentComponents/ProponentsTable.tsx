@@ -14,8 +14,7 @@ import {
 	InputGroupAddon,
 } from '@/components/ui/input-group';
 import {
-	AdvisersProponentProps,
-	type ProgramsProponentProps,
+	type AdvisersProponentProps,
 	type ProponentsProps,
 	type ProponentsTableProps,
 	type StudentsProponentsProps,
@@ -26,7 +25,6 @@ import {
 	PencilRuler,
 	ReceiptText,
 	Trash,
-	ArrowUpDown,
 	MoreHorizontal,
 	PowerOff,
 } from 'lucide-react';
@@ -49,35 +47,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
 const ITEMS_PER_PAGE = 10;
-const SortButton = ({
-	field,
-	label,
-	onSort,
-}: {
-	field: SortField;
-	label: string;
-	onSort: (field: SortField) => void;
-}) => (
-	<Button
-		variant="ghost"
-		className="-ml-3 h-8 font-semibold text-muted-foreground"
-		size="sm"
-		onClick={() => onSort(field)}
-	>
-		{label}
-		<ArrowUpDown size={12} className="w-3.5! h-3.5! text-sm font-semibold" />
-	</Button>
-);
 const ProponentsTable = ({
 	students,
 	proponents,
 	advisers,
-	programs,
 	roles,
 	loading,
 	refresh,
@@ -93,24 +69,15 @@ const ProponentsTable = ({
 	const [currentPage, setCurrentPage] = useState(1);
 	const [selectedAdviser, setSelectedAdviser] =
 		useState<AdvisersProponentProps | null>(null);
-	const [selectedProgram, setSelectedProgram] =
-		useState<ProgramsProponentProps | null>(null);
 	const [selectedStudents, setSelectedStudents] = useState<
 		StudentsProponentsProps[]
 	>([]);
 	const filteredProponents = proponents.filter((props) => {
 		const searchLower = searchTerm.toLowerCase();
-		const semesterLabel =
-			props.semester === 1
-				? '1st Semester'
-				: props.semester === 2
-				? '2nd Semester'
-				: '';
 		return (
 			props.proponents_id.toLowerCase().includes(searchLower) ||
 			props.academic_yr.toLowerCase().includes(searchLower) ||
 			props.title.toLowerCase().includes(searchLower) ||
-			semesterLabel.toLowerCase().includes(searchLower) ||
 			formatDate(props.created_at).toLowerCase().includes(searchLower) ||
 			formatDate(props.updated_at).toLowerCase().includes(searchLower)
 		);
@@ -132,10 +99,6 @@ const ProponentsTable = ({
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
-	const getProgram = (id: number) => {
-		const findProgram = programs.find((prog) => prog.id === id);
-		return findProgram ?? { id: 0, name: '', code: '' };
-	};
 
 	const getAdviser = (id: number) => {
 		const findAdviser = advisers.find((adv) => adv.id === id);
@@ -180,7 +143,6 @@ const ProponentsTable = ({
 						<ProponentsAdd
 							students={students}
 							advisers={advisers}
-							programs={programs}
 							roles={roles}
 							refresh={refresh}
 						/>
@@ -204,12 +166,6 @@ const ProponentsTable = ({
 									</TableHead>
 									<TableHead className="text-left text-muted-foreground">
 										Academic Year
-									</TableHead>
-									<TableHead className="text-left text-muted-foreground">
-										Semester
-									</TableHead>
-									<TableHead className="text-left text-muted-foreground">
-										Program
 									</TableHead>
 									<TableHead className="text-left text-muted-foreground">
 										Adviser
@@ -257,16 +213,7 @@ const ProponentsTable = ({
 											<TableCell className="text-left">
 												{proponent.academic_yr}
 											</TableCell>
-											<TableCell className="text-left">
-												{proponent.semester === 1
-													? '1st Semester'
-													: '2nd Semester'}
-											</TableCell>
-											<TableCell className="text-left">
-												<Badge variant="outline">
-													{getProgram(proponent.program_id).code}
-												</Badge>
-											</TableCell>
+
 											<TableCell className="text-left">
 												{getAdviser(proponent.adviser_id).name}
 											</TableCell>
@@ -294,9 +241,6 @@ const ProponentsTable = ({
 																setSelectedProponent(proponent);
 																setSelectedAdviser(
 																	getAdviser(proponent.adviser_id)
-																);
-																setSelectedProgram(
-																	getProgram(proponent.program_id)
 																);
 																setSelectedStudents(getStudentsIds(proponent));
 																setOpen(true);
@@ -326,7 +270,7 @@ const ProponentsTable = ({
 										<ProponetsEdit
 											students={students}
 											advisers={advisers}
-											programs={programs}
+											roles={roles}
 											open={open}
 											setOpen={setOpen}
 											proponent={selectedProponent}
@@ -338,7 +282,6 @@ const ProponentsTable = ({
 											setOpen={setOpen}
 											proponent={selectedProponent}
 											advisers={selectedAdviser}
-											programs={selectedProgram}
 											students={selectedStudents}
 											roles={roles}
 										/>

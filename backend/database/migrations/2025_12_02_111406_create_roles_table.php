@@ -17,7 +17,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->boolean('globalRole')->default(false);
             $table->integer('assigned')->default(0);
-            $table->foreignId('department_id')->nullable()->constrained();
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->timestamps();
         });

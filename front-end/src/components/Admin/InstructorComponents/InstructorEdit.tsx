@@ -38,6 +38,7 @@ const instructorSchema = z
 			.min(2, 'Last name must be at least 2 characters')
 			.toUpperCase(),
 		suffix: z.string().optional().nullable(),
+		email: z.email('Invalid email address'),
 		contact_number: z.string().optional().nullable(),
 		selectedDepartmentId: z.number(),
 		status: z.enum(['active', 'inactive']),
@@ -60,6 +61,7 @@ const InstructorEdit = ({
 		first_name: parseName(instructor.name).first_name,
 		last_name: parseName(instructor.name).last_name,
 		suffix: parseName(instructor.name).suffix,
+		email: instructor.account.email,
 		contact_number: instructor.contact_number,
 		selectedDepartmentId: instructor.department_id,
 		status: instructor.status as 'active' | 'inactive',
@@ -134,6 +136,7 @@ const InstructorEdit = ({
 				first_name: parseName(instructor.name).first_name,
 				last_name: parseName(instructor.name).last_name,
 				suffix: parseName(instructor.name).suffix,
+				email: instructor.account.email,
 				contact_number: instructor.contact_number,
 				selectedDepartmentId: instructor.department_id,
 				status: instructor.status as 'active' | 'inactive',
@@ -260,6 +263,31 @@ const InstructorEdit = ({
 									}}
 								/>
 							</div>
+							<form.Field
+								name="email"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Email</FieldLabel>
+											<Input
+												id={field.name}
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder={'Ex. john.fritz@gmail.com'}
+												autoComplete="off"
+											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
 							<form.Field
 								name="selectedDepartmentId"
 								children={(field) => {

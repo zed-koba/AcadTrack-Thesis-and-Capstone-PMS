@@ -5,6 +5,7 @@ namespace App\Models\admin;
 use App\Models\admin\Accounts;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Advisers extends Model
 {
@@ -17,5 +18,9 @@ class Advisers extends Model
 
     public function account():BelongsTo {
         return $this->belongsTo(Accounts::class, 'account_id');
+    }
+
+    public function projects():HasMany {
+        return $this->hasMany(Proponents::class, 'adviser_id');
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\admin\Accounts;
 use App\Models\admin\Departments;
+use App\Models\admin\Instructors;
 use App\Models\admin\Programs;
 use App\Models\admin\Role;
 use App\Models\admin\Students;
@@ -15,15 +17,17 @@ class StudentsController extends Controller
     public function getData()
     {
         $students = Students::orderBy('created_at', 'DESC')->get();
-        $departments = Departments::where('status', 'active')->orderBy('created_at','DESC')->get();
+        $departments = Departments::where('status', 'active')->orderBy('created_at', 'DESC')->get();
         $roles = Role::where('status', 'active')->get();
         $programs = Programs::where('status', 'active')->get();
+        $instructors = Instructors::where('status', 'active')->get();
         return response()->json([
             'status' => 200,
             'students' => $students,
             'departments' => $departments,
             'roles' => $roles,
             'programs' => $programs,
+            'instructors' => $instructors,
         ], 200);
     }
 
@@ -32,6 +36,8 @@ class StudentsController extends Controller
         $rules = [
             'name' => 'required',
             'student_id' => 'required|unique:students,student_id',
+            'instructor_id' => 'required|integer',
+            'email' => 'required|string',
             'department_id' => 'nullable|integer',
             'program_id' => 'nullable|integer',
             'section' => 'required',
@@ -39,7 +45,6 @@ class StudentsController extends Controller
             'semester' => 'required',
             'facebook_profile' => 'nullable',
             'year_level' => 'required',
-            'thesis_title' => 'nullable',
             'role_id' => 'integer|nullable',
 
         ];
@@ -59,28 +64,38 @@ class StudentsController extends Controller
         }
         try {
             DB::beginTransaction();
+            $account = Accounts::create([
+                'email' => $request->email,
+                'password' => '123',
+                'status' => 'pending',
+                'role' => 'student',
+            ]);
+
             $student = Students::create([
                 'name' => $request->name,
                 'student_id' => $request->student_id,
                 'department_id' => $request->department_id,
                 'program_id' => $request->program_id,
                 'section' => $request->section,
+                'instructor_id' => $request->instructor_id,
+                'account_id' => $account->id,
                 'mobile_num' => $request->mobile_num,
                 'semester' => $request->semester,
                 'facebook_profile' => $request->facebook_profile,
                 "year_level" => $request->year_level,
                 "thesis_title" => $request->thesis_title,
                 "role_id" => $request->role_id,
-
             ]);
-            
-            $role = Role::find($request->role_id);
-            $role->increment('assigned');
+
+            if ($request->role_id != null) {
+                $role = Role::find($request->role_id);
+                $role->increment('assigned');
+            }
             DB::commit();
             return response()->json([
                 'status' => 201,
                 'message' => 'Successfully added student',
-    
+
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -125,17 +140,17 @@ class StudentsController extends Controller
         try {
             DB::beginTransaction();
             $student = Students::find($id);
-            if($student->role_id != $request->role_id) {
+            if ($student->role_id != $request->role_id) {
                 $initialRole = Role::find($student->role_id);
                 $newRole = Role::find($request->role_id);
-                if($request->role_id != null) {
-                $newRole->increment('assigned');
+                if ($request->role_id != null) {
+                    $newRole->increment('assigned');
                 }
-                if($student->role_id != null) {
+                if ($student->role_id != null) {
                     $initialRole->decrement('assigned');
                 }
-            } 
-            $student->update($request->only(['name', 'student_id','department_id', 'program_id', 'section', 'mobile_num', 'semester', 'facebook_profile', 'year_level', 'thesis_title', 'role_id']));
+            }
+            $student->update($request->only(['name', 'student_id', 'department_id', 'program_id', 'section', 'mobile_num', 'semester', 'facebook_profile', 'year_level', 'thesis_title', 'role_id']));
             DB::commit();
             return response()->json([
                 'status' => 200,
@@ -146,7 +161,7 @@ class StudentsController extends Controller
             return response()->json([
                 'status' => 500,
                 'message' => 'An error occurred while updating the student.',
-                'error'=> $e->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
