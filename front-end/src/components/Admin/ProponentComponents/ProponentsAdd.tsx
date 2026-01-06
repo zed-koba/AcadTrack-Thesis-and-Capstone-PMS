@@ -58,6 +58,7 @@ const ProponentsAdd = ({
 	students,
 	programs,
 	advisers,
+	roles,
 	refresh,
 }: ProponentAddProps) => {
 	const [open, setOpen] = useState(false);
@@ -87,35 +88,35 @@ const ProponentsAdd = ({
 				academic_yr: value.academic_yr,
 				title: value.title,
 				semester: value.semester,
-				adviser: value.adviser,
-				program: value.program,
+				adviser_id: value.adviser,
+				program_id: value.program,
 				students_id: value.studentsId,
 			};
 			try {
-				// const res = await fetch(`${apiUrl}/proponents/add`, {
-				// 	method: 'POST',
-				// 	headers: {
-				// 		'Content-type': 'application/json',
-				// 		Accept: 'application/json',
-				// 	},
-				// 	body: JSON.stringify(payLoad),
-				// });
-				// const result = await res.json();
-				// if (result.status === 422) {
-				// 	const errors = result.errors as Record<string, string[]>;
-				// 	Object.values(errors).forEach((errorMessages) =>
-				// 		errorMessages.forEach((message) => toast.error(message))
-				// 	);
-				// 	return;
-				// }
-				// if (!res.ok) {
-				// 	console.log('Failed to fetch data ' + JSON.stringify(payLoad));
-				// 	return JSON.stringify(payLoad);
-				// }
-				// form.reset();
-				// toast.success('Sucessfully added proponent');
-				// setOpen(false);
-				// refresh?.();
+				const res = await fetch(`${apiUrl}/proponents/add`, {
+					method: 'POST',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
+					body: JSON.stringify(payLoad),
+				});
+				const result = await res.json();
+				if (result.status === 422) {
+					const errors = result.errors as Record<string, string[]>;
+					Object.values(errors).forEach((errorMessages) =>
+						errorMessages.forEach((message) => toast.error(message))
+					);
+					return;
+				}
+				if (!res.ok) {
+					console.log('Failed to fetch data ' + JSON.stringify(payLoad));
+					return JSON.stringify(payLoad);
+				}
+				form.reset();
+				toast.success('Sucessfully added proponent');
+				setOpen(false);
+				refresh?.();
 				console.log(payLoad);
 			} catch (error) {
 				console.log(error);
@@ -360,6 +361,7 @@ const ProponentsAdd = ({
 												</FieldLabel>
 												<ProponentsAutoComplete
 													students={students}
+													initialStudents={[]}
 													selectedStudentsIds={field.state.value ?? []}
 													onSelectionChange={field.handleChange}
 													placeholder="Search for students by name or ID..."

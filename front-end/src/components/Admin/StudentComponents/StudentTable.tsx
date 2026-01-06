@@ -32,7 +32,13 @@ import {
 } from '@/components/ui/pagination';
 import { formatDate } from '@/components/functions/functions';
 
-import type { StudentProps, StudentsTableProps } from '../interface/student';
+import {
+	DepartmentStudentsProps,
+	ProgramsStudentsProps,
+	RolesStudentsProps,
+	type StudentProps,
+	type StudentsTableProps,
+} from '../interface/student';
 import StudentAdd from './StudentAdd';
 import StudentEdit from './StudentEdit';
 import StudentDetails from './StudentDetails';
@@ -47,6 +53,7 @@ import { Badge } from '@/components/ui/badge';
 
 type SortField = keyof StudentProps;
 type SortDirection = 'asc' | 'desc';
+type SelectedType = 'role' | 'program' | 'department';
 const ITEMS_PER_PAGE = 10;
 
 const StudentTable = ({
@@ -60,6 +67,13 @@ const StudentTable = ({
 	const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
 		null
 	);
+	const [selectedDepartment, setSelectedDepartment] =
+		useState<DepartmentStudentsProps | null>(null);
+	const [selectedRole, setSelectedRole] = useState<RolesStudentsProps | null>(
+		null
+	);
+	const [selectedProgram, setSelectedProgram] =
+		useState<ProgramsStudentsProps | null>(null);
 	const [studentId, setStudentId] = useState<number | null>(null);
 	const [clickedButton, setClickedButton] = useState<string | null>(null);
 	const [sortField, setSortField] = useState<SortField>('created_at');
@@ -116,6 +130,29 @@ const StudentTable = ({
 			return <Badge variant="outline">{findProgram?.code}</Badge>;
 		if (type === 'department')
 			return <Badge variant="outline">{findDepartment?.code}</Badge>;
+	};
+
+	const getSelectedInfo = (
+		id: number,
+		type: SelectedType
+	):
+		| RolesStudentsProps
+		| ProgramsStudentsProps
+		| DepartmentStudentsProps
+		| null => {
+		switch (type) {
+			case 'role':
+				return roles.find((r) => r.id === id) ?? null;
+
+			case 'program':
+				return programs.find((p) => p.id === id) ?? null;
+
+			case 'department':
+				return departments.find((d) => d.id === id) ?? null;
+
+			default:
+				return null;
+		}
 	};
 	return (
 		<>
@@ -266,13 +303,31 @@ const StudentTable = ({
 																setSelectedStudent(student);
 																setOpen(true);
 																setClickedButton('details');
+																setSelectedDepartment(
+																	getSelectedInfo(
+																		student.department_id,
+																		'department'
+																	) as DepartmentStudentsProps | null
+																);
+																setSelectedRole(
+																	getSelectedInfo(
+																		student.role_id,
+																		'role'
+																	) as RolesStudentsProps | null
+																);
+																setSelectedProgram(
+																	getSelectedInfo(
+																		student.program_id,
+																		'program'
+																	) as ProgramsStudentsProps | null
+																);
 															}}
 														>
 															<ReceiptText className="h-4 w-4 mr-2" /> Details
 														</DropdownMenuItem>
-														<DropdownMenuItem>
+														{/* <DropdownMenuItem>
 															<PowerOff className="h-4 w-4 mr-2" /> Deactivate
-														</DropdownMenuItem>
+														</DropdownMenuItem> */}
 														<DropdownMenuItem
 															onClick={() => {
 																setSelectedStudent(student);
@@ -303,6 +358,9 @@ const StudentTable = ({
 									) : clickedButton === 'details' ? (
 										<StudentDetails
 											student={selectedStudent}
+											program={selectedProgram}
+											role={selectedRole}
+											department={selectedDepartment}
 											open={open}
 											setOpen={setOpen}
 										/>

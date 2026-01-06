@@ -7,16 +7,18 @@ import {
 	TableCell,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import { apiUrl } from '@/components/Routes/http';
+import { useState } from 'react';
 import {
 	InputGroup,
 	InputGroupInput,
 	InputGroupAddon,
 } from '@/components/ui/input-group';
-import type {
-	ProponentsProps,
-	ProponentsTableProps,
+import {
+	AdvisersProponentProps,
+	type ProgramsProponentProps,
+	type ProponentsProps,
+	type ProponentsTableProps,
+	type StudentsProponentsProps,
 } from '../interface/proponent';
 
 import {
@@ -47,6 +49,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 type SortField = keyof ProponentsProps;
 type SortDirection = 'asc' | 'desc';
@@ -75,6 +78,7 @@ const ProponentsTable = ({
 	proponents,
 	advisers,
 	programs,
+	roles,
 	loading,
 	refresh,
 }: ProponentsTableProps) => {
@@ -87,7 +91,13 @@ const ProponentsTable = ({
 	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
-
+	const [selectedAdviser, setSelectedAdviser] =
+		useState<AdvisersProponentProps | null>(null);
+	const [selectedProgram, setSelectedProgram] =
+		useState<ProgramsProponentProps | null>(null);
+	const [selectedStudents, setSelectedStudents] = useState<
+		StudentsProponentsProps[]
+	>([]);
 	const filteredProponents = proponents.filter((props) => {
 		const searchLower = searchTerm.toLowerCase();
 		const semesterLabel =
@@ -100,7 +110,6 @@ const ProponentsTable = ({
 			props.proponents_id.toLowerCase().includes(searchLower) ||
 			props.academic_yr.toLowerCase().includes(searchLower) ||
 			props.title.toLowerCase().includes(searchLower) ||
-			props.program.toLowerCase().includes(searchLower) ||
 			semesterLabel.toLowerCase().includes(searchLower) ||
 			formatDate(props.created_at).toLowerCase().includes(searchLower) ||
 			formatDate(props.updated_at).toLowerCase().includes(searchLower)
@@ -123,7 +132,28 @@ const ProponentsTable = ({
 		startIndex,
 		startIndex + ITEMS_PER_PAGE
 	);
+	const getProgram = (id: number) => {
+		const findProgram = programs.find((prog) => prog.id === id);
+		return findProgram ?? { id: 0, name: '', code: '' };
+	};
 
+	const getAdviser = (id: number) => {
+		const findAdviser = advisers.find((adv) => adv.id === id);
+
+		return findAdviser ?? { id: 0, name: '' };
+	};
+
+	const getStudentsIds = (proponent: ProponentsProps) => {
+		const findIds = new Set<number>(
+			proponent.details
+				.filter((d) => d.foreign_proponents_id === proponent.proponents_id)
+				.map((d) => d.student_id)
+				.filter((id): id is number => id !== undefined)
+		);
+
+		const findStudents = students.filter((student) => findIds.has(student.id));
+		return findStudents;
+	};
 	return (
 		<>
 			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
@@ -151,6 +181,7 @@ const ProponentsTable = ({
 							students={students}
 							advisers={advisers}
 							programs={programs}
+							roles={roles}
 							refresh={refresh}
 						/>
 					</div>
@@ -232,10 +263,12 @@ const ProponentsTable = ({
 													: '2nd Semester'}
 											</TableCell>
 											<TableCell className="text-left">
-												{proponent.program}
+												<Badge variant="outline">
+													{getProgram(proponent.program_id).code}
+												</Badge>
 											</TableCell>
 											<TableCell className="text-left">
-												{proponent.adviser}
+												{getAdviser(proponent.adviser_id).name}
 											</TableCell>
 											<TableCell>{formatDate(proponent.created_at)}</TableCell>
 											<TableCell>{formatDate(proponent.updated_at)}</TableCell>
@@ -259,14 +292,18 @@ const ProponentsTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setSelectedProponent(proponent);
+																setSelectedAdviser(
+																	getAdviser(proponent.adviser_id)
+																);
+																setSelectedProgram(
+																	getProgram(proponent.program_id)
+																);
+																setSelectedStudents(getStudentsIds(proponent));
 																setOpen(true);
 																setClickedButton('details');
 															}}
 														>
 															<ReceiptText className="h-4 w-4 mr-2" /> Details
-														</DropdownMenuItem>
-														<DropdownMenuItem>
-															<PowerOff className="h-4 w-4 mr-2" /> Deactivate
 														</DropdownMenuItem>
 														<DropdownMenuItem
 															onClick={() => {
@@ -287,6 +324,9 @@ const ProponentsTable = ({
 								{selectedProponent &&
 									(clickedButton === 'edit' ? (
 										<ProponetsEdit
+											students={students}
+											advisers={advisers}
+											programs={programs}
 											open={open}
 											setOpen={setOpen}
 											proponent={selectedProponent}
@@ -297,13 +337,17 @@ const ProponentsTable = ({
 											open={open}
 											setOpen={setOpen}
 											proponent={selectedProponent}
+											advisers={selectedAdviser}
+											programs={selectedProgram}
+											students={selectedStudents}
+											roles={roles}
 										/>
 									) : (
 										<ProponentDelete
 											open={open}
 											setOpen={setOpen}
 											proponent_id={proponentId}
-											onSuccess={fetchData}
+											onSuccess={refresh}
 										/>
 									))}
 							</TableBody>

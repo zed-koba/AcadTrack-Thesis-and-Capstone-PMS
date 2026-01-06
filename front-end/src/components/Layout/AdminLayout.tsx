@@ -5,6 +5,7 @@ import {
 	Building2,
 	Glasses,
 	GraduationCap,
+	Landmark,
 	LayoutDashboard,
 	LibraryBig,
 	UserCog,
@@ -21,6 +22,7 @@ const AdminLayout = () => {
 		{ label: 'Roles', to: '/Admin/Roles', icon: <UserCog /> },
 		{ label: 'Programs', to: '/Admin/Programs', icon: <GraduationCap /> },
 		{ label: 'Adviser', to: '/Admin/Adviser', icon: <Glasses /> },
+		{ label: 'Instructor', to: '/Admin/Instructor', icon: <Landmark /> },
 	];
 	return (
 		<div className="flex content-start relative">

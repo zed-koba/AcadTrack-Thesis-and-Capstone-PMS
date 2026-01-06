@@ -1,5 +1,6 @@
 import { apiUrl } from '@/components/Routes/http';
 import {
+	RolesProponentsProps,
 	StudentsProponentsProps,
 	type AdvisersProponentProps,
 	type ProgramsProponentProps,
@@ -14,6 +15,7 @@ const Proponents = () => {
 	const [advisers, setAdvisers] = useState<AdvisersProponentProps[]>([]);
 	const [programs, setPrograms] = useState<ProgramsProponentProps[]>([]);
 	const [students, setStudents] = useState<StudentsProponentsProps[]>([]);
+	const [roles, setRoles] = useState<RolesProponentsProps[]>([]);
 	const [loading, setLoading] = useState(true);
 	const fetchData = async () => {
 		try {
@@ -32,6 +34,7 @@ const Proponents = () => {
 				setAdvisers(result.advisers);
 				setPrograms(result.programs);
 				setStudents(result.students);
+				setRoles(result.roles);
 			}
 		} catch (error) {
 			console.log(error);
@@ -63,6 +66,7 @@ const Proponents = () => {
 						advisers={advisers}
 						programs={programs}
 						students={students}
+						roles={roles}
 						proponents={proponents}
 						loading={loading}
 						refresh={fetchData}

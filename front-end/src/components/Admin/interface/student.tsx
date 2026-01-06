@@ -63,6 +63,9 @@ export type StudentDetailsProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	student: StudentProps;
+	role: RolesStudentsProps | null;
+	program: ProgramsStudentsProps | null;
+	department: DepartmentStudentsProps | null;
 };
 
 export type StudentDeleteProps = {

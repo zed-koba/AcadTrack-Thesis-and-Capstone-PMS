@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('advisers', function (Blueprint $table) {
+        Schema::create('instructors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->string('contact_number')->nullable();
             $table->foreignId('department_id')->nullable()->constrained();
             $table->enum('status', allowed: ['active', 'inactive'])->default('inactive');
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('advisers');
+        Schema::dropIfExists('instructors');
     }
 };

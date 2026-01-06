@@ -38,49 +38,47 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import type {
-	AdviserProps,
-	AdvisersTableProps,
-	DepartmentAdviserProps,
-} from '../interface/adviser';
-import AdviserAdd from './AdviserAdd';
-import AdviserEdit from './AdviserEdit';
-import AdviserDetails from './AdviserDetails';
-import AdviserDelete from './AdviserDelete';
+	DepartmentInstructorProps,
+	InstructorProps,
+	InstructorTableProps,
+} from '../interface/instructor';
+import InstructorAdd from './InstructorAdd';
+import InstructorEdit from './InstructorEdit';
+import InstructorDetails from './InstructorDetails';
+import InstructorDelete from './InstructorDelete';
 
-type SortField = keyof AdviserProps;
+type SortField = keyof InstructorProps;
 type SortDirection = 'asc' | 'desc';
 
 const ITEMS_PER_PAGE = 10;
-const AdviserTable = ({
-	advisers,
+const InstructorTable = ({
+	instructors,
 	departments,
 	loading,
 	refresh,
-}: AdvisersTableProps) => {
+}: InstructorTableProps) => {
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [sortField, setSortField] = useState<SortField>('created_at');
 	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
 	const [currentPage, setCurrentPage] = useState(1);
-	const [selectedAdviser, setSelectedAdviser] = useState<AdviserProps | null>(
-		null
-	);
+	const [selectedInstructor, setSelectedInstructor] =
+		useState<InstructorProps | null>(null);
 	const [open, setOpen] = useState(false);
 	const [clickedButton, setClickedButton] = useState<string>('');
 	const [adviserDepartment, setAdviserDepartment] =
-		useState<DepartmentAdviserProps | null>(null);
+		useState<DepartmentInstructorProps | null>(null);
 
-	const filteredAdvisers = advisers.filter((adv) => {
+	const filteredInstructors = instructors.filter((adv) => {
 		const searchLower = searchTerm.toLowerCase();
 		return (
 			adv.name.toLowerCase().includes(searchLower) ||
-			adv.account.email.toLowerCase().includes(searchLower) ||
 			adv.contact_number.toLowerCase().includes(searchLower) ||
 			formatDate(adv.created_at).toLowerCase().includes(searchLower) ||
 			formatDate(adv.updated_at).toLowerCase().includes(searchLower)
 		);
 	});
 
-	const sortedPrograms = [...filteredAdvisers].sort((a, b) => {
+	const sortedPrograms = [...filteredInstructors].sort((a, b) => {
 		const aValue = a[sortField];
 		const bValue = b[sortField];
 
@@ -125,12 +123,12 @@ const AdviserTable = ({
 								<Search />
 							</InputGroupAddon>
 							<InputGroupAddon align="inline-end">
-								{searchTerm.length > 1 ? filteredAdvisers.length : 0} results
+								{searchTerm.length > 1 ? filteredInstructors.length : 0} results
 							</InputGroupAddon>
 						</InputGroup>
 					</div>
 					<div className="space-y-6 text-white">
-						<AdviserAdd departments={departments} onSuccess={refresh} />
+						<InstructorAdd departments={departments} onSuccess={refresh} />
 					</div>
 				</div>
 				<div className="rounded-lg border bg-card mt-3 shadow-sm">
@@ -139,11 +137,11 @@ const AdviserTable = ({
 							<TableHeader>
 								<TableRow className="text-muted-foreground">
 									<TableHead className="text-muted-foreground text-left pl-4">
-										Adviser Name
+										Instructor Name
 									</TableHead>
-									<TableHead className="text-muted-foreground text-left max-w-[200px]">
+									{/* <TableHead className="text-muted-foreground text-left max-w-[200px]">
 										Email
-									</TableHead>
+									</TableHead> */}
 									<TableHead className="text-muted-foreground text-left">
 										Department
 									</TableHead>
@@ -183,7 +181,7 @@ const AdviserTable = ({
 											colSpan={9}
 											className="-ml-3 h-8 text-white text-center"
 										>
-											No advisers found
+											No instructors found
 										</TableCell>
 									</TableRow>
 								) : (
@@ -192,9 +190,9 @@ const AdviserTable = ({
 											<TableCell className="text-left pl-3 text-white font-medium">
 												{adv.name}
 											</TableCell>
-											<TableCell className="text-left max-w-[200px] text-white truncate">
+											{/* <TableCell className="text-left max-w-[200px] text-white truncate">
 												{adv.account.email}
-											</TableCell>
+											</TableCell> */}
 											<TableCell className="text-left">
 												<Badge variant="outline">
 													{getCodeBadge(adv.department_id).name}
@@ -224,7 +222,7 @@ const AdviserTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setOpen(true);
-																setSelectedAdviser(adv);
+																setSelectedInstructor(adv);
 																setClickedButton('edit');
 															}}
 														>
@@ -233,7 +231,7 @@ const AdviserTable = ({
 														<DropdownMenuItem
 															onClick={() => {
 																setOpen(true);
-																setSelectedAdviser(adv);
+																setSelectedInstructor(adv);
 																setAdviserDepartment(
 																	getCodeBadge(adv.department_id)
 																);
@@ -246,7 +244,7 @@ const AdviserTable = ({
 															className="text-red-500"
 															onClick={() => {
 																setOpen(true);
-																setSelectedAdviser(adv);
+																setSelectedInstructor(adv);
 																setClickedButton('delete');
 															}}
 														>
@@ -259,25 +257,25 @@ const AdviserTable = ({
 										</TableRow>
 									))
 								)}
-								{selectedAdviser &&
+								{selectedInstructor &&
 									(clickedButton === 'edit' ? (
-										<AdviserEdit
-											adviser={selectedAdviser}
+										<InstructorEdit
+											instructor={selectedInstructor}
 											departments={departments}
 											open={open}
 											setOpen={setOpen}
 											onSuccess={refresh}
 										/>
 									) : clickedButton === 'details' ? (
-										<AdviserDetails
-											adviser={selectedAdviser}
+										<InstructorDetails
+											instructor={selectedInstructor}
 											open={open}
 											department={adviserDepartment}
 											setOpen={setOpen}
 										/>
 									) : (
-										<AdviserDelete
-											adviser_id={selectedAdviser.id}
+										<InstructorDelete
+											instructor_id={selectedInstructor.id}
 											open={open}
 											setOpen={setOpen}
 											onSuccess={refresh}
@@ -336,4 +334,4 @@ const AdviserTable = ({
 	);
 };
 
-export default AdviserTable;
+export default InstructorTable;

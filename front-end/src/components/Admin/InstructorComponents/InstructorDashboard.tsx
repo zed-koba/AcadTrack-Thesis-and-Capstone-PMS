@@ -1,14 +1,18 @@
 import { CircleCheckBig, CircleX, UserCog } from 'lucide-react';
-import type { AdviserDashboardProps } from '../interface/adviser';
+import type { InstructorDashboardProps } from '../interface/instructor';
 
-const AdvisersDashboard = ({ advisers = [] }: AdviserDashboardProps) => {
-	const activeCount = advisers.filter((r) => r.status === 'active').length;
-	const inactiveCount = advisers.filter((r) => r.status === 'inactive').length;
+const InstructorDashboard = ({
+	instructors = [],
+}: InstructorDashboardProps) => {
+	const activeCount = instructors.filter((r) => r.status === 'active').length;
+	const inactiveCount = instructors.filter(
+		(r) => r.status === 'inactive'
+	).length;
 
 	const dashboards = [
 		{
 			label: 'Total Programs',
-			value: advisers.length,
+			value: instructors.length,
 			icon: <UserCog size={16} />,
 		},
 		{
@@ -50,4 +54,4 @@ const AdvisersDashboard = ({ advisers = [] }: AdviserDashboardProps) => {
 	);
 };
 
-export default AdvisersDashboard;
+export default InstructorDashboard;

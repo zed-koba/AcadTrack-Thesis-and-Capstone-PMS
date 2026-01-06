@@ -5,10 +5,10 @@ use App\Http\Controllers\admin\AdvisersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
 use App\Http\Controllers\admin\DepartmentsController;
+use App\Http\Controllers\admin\InstructorsController;
 use App\Http\Controllers\admin\ProgramsController;
-use App\Http\Controllers\admin\RoleController;
+use App\Http\Controllers\admin\RoleController;;
 
-;
 use App\Http\Controllers\StudentsController;
 
 // Route::get('/user', function (Request $request) {
@@ -38,20 +38,29 @@ Route::delete('students/delete/{id}', [StudentsController::class, 'deleteStudent
 //Departments Routes
 Route::get('departments', [DepartmentsController::class, 'getDepartments']);
 Route::post('departments/add', [DepartmentsController::class, 'storeDepartment']);
-Route::put('departments/edit/{id}', [DepartmentsController::class,'updateDepartment']);
+Route::put('departments/edit/{id}', [DepartmentsController::class, 'updateDepartment']);
 
 
 //Roles Routes
 Route::get('roles', [RoleController::class, 'getRoles']);
-Route::post('roles/add', [RoleController::class,'storeRole']);
-Route::put('roles/edit/{id}', [RoleController::class,'updateRole']);
+Route::post('roles/add', [RoleController::class, 'storeRole']);
+Route::put('roles/edit/{id}', [RoleController::class, 'updateRole']);
 
 //Programs Routes
-Route::get('programs', [ProgramsController::class,'getPrograms']);
-Route::post('programs/add', [ProgramsController::class,'storeProgram']);
-Route::put('programs/edit/{id}', [ProgramsController::class,'updateProgram']);
+Route::get('programs', [ProgramsController::class, 'getPrograms']);
+Route::post('programs/add', [ProgramsController::class, 'storeProgram']);
+Route::put('programs/edit/{id}', [ProgramsController::class, 'updateProgram']);
 
 
 //Advisers Routes
 Route::get('advisers', [AdvisersController::class,  'getAdvisers']);
-Route::post('advisers/add', [AdvisersController::class,'storeAdviser']);
+Route::post('advisers/add', [AdvisersController::class, 'storeAdviser']);
+Route::put('advisers/edit/{id}', [AdvisersController::class, 'updateAdviser']);
+Route::delete('advisers/delete/{id}', [AdvisersController::class, 'deleteAdviser']);
+
+
+//Instructors Routes
+Route::get('instructors', [InstructorsController::class, 'getInstructors']);
+Route::post('instructors/add', [InstructorsController::class, 'storeInstructor']);
+Route::put('instructors/edit/{id}', [InstructorsController::class, 'updateInstructor']);
+Route::delete('instructors/delete/{id}', [InstructorsController::class, 'deleteInstructor']);

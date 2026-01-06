@@ -3,38 +3,34 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\admin\Accounts;
-use App\Models\admin\Advisers;
 use App\Models\admin\Departments;
+use App\Models\admin\Instructors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class AdvisersController extends Controller
+class InstructorsController extends Controller
 {
     //
-
-    public function getAdvisers(Request $request)
+    public function getInstructors(Request $request)
     {
-        $advisers = Advisers::with('account:id,email')->orderBy('created_at', 'DESC')->get();
+        $instructor = Instructors::orderBy('created_at', 'DESC')->get();
         $departments = Departments::where('status', 'active')->orderBy('created_at', 'DESC')->get();
         return response()->json([
             'status' => 200,
-            'advisers' => $advisers,
+            'instructor' => $instructor,
             'departments' => $departments,
         ], 200);
     }
 
-    public function storeAdviser(Request $request)
+    public function storeInstructor(Request $request)
     {
         $rules = [
             'name' => 'required|string',
             'contact_number' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|max:11',
             'status' => 'in:active,inactive|required',
-            'email' => 'required|email|unique:accounts,email'
         ];
         $messages = [
-            'email.unique' => 'Email already exists',
             'mobile_num.regex' => 'Mobile number format is invalid',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -47,24 +43,17 @@ class AdvisersController extends Controller
 
         DB::beginTransaction();
         try {
-            $account = Accounts::create([
-                'email' => $request->email,
-                'password' => '123',
-                'status' => 'pending',
-                'role' => 'adviser',
-            ]);
-            $advisers = Advisers::create([
+            $instructor = Instructors::create([
                 'name' => $request->name,
-                'account_id' => $account->id,
                 'contact_number' => $request->contact_number,
                 'department_id' => $request->department_id,
                 'status' => $request->status,
             ]);
-
+            
             DB::commit();
             return response()->json([
                 'status' => 201,
-                'message' => 'Adviser added sucessfully'
+                'message' => 'Instructor added sucessfully'
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -76,17 +65,15 @@ class AdvisersController extends Controller
         }
     }
 
-    public function updateAdviser(Request $request, $id)
+    public function updateInstructor(Request $request, $id)
     {
-        $adviser = Advisers::find($id);
+        $instructor = Instructors::find($id);
         $rules = [
             'name' => 'required|string',
             'contact_number' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|max:11',
             'status' => 'in:active,inactive|required',
-            'email' => 'required|email|unique:accounts,email,' . $adviser->account_id,
         ];
         $messages = [
-            'email.unique' => 'Email already exists',
             'mobile_num.regex' => 'Mobile number format is invalid',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -99,39 +86,38 @@ class AdvisersController extends Controller
 
         DB::beginTransaction();
         try {
-            $adviser->update($request->only(['name', 'account_id', 'contact_num', 'department_id', 'status']));
-            $account = Accounts::where('id', $adviser->account_id);
-            $account->update($request->only(['email']));
+            $instructor->update($request->only(['name', 'contact_num', 'department_id', 'status']));
             DB::commit();
             return response()->json([
                 'status' => 201,
-                'message' => 'Adviser updated sucessfully'
+                'message' => 'Instructor updated sucessfully'
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 500,
-                'message' => 'Failed to update adviser',
+                'message' => 'Failed to update Instructor',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
-    public function deleteAdviser($id)
+
+    public function deleteInstructor($id)
     {
         DB::beginTransaction();
         try {
-            $adviser = Advisers::find($id);
+            $adviser = Instructors::find($id);
             $adviser->delete();
             DB::commit();
             return response()->json([
                 'status' => 200,
-                'message' => 'Successfully deleted adviser',
+                'message' => 'Successfully deleted instructor',
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 500,
-                'message' => 'An error occurred while deleting the student.',
+                'message' => 'An error occurred while deleting the instructor.',
                 'error' => $e->getMessage(),
             ], 500);
         }

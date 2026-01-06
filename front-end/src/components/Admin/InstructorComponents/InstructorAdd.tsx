@@ -4,6 +4,7 @@ import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
+	DialogTrigger,
 	DialogDescription,
 	DialogTitle,
 } from '@/components/ui/dialog';
@@ -19,18 +20,15 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { useForm } from '@tanstack/react-form';
 import { CircleAlert, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
-import {
-	NAME_SUFFIX,
-	parseName,
-	type AdviserEditProps,
-} from '../interface/adviser';
+import { NAME_SUFFIX } from '../interface/instructor';
 import { Tooltip, TooltipContent } from '@/components/ui/tooltip';
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
+import type { InstructorAddProps } from '../interface/instructor';
 
-const adviserSchema = z
+const instructorSchema = z
 	.object({
 		first_name: z
 			.string()
@@ -41,8 +39,7 @@ const adviserSchema = z
 			.min(2, 'Last name must be at least 2 characters')
 			.toUpperCase(),
 		suffix: z.string().optional(),
-		email: z.email('Invalid email address'),
-		contact_number: z.string().optional().nullable(),
+		contact_number: z.string().optional(),
 		selectedDepartmentId: z.number(),
 		status: z.enum(['active', 'inactive']),
 	})
@@ -51,29 +48,23 @@ const adviserSchema = z
 		path: ['selectedDepartmentId'],
 	});
 
-const AdviserEdit = ({
-	open,
-	setOpen,
-	adviser,
-	departments,
-	onSuccess,
-}: AdviserEditProps) => {
+const InstructorAdd = ({ departments, onSuccess }: InstructorAddProps) => {
+	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-	type formValues = z.infer<typeof adviserSchema>;
+	type formValues = z.infer<typeof instructorSchema>;
 	const defaultValues: formValues = {
-		first_name: parseName(adviser.name).first_name,
-		last_name: parseName(adviser.name).last_name,
-		suffix: parseName(adviser.name).suffix,
-		email: adviser.account.email,
-		contact_number: adviser.contact_number,
-		selectedDepartmentId: adviser.department_id,
-		status: adviser.status as 'active' | 'inactive',
+		first_name: '',
+		last_name: '',
+		suffix: 'none',
+		contact_number: '',
+		selectedDepartmentId: 0,
+		status: 'active',
 	};
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onChange: adviserSchema,
-			onSubmit: adviserSchema,
+			onChange: instructorSchema,
+			onSubmit: instructorSchema,
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
@@ -86,12 +77,11 @@ const AdviserEdit = ({
 					(value.suffix === 'none' ? '' : value.suffix),
 				contact_number: value.contact_number,
 				department_id: value.selectedDepartmentId,
-				email: value.email,
 				status: value.status,
 			};
 			try {
-				const res = await fetch(`${apiUrl}/advisers/edit/${adviser.id}`, {
-					method: 'PUT',
+				const res = await fetch(`${apiUrl}/instructors/add`, {
+					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 						Accept: 'application/json',
@@ -107,7 +97,6 @@ const AdviserEdit = ({
 							toast.error(message);
 						})
 					);
-					console.log(result.request);
 					return;
 				} else if (result.status == 500) {
 					toast.error(result.message);
@@ -134,29 +123,23 @@ const AdviserEdit = ({
 			}
 		},
 	});
-	useEffect(() => {
-		if (adviser) {
-			form.reset({
-				first_name: parseName(adviser.name).first_name,
-				last_name: parseName(adviser.name).last_name,
-				suffix: parseName(adviser.name).suffix,
-				email: adviser.account.email,
-				contact_number: adviser.contact_number,
-				selectedDepartmentId: adviser.department_id,
-				status: adviser.status as 'active' | 'inactive',
-			});
-		}
-	}, [form, adviser]);
+
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
+				<DialogTrigger asChild>
+					<Button variant="primary">
+						<Plus />
+						Add Instructor
+					</Button>
+				</DialogTrigger>
 				<DialogContent className="text-white">
 					<DialogHeader className="gap-0!">
 						<DialogTitle className="font-medium text-lg">
-							Edit Adviser
+							Add New Instructor
 						</DialogTitle>
 						<DialogDescription className="text-sm text-muted-foreground">
-							Update the adviser details below.
+							Fill in the details to create a new instructor.
 						</DialogDescription>
 					</DialogHeader>
 					<form
@@ -267,31 +250,7 @@ const AdviserEdit = ({
 									}}
 								/>
 							</div>
-							<form.Field
-								name="email"
-								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Email</FieldLabel>
-											<Input
-												id={field.name}
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												aria-invalid={isInvalid}
-												placeholder={'Ex. john.fritz@gmail.com'}
-												autoComplete="off"
-											/>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
-										</Field>
-									);
-								}}
-							/>
+
 							<form.Field
 								name="selectedDepartmentId"
 								children={(field) => {
@@ -376,11 +335,11 @@ const AdviserEdit = ({
 								<Button
 									className="cursor-pointer"
 									type="submit"
-									variant="edit"
+									variant="primary"
 									disabled={loading}
 								>
 									{loading ? <Spinner /> : ''}
-									{loading ? 'Adding...' : 'Update Adviser'}
+									{loading ? 'Adding...' : 'Add Instructor'}
 									{loading ? '' : <Plus />}
 								</Button>
 							</div>
@@ -392,4 +351,4 @@ const AdviserEdit = ({
 	);
 };
 
-export default AdviserEdit;
+export default InstructorAdd;

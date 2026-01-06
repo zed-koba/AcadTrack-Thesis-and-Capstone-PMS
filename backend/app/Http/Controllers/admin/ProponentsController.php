@@ -8,6 +8,7 @@ use App\Models\admin\ProponentsDetails;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Advisers;
 use App\Models\admin\Programs;
+use App\Models\admin\Role;
 use App\Models\admin\Students;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -19,15 +20,17 @@ class ProponentsController extends Controller
   {
     $proponents = Proponents::with('details')->orderBy('created_at', 'DESC')->get();
     $advisers = Advisers::where('status', 'active')->get();
-    $programs = Programs::where('status','active')->get();
+    $programs = Programs::where('status', 'active')->get();
     $students = Students::orderBy('created_at', 'DESC')->get();
+    $roles = Role::where('status','active')->get();
     return response()->json([
       'status' => 200,
       'proponents' => $proponents,
       'programs' => $programs,
       'advisers' => $advisers,
       'students' => $students,
-    ],200);
+      'roles' => $roles,
+    ], 200);
   }
 
   public function storeProponent(Request $request)
@@ -56,8 +59,8 @@ class ProponentsController extends Controller
         'academic_yr' => $request->academic_yr,
         'semester' => (int) $request->semester,
         'title' => $request->title,
-        'adviser_id' => $request->adviser,
-        'program_id' => $request->program,
+        'adviser_id' => $request->adviser_id,
+        'program_id' => $request->program_id,
       ]);
       if (isset($request->students_id)) {
         foreach ($request->students_id as $student) {
@@ -75,7 +78,7 @@ class ProponentsController extends Controller
           'message' => 'Sucessfully added Proponent',
           'data' => [
             'proponent' => $proponents,
-            'details' => $request->details,
+            'students_id' => $request->students_id,
           ],
         ],
         201,
@@ -97,10 +100,9 @@ class ProponentsController extends Controller
       'academic_yr' => 'required|string',
       'semester' => 'required|integer',
       'title' => 'required|string',
-      'adviser' => 'required|string',
-      'program' => 'required',
-      'details' => 'array|max:4',
-      'details.*.name' => 'string',
+      'adviser_id' => 'required|integer',
+      'program_id' => 'required|integer',
+      'students_id' => 'array|nullable',
     ];
     $validator = Validator::make($request->all(), $rules);
     if ($validator->fails()) {
@@ -115,29 +117,31 @@ class ProponentsController extends Controller
     DB::beginTransaction();
     try {
       $proponents = Proponents::find($id);
-      $proponents->update($request->only(['academic_yr', 'semester', 'title', 'program', 'adviser']));
-      foreach ($request->details as $detail) {
-        if (isset($detail['propsdetails_id'])) {
-          $detailModel = ProponentsDetails::find($detail['propsdetails_id']);
-          $detailModel->update(['name' => $detail['name']]);
-        } else {
+      $proponents->update($request->only(['academic_yr', 'semester', 'title', 'program_id', 'adviser_id']));
+   
+
+      foreach ($request->students_id as $detail) {
+        $detailModel = ProponentsDetails::where('foreign_proponents_id', $proponents->proponents_id)->where('student_id', $detail);
+        if (!$detailModel->exists()) {
           ProponentsDetails::create([
             'foreign_proponents_id' => $proponents->proponents_id,
-            'name' => $detail["name"],
+            'student_id' => $detail,
           ]);
+          $message = "student doesnt exist";
         }
       }
 
       if (!empty($request->deleted_ids)) {
-        ProponentsDetails::whereIn('propsdetails_id', $request->deleted_ids)->delete();
+        ProponentsDetails::where('foreign_proponents_id', $proponents->proponents_id)->whereIn('student_id', $request->deleted_ids)->delete();
       }
+
       DB::commit();
       return response()->json([
         'status' => 200,
         'message' => 'Sucessfully updated the proponent',
         'data' => [
-          'proponent' => $proponents,
-          'details' => $request->details,
+          'proponent' => $proponents->proponents_id,
+          'message' => $detailModel->exists(),
         ]
       ], 200);
     } catch (\Exception $e) {

@@ -11,12 +11,15 @@ import { Input } from '@/components/ui/input';
 const ProponentsAutoComplete = ({
 	students,
 	selectedStudentsIds,
+	initialStudents,
 	onSelectionChange,
 	placeholder = 'Search students...',
 	disabled = false,
+	onRemovedIdsChange,
 }: ProponentsAutoCompleteProps) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [open, setOpen] = useState(false);
+	const [removedStudentIds, setRemovedStudentIds] = useState<number[]>([]);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const filteredStudents = students.filter((stud) => {
@@ -51,15 +54,31 @@ const ProponentsAutoComplete = ({
 		if (!selectedStudentsIds.includes(student.id)) {
 			onSelectionChange([...selectedStudentsIds, student.id]);
 		}
+		if (
+			removedStudentIds.includes(student.id) &&
+			initialStudents.includes(student.id)
+		) {
+			const updatedRemoved = removedStudentIds.filter(
+				(id) => id !== student.id
+			);
+			setRemovedStudentIds(updatedRemoved);
+			onRemovedIdsChange?.(updatedRemoved);
+		}
 		setSearchQuery('');
 		setOpen(false);
 		inputRef.current?.focus();
 	};
-
 	const handleRemove = (studentId: number) => {
 		onSelectionChange(selectedStudentsIds.filter((id) => id !== studentId));
+		if (
+			initialStudents.includes(studentId) &&
+			!removedStudentIds.includes(studentId)
+		) {
+			const updatedRemoved = [...removedStudentIds, studentId];
+			setRemovedStudentIds(updatedRemoved);
+			onRemovedIdsChange?.(updatedRemoved);
+		}
 	};
-
 	return (
 		<div ref={containerRef} className="relative space-y-2">
 			<div className="relative">

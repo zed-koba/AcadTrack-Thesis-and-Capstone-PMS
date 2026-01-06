@@ -1,4 +1,4 @@
-export type AdviserProps = {
+export type InstructorProps = {
 	id: number;
 	name: string;
 	first_name: string;
@@ -9,52 +9,50 @@ export type AdviserProps = {
 	status: string;
 	created_at: string;
 	updated_at: string;
-	account: {
-		id: number;
-		email: string;
-	};
 };
-export type AdviserDetailsProps = {
-	adviser: AdviserProps | null;
+export type InstructorDetailsProps = {
+	instructor: InstructorProps | null;
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	department: DepartmentAdviserProps | null;
+	department: DepartmentInstructorProps | null;
 };
-export type DepartmentAdviserProps = {
+export type DepartmentInstructorProps = {
 	id: number;
 	name: string;
 	code: string;
 };
 
-export type AdviserAddProps = {
-	departments: DepartmentAdviserProps[];
+export type InstructorAddProps = {
+	departments: DepartmentInstructorProps[];
 	onSuccess?: () => void;
 };
 
-export type AdviserEditProps = {
+export type InstructorDeleteProps = {
 	open: boolean;
-	departments: DepartmentAdviserProps[];
 	setOpen: (open: boolean) => void;
-	adviser: AdviserProps;
+	instructor_id: number;
 	onSuccess?: () => void;
 };
 
-export type AdviserDashboardProps = {
-	advisers?: AdviserProps[];
+export type InstructorEditProps = {
+	open: boolean;
+	departments: DepartmentInstructorProps[];
+	setOpen: (open: boolean) => void;
+	instructor: InstructorProps;
+	onSuccess?: () => void;
 };
 
-export type AdvisersTableProps = {
-	advisers: AdviserProps[];
-	departments: DepartmentAdviserProps[];
+export type InstructorDashboardProps = {
+	instructors?: InstructorProps[];
+};
+
+export type InstructorTableProps = {
+	instructors: InstructorProps[];
+	departments: DepartmentInstructorProps[];
 	loading: boolean;
 	refresh: () => void;
 };
-export type AdviserDeleteProps = {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	adviser_id: number;
-	onSuccess?: () => void;
-};
+
 export const NAME_SUFFIX = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
 
 type ParsedName = {

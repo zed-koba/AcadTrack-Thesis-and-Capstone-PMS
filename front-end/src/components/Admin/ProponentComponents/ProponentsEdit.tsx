@@ -1,7 +1,3 @@
-import type {
-	ProponentsEdit,
-	ProponentsDetailsProps,
-} from '../interface/proponent';
 import { useEffect, useState } from 'react';
 import {
 	Dialog,
@@ -11,7 +7,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowRightToLine, Plus, UserCircle } from 'lucide-react';
+import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Input } from '@/components/ui/input';
@@ -23,6 +19,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { apiUrl } from '@/components/Routes/http';
+import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import {
 	Field,
@@ -30,104 +27,66 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from '@/components/ui/field';
-import ProponentUpdate from './ProponentsUpdate';
-import { toast } from 'sonner';
-
-const proponentDetailsSchema = z.object({
-	name: z.string().optional(),
-});
+import type {
+	ProponentsEditProps,
+	StudentsProponentsProps,
+} from '../interface/proponent';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '@/components/ui/command';
+import ProponentsAutoComplete from './ProponentsAutoComplete';
 
 const proponentSchema = z.object({
 	academic_yr: z.string().min(1, 'Title is required'),
 	title: z.string().min(1, 'Title is required'),
 	semester: z.number().min(1, 'Must select a semester').max(2),
-	program: z.string().min(1, 'Program is required'),
-	adviser: z.string().min(1, 'Adviser is required'),
-	details: z.array(proponentDetailsSchema),
+	program: z.number().min(1, 'Program is required'),
+	adviser: z.number().min(1, 'Adviser is required'),
+	studentsId: z.array(z.number()).optional().nullable(),
 });
 
-const ProponetsEdit = ({
+const ProponentsEdit = ({
+	proponent,
+	students,
+	programs,
+	advisers,
+	onSuccess,
 	open,
 	setOpen,
-	proponent,
-	onSuccess,
-}: ProponentsEdit) => {
+}: ProponentsEditProps) => {
+	const [adviserOpen, setAdviserOpen] = useState(false);
+	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [editFirst, setEditFirst] = useState(false);
-	const [openProponent, setOpenPropent] = useState(false);
-	const [removedProponents, setRemovedProponents] = useState<number[]>([]);
-	const [proponentsDetails, setProponents] = useState<ProponentsDetailsProps[]>(
-		proponent.details
+	const [selectAdviserId, setSelectedAdviserId] = useState(
+		proponent.adviser_id
 	);
-	const [selectedProponent, setSelectedProponent] =
-		useState<ProponentsDetailsProps | null>(null);
-	const [selectedProponentIndex, setSelectedProponentIndex] = useState<
-		number | null
-	>(null);
-	useEffect(() => {
-		setProponents(proponent.details);
-	}, [proponent]);
-
-	const handleNameUpdate = (updatedProponent: ProponentsDetailsProps) => {
-		setProponents((prev) =>
-			prev.map((p, i) => {
-				if (updatedProponent.propsdetails_id !== undefined) {
-					return p.propsdetails_id === updatedProponent.propsdetails_id
-						? updatedProponent
-						: p;
-				} else {
-					return i === selectedProponentIndex ? updatedProponent : p;
-				}
-			})
-		);
-		setEditFirst(false);
-		setSelectedProponent(null);
-		console.log(proponentsDetails);
-	};
-	const handleRemoveProponent = (id?: number) => {
-		setProponents((prev) =>
-			prev.filter((p, i) => {
-				if (id !== undefined) {
-					return p.propsdetails_id !== id;
-				} else {
-					return i !== selectedProponentIndex;
-				}
-			})
-		);
-		if (id) {
-			setRemovedProponents((prev) => [...prev, id]);
-		}
-		setEditFirst(false);
-	};
-
-	const handleNewProponent = () => {
-		if (proponentsDetails.length >= 4) {
-			toast.error('Maximum of 4 Proponents allowed.');
-			return;
-		}
-		const hasUnedited = proponentsDetails.some(
-			(p) => p.name == 'Edit this proponent' && !p.propsdetails_id
-		);
-		if (hasUnedited) {
-			toast.error('Please fill in the new proponent before adding another.');
-			setEditFirst(true);
-			return;
-		}
-		const newProponent: ProponentsDetailsProps = {
-			name: 'Edit this proponent',
-		};
-		setProponents((prev) => [...prev, newProponent]);
-	};
+	const [removedStudentsIds, setRemovedStudentsIds] = useState<number[]>([]);
 	type formValues = z.infer<typeof proponentSchema>;
+	const studentsIds: number[] | undefined = proponent.details
+		.filter((d) => d.foreign_proponents_id === proponent.proponents_id)
+		.map((d) => d.student_id)
+		.filter((id): id is number => id !== undefined);
+	const [updatedStudentsIds, setUpdatedStudentsIds] =
+		useState<number[]>(studentsIds);
 	const defaultValues: formValues = {
 		academic_yr: proponent.academic_yr,
 		title: proponent.title,
 		semester: proponent.semester,
-		program: proponent.program,
-		adviser: proponent.adviser,
-		details: proponent.details,
+		adviser: proponent.adviser_id,
+		program: proponent.program_id,
+		studentsId: updatedStudentsIds,
 	};
-
 	const form = useForm({
 		defaultValues,
 		validators: {
@@ -136,7 +95,15 @@ const ProponetsEdit = ({
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
-			console.log('SUBMIT');
+			const payLoad = {
+				academic_yr: value.academic_yr,
+				title: value.title,
+				semester: value.semester,
+				adviser_id: value.adviser,
+				program_id: value.program,
+				students_id: updatedStudentsIds,
+				deleted_ids: removedStudentsIds,
+			};
 			try {
 				const res = await fetch(`${apiUrl}/proponents/edit/${proponent.id}`, {
 					method: 'PUT',
@@ -144,15 +111,7 @@ const ProponetsEdit = ({
 						'Content-type': 'application/json',
 						Accept: 'application/json',
 					},
-					body: JSON.stringify({
-						academic_yr: value.academic_yr,
-						title: value.title,
-						adviser: value.adviser,
-						program: value.program,
-						semester: value.semester,
-						details: proponentsDetails,
-						deleted_ids: removedProponents,
-					}),
+					body: JSON.stringify(payLoad),
 				});
 				const result = await res.json();
 				if (result.status === 422) {
@@ -163,45 +122,94 @@ const ProponetsEdit = ({
 					return;
 				}
 				if (!res.ok) {
-					console.log('Failed to fetch data' + JSON.stringify({ value }));
-					console.log(proponentsDetails);
-					return JSON.stringify({ value });
+					console.log('Failed to fetch data ' + JSON.stringify(payLoad));
+					return JSON.stringify(payLoad);
 				}
 				form.reset();
-				toast.success('Successfully updated proponent');
-				setOpen(false);
-				onSuccess?.();
-				setLoading(false);
+				if (result.status === 200) {
+					toast.success(result.message);
+					setOpen(false);
+					onSuccess?.();
+					setRemovedStudentsIds([]);
+				}
 			} catch (error) {
 				console.log(error);
+			} finally {
+				setLoading(false);
 			}
 		},
 	});
+	const handleSelectedIds = (student: number[]) => {
+		setUpdatedStudentsIds(student);
+	};
+	const selectedAdviser = advisers.find((adv) => adv.id === selectAdviserId);
+	useEffect(() => {
+		if (proponent) {
+			form.reset({
+				academic_yr: proponent.academic_yr,
+				title: proponent.title,
+				semester: proponent.semester,
+				adviser: proponent.adviser_id,
+				program: proponent.program_id,
+				studentsId: updatedStudentsIds,
+			});
+			setUpdatedStudentsIds(studentsIds);
+			setSelectedAdviserId(proponent.adviser_id);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form, proponent]);
 	return (
-		<>
-			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="text-white">
-					<DialogHeader>
-						<DialogTitle>Edit Proponent: {proponent.proponents_id}</DialogTitle>
-						<DialogDescription>
-							Update the details of this project member.
-						</DialogDescription>
-					</DialogHeader>
-					<form
-						onSubmit={(e) => {
-							e.preventDefault();
-							form.handleSubmit();
-						}}
-					>
-						<FieldGroup>
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogContent className="text-white">
+				<DialogHeader>
+					<DialogTitle>Edit Proponent</DialogTitle>
+					<DialogDescription>
+						Update the project and proponent details below.
+					</DialogDescription>
+				</DialogHeader>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<FieldGroup>
+						<form.Field
+							name="title"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Title</FieldLabel>
+										<Input
+											id={field.name}
+											name={field.name}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											aria-invalid={isInvalid}
+											placeholder="Ex. Web Based Project Management System"
+											autoComplete="off"
+										/>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<div className="grid grid-cols-2 gap-2">
 							<form.Field
-								name="title"
+								name="academic_yr"
 								children={(field) => {
 									const isInvalid =
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Title</FieldLabel>
+											<FieldLabel htmlFor={field.name}>
+												Academic Year
+											</FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}
@@ -209,7 +217,7 @@ const ProponetsEdit = ({
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}
-												placeholder="Ex. Web Based Project Management System"
+												placeholder="Ex. 2024-2025"
 												autoComplete="off"
 											/>
 											{isInvalid && (
@@ -219,45 +227,126 @@ const ProponetsEdit = ({
 									);
 								}}
 							/>
-							<div className="grid grid-cols-2 gap-2">
-								<form.Field
-									name="academic_yr"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>
-													Academic Year
-												</FieldLabel>
-												<Input
+							<form.Field
+								name="semester"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor={field.name}>Semester</FieldLabel>
+											<Select
+												name={field.name}
+												defaultValue={
+													field.state.value ? String(field.state.value) : ''
+												}
+												onValueChange={(v) => field.handleChange(Number(v))}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
 													id={field.name}
-													name={field.name}
-													value={field.state.value}
-													onChange={(e) => field.handleChange(e.target.value)}
-													onBlur={field.handleBlur}
-													placeholder="Ex. 2024-2025"
-													autoComplete="off"
-												/>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
+												>
+													<SelectValue placeholder="Select Semester" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="1">1st Semester</SelectItem>
+													<SelectItem value="2">2nd Semester</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+						</div>
+						<form.Field
+							name="adviser"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Adviser</FieldLabel>
+										<Popover open={adviserOpen} onOpenChange={setAdviserOpen}>
+											<PopoverTrigger asChild>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={adviserOpen}
+													className={cn(
+														'w-full justify-between',
+														field.state.value === 0
+															? 'text-muted-foreground'
+															: 'text-white'
+													)}
+												>
+													{selectedAdviser
+														? selectedAdviser.name
+														: 'Search and select adviser'}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-[400px] p-0" align="start">
+												<Command>
+													<CommandInput placeholder="Search adviser...." />
+													<CommandList>
+														<CommandEmpty>No adviser found.</CommandEmpty>
+														<CommandGroup>
+															{advisers.map((adv) => (
+																<CommandItem
+																	key={adv.id}
+																	value={`${adv.name} ${String(adv.id)}`}
+																	onSelect={() => {
+																		field.setValue(adv.id);
+																		setSelectedAdviserId(adv.id);
+																		setAdviserOpen(false);
+																	}}
+																	className={cn(
+																		'',
+																		selectAdviserId === adv.id
+																			? 'bg-blue-600! text-white hover:bg-blue-600!'
+																			: 'hover:bg-card/50'
+																	)}
+																>
+																	<Check
+																		className={cn(
+																			'h-4 w-4',
+																			Number(field.state.value) === adv.id
+																				? 'opacity-100 text-white'
+																				: 'opacity-0'
+																		)}
+																	/>
+																	{adv.name}
+																</CommandItem>
+															))}
+														</CommandGroup>
+													</CommandList>
+												</Command>
+											</PopoverContent>
+										</Popover>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<div className="grid grid-cols-3 gap-2">
+							<div className="col-span-3">
 								<form.Field
-									name="semester"
+									name="program"
 									children={(field) => {
 										const isInvalid =
 											field.state.meta.isTouched && !field.state.meta.isValid;
 										return (
 											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>Semester</FieldLabel>
+												<FieldLabel htmlFor={field.name}>Programs:</FieldLabel>
 												<Select
 													name={field.name}
-													value={
+													defaultValue={
 														field.state.value ? String(field.state.value) : ''
 													}
 													onValueChange={(v) => field.handleChange(Number(v))}
@@ -267,11 +356,14 @@ const ProponetsEdit = ({
 														aria-invalid={isInvalid}
 														id={field.name}
 													>
-														<SelectValue placeholder="Select Semester" />
+														<SelectValue placeholder="Select a program" />
 													</SelectTrigger>
 													<SelectContent>
-														<SelectItem value="1">1st Semester</SelectItem>
-														<SelectItem value="2">2nd Semester</SelectItem>
+														{programs.map((prog) => (
+															<SelectItem key={prog.id} value={String(prog.id)}>
+																{prog.name}
+															</SelectItem>
+														))}
 													</SelectContent>
 												</Select>
 												{isInvalid && (
@@ -282,124 +374,62 @@ const ProponetsEdit = ({
 									}}
 								/>
 							</div>
-							<div className="grid grid-cols-3 gap-2">
-								<div className="col-span-2">
-									<form.Field
-										name="adviser"
-										children={(field) => {
-											const isInvalid =
-												field.state.meta.isTouched && !field.state.meta.isValid;
-											return (
-												<Field data-invalid={isInvalid}>
-													<FieldLabel htmlFor={field.name}>Adviser</FieldLabel>
-													<Input
-														id={field.name}
-														name={field.name}
-														value={field.state.value}
-														aria-invalid={isInvalid}
-														onBlur={field.handleBlur}
-														onChange={(e) => field.handleChange(e.target.value)}
-														autoComplete="off"
-														placeholder="Ex. Jay De Sagun"
-													/>
-													{isInvalid && (
-														<FieldError errors={field.state.meta.errors} />
-													)}
-												</Field>
-											);
-										}}
-									/>
-								</div>
-								<form.Field
-									name="program"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>Program</FieldLabel>
-												<Input
-													id={field.name}
-													name={field.name}
-													value={field.state.value}
-													aria-invalid={isInvalid}
-													onBlur={field.handleBlur}
-													onChange={(e) => field.handleChange(e.target.value)}
-													autoComplete="off"
-													placeholder="Ex. BSCS"
-												/>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-							</div>
-							<div className="pt-2 flex flex-col gap-4">
-								<h2 className="text-white text-lg">Proponents: </h2>
-								<div className="pt-2 flex flex-col gap-4">
-									{proponentsDetails.map((p, i) => (
-										<div
-											key={p.propsdetails_id}
-											className="bg-card p-4 rounded-lg border-none flex justify-start items-center gap-3 text-base font-semibold text-white cursor-pointer hover:bg-gray-700"
-											onClick={() => {
-												setSelectedProponent(p);
-												setSelectedProponentIndex(i);
-												setOpenPropent(true);
-											}}
-										>
-											<UserCircle /> {p.name}
-										</div>
-									))}
-								</div>
-							</div>
-						</FieldGroup>
-						<div className="flex justify-end pt-4 gap-3">
-							<Button
-								className="cursor-pointer"
-								type="button"
-								variant="outline"
-								onClick={() => setOpen(false)}
-							>
-								Cancel
-							</Button>
-							<Button
-								className="cursor-pointer"
-								variant="details"
-								type="button"
-								onClick={handleNewProponent}
-								disabled={editFirst}
-							>
-								Add Proponent <Plus />
-							</Button>
-							<Button
-								className="cursor-pointer"
-								type="submit"
-								variant="edit"
-								disabled={loading}
-							>
-								{loading ? <Spinner /> : ''}
-								{loading ? 'Updating...' : 'Update'}
-								{loading ? '' : <ArrowRightToLine />}
-							</Button>
 						</div>
-					</form>
-				</DialogContent>
-				{selectedProponent && (
-					<ProponentUpdate
-						open={openProponent}
-						proponent={selectedProponent}
-						setOpen={setSelectedProponent}
-						onUpdate={handleNameUpdate}
-						onRemove={(id?: number) => {
-							handleRemoveProponent(id);
-						}}
-					/>
-				)}
-			</Dialog>
-		</>
+						<div className="pt-2 flex flex-col gap-4">
+							<form.Field
+								name="studentsId"
+								children={(field) => {
+									const arrayErrors = field.state.meta.errors;
+									return (
+										<>
+											<div className="flex flex-col gap-1">
+												<FieldLabel htmlFor={field.name}>
+													Proponents:{' '}
+												</FieldLabel>
+												<ProponentsAutoComplete
+													students={students}
+													selectedStudentsIds={updatedStudentsIds ?? []}
+													onSelectionChange={handleSelectedIds}
+													initialStudents={studentsIds}
+													onRemovedIdsChange={setRemovedStudentsIds}
+													placeholder="Search for students by name or ID..."
+												/>
+												{arrayErrors.length > 0 && (
+													<p className="text-destructive text-md font-normal">
+														{arrayErrors[0]?.message}
+													</p>
+												)}
+											</div>
+										</>
+									);
+								}}
+							/>
+						</div>
+					</FieldGroup>
+					<div className="flex justify-end pt-4 gap-3">
+						<Button
+							className="cursor-pointer"
+							type="button"
+							variant="outline"
+							onClick={() => setOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button
+							className="cursor-pointer"
+							type="submit"
+							variant="edit"
+							disabled={loading}
+						>
+							{loading ? <Spinner /> : ''}
+							{loading ? 'Adding...' : 'Update'}
+							{loading ? '' : <Plus />}
+						</Button>
+					</div>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 };
 
-export default ProponetsEdit;
+export default ProponentsEdit;
