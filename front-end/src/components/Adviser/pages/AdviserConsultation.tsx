@@ -17,7 +17,7 @@ const AdviserConsultation = () => {
 	const [loading, setLoading] = useState(true);
 	const fetchAvaibilities = async () => {
 		try {
-			const res = await fetch(`${apiAdviserUrl}/${2}/availabilities`, {
+			const res = await fetch(`${apiAdviserUrl}/${1}/availabilities`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',

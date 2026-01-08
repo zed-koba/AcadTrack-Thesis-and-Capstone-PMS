@@ -45,7 +45,7 @@ class AdviserAvailabilityController extends Controller
         try {
             DB::beginTransaction();
             $availability = AdviserAvailability::create([
-                'adviser_id' => 2,
+                'adviser_id' => 1,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'day' => $request->day,
@@ -55,7 +55,7 @@ class AdviserAvailabilityController extends Controller
             DB::commit();
             return response()->json([
                 'status' => 201,
-                'message' => 'Successfully added student',
+                'message' => 'Successfully added availability',
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
