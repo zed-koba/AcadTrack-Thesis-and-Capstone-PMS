@@ -94,10 +94,8 @@ class ProponentsController extends Controller
   {
     $rules = [
       'academic_yr' => 'required|string',
-      'semester' => 'required|integer',
       'title' => 'required|string',
       'adviser_id' => 'required|integer',
-      'program_id' => 'required|integer',
       'students_id' => 'array|nullable',
     ];
     $validator = Validator::make($request->all(), $rules);
@@ -113,9 +111,7 @@ class ProponentsController extends Controller
     DB::beginTransaction();
     try {
       $proponents = Proponents::find($id);
-      $proponents->update($request->only(['academic_yr', 'semester', 'title', 'program_id', 'adviser_id']));
-   
-
+      $proponents->update($request->only(['academic_yr', 'title', 'adviser_id']));
       foreach ($request->students_id as $detail) {
         $detailModel = ProponentsDetails::where('foreign_proponents_id', $proponents->proponents_id)->where('student_id', $detail);
         if (!$detailModel->exists()) {
@@ -137,7 +133,6 @@ class ProponentsController extends Controller
         'message' => 'Sucessfully updated the proponent',
         'data' => [
           'proponent' => $proponents->proponents_id,
-          'message' => $detailModel->exists(),
         ]
       ], 200);
     } catch (\Exception $e) {

@@ -6,6 +6,7 @@ use App\Models\admin\Accounts;
 use App\Models\admin\Departments;
 use App\Models\admin\Instructors;
 use App\Models\admin\Programs;
+use App\Models\admin\Proponents;
 use App\Models\admin\Role;
 use App\Models\admin\Students;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class StudentsController extends Controller
         $roles = Role::where('status', 'active')->get();
         $programs = Programs::where('status', 'active')->get();
         $instructors = Instructors::where('status', 'active')->get();
+        $proponents = Proponents::with('details')->get();
         return response()->json([
             'status' => 200,
             'students' => $students,
@@ -28,6 +30,7 @@ class StudentsController extends Controller
             'roles' => $roles,
             'programs' => $programs,
             'instructors' => $instructors,
+            'proponents' => $proponents,
         ], 200);
     }
 

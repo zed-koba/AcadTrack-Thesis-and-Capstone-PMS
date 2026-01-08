@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->string('contact_number')->nullable();
             $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
-            $table->enum('status', allowed: ['active', 'inactive'])->default('inactive');
+            $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->timestamps();
         });
     }

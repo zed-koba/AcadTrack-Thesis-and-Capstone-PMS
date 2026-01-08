@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ProgramsController extends Controller
 {
-    public function getPrograms(Request $request)
+    public function getPrograms()
     {
         $programs = Programs::orderBy("created_at", "desc")->get();
         $departments = Departments::where('status', 'active')->orderBy('created_at', 'desc')->get();

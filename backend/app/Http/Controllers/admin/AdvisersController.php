@@ -121,7 +121,9 @@ class AdvisersController extends Controller
         DB::beginTransaction();
         try {
             $adviser = Advisers::find($id);
+            $account = Accounts::find($adviser->account_id);
             $adviser->delete();
+            $account->delete();
             DB::commit();
             return response()->json([
                 'status' => 200,

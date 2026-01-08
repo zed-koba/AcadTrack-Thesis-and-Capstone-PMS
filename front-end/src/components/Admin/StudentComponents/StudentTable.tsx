@@ -38,7 +38,6 @@ import {
 	type ProgramsStudentsProps,
 	type RolesStudentsProps,
 	type StudentProps,
-	type StudentsInstructorProps,
 	type StudentsTableProps,
 } from '../interface/student';
 import StudentAdd from './StudentAdd';
@@ -52,6 +51,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import type { ProponentsProps } from '../interface/proponent';
 
 type SortField = keyof StudentProps;
 type SortDirection = 'asc' | 'desc';
@@ -65,6 +65,7 @@ const StudentTable = ({
 	programs,
 	instructors,
 	loading,
+	proponents,
 	refresh,
 }: StudentsTableProps) => {
 	const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
@@ -79,6 +80,8 @@ const StudentTable = ({
 		useState<InstructorStudentsProps | null>(null);
 	const [selectedProgram, setSelectedProgram] =
 		useState<ProgramsStudentsProps | null>(null);
+	const [selectedProponent, setSelectedProponent] =
+		useState<ProponentsProps | null>(null);
 	const [studentId, setStudentId] = useState<number | null>(null);
 	const [clickedButton, setClickedButton] = useState<string | null>(null);
 	const [sortField, setSortField] = useState<SortField>('created_at');
@@ -119,7 +122,6 @@ const StudentTable = ({
 		const findRole = roles.find((r) => r.id === id);
 		const findProgram = programs.find((p) => p.id === id);
 		const findDepartment = departments.find((d) => d.id === id);
-		console.log(findRole);
 		if (type === 'role')
 			return (
 				<Badge variant="outline">
@@ -144,10 +146,8 @@ const StudentTable = ({
 		switch (type) {
 			case 'role':
 				return roles.find((r) => r.id === id) ?? null;
-
 			case 'program':
 				return programs.find((p) => p.id === id) ?? null;
-
 			case 'department':
 				return departments.find((d) => d.id === id) ?? null;
 
@@ -156,6 +156,13 @@ const StudentTable = ({
 			default:
 				return null;
 		}
+	};
+	const getProponentInfo = (id: number) => {
+		const findProponent =
+			proponents.find((prop) =>
+				prop.details.find((d) => d.student_id === id)
+			) ?? null;
+		return findProponent as ProponentsProps;
 	};
 
 	return (
@@ -335,6 +342,9 @@ const StudentTable = ({
 																		'instructor'
 																	) as InstructorStudentsProps | null
 																);
+																setSelectedProponent(
+																	getProponentInfo(student.id)
+																);
 															}}
 														>
 															<ReceiptText className="h-4 w-4 mr-2" /> Details
@@ -375,6 +385,7 @@ const StudentTable = ({
 											student={selectedStudent}
 											program={selectedProgram}
 											instructor={selectedInstructor}
+											proponent={selectedProponent}
 											role={selectedRole}
 											department={selectedDepartment}
 											open={open}

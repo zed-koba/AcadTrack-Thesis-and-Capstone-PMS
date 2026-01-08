@@ -2,9 +2,11 @@
 
 namespace App\Models\admin;
 
+use App\Models\adviser\AdviserWeekly;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Students extends Model
@@ -49,5 +51,9 @@ class Students extends Model
 
     public function account(): BelongsTo {
         return $this->belongsTo(Accounts::class, 'account_id');
+    }
+
+    public function weeklySchedule():HasMany {
+        return $this->hasMany(AdviserWeekly::class, 'student_id');
     }
 }

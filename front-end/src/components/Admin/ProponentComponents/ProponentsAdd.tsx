@@ -107,10 +107,11 @@ const ProponentsAdd = ({
 					return JSON.stringify(payLoad);
 				}
 				form.reset();
-				toast.success('Sucessfully added proponent');
-				setOpen(false);
-				refresh?.();
-				console.log(payLoad);
+				if (result.status === 200) {
+					toast.success(result.message);
+					setOpen(false);
+					refresh?.();
+				}
 			} catch (error) {
 				console.log(error);
 			} finally {

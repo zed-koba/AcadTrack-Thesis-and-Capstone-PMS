@@ -1,3 +1,4 @@
+import type { ProponentsProps } from './proponent';
 export type StudentProps = {
 	id: number;
 	student_id: string;
@@ -44,6 +45,7 @@ export type StudentsTableProps = {
 	programs: ProgramsStudentsProps[];
 	roles: RolesStudentsProps[];
 	instructors: InstructorStudentsProps[];
+	proponents: ProponentsProps[];
 	loading: boolean;
 	refresh?: () => void;
 };
@@ -52,6 +54,7 @@ export type InstructorStudentsProps = {
 	id: number;
 	name: string;
 };
+
 export type StudentAddProps = {
 	programs: ProgramsStudentsProps[];
 	departments: DepartmentStudentsProps[];
@@ -78,6 +81,7 @@ export type StudentDetailsProps = {
 	program: ProgramsStudentsProps | null;
 	department: DepartmentStudentsProps | null;
 	instructor: InstructorStudentsProps | null;
+	proponent: ProponentsProps | null;
 };
 
 export type StudentDeleteProps = {

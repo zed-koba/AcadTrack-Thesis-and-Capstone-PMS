@@ -3,6 +3,8 @@
 namespace App\Models\admin;
 
 use App\Models\admin\Accounts;
+use App\Models\adviser\AdviserAvailability;
+use App\Models\adviser\AdviserWeekly;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,5 +24,13 @@ class Advisers extends Model
 
     public function projects():HasMany {
         return $this->hasMany(Proponents::class, 'adviser_id');
+    }
+
+    public function adviserAvailability():hasMany {
+        return $this->hasMany(AdviserAvailability::class, 'adviser_id');
+    }
+
+    public function weeklySchedule(): hasMany {
+        return $this->hasMany(AdviserWeekly::class,'adviser_id');
     }
 }

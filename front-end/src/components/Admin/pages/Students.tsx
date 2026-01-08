@@ -1,6 +1,6 @@
 import { apiUrl } from '@/components/Routes/http';
 import {
-	type StudentsInstructorProps,
+	type InstructorStudentsProps,
 	type DepartmentStudentsProps,
 	type ProgramsStudentsProps,
 	type RolesStudentsProps,
@@ -9,14 +9,16 @@ import {
 import StudentTable from '../StudentComponents/StudentTable';
 import { useState, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
+import { ProponentsProps } from '../interface/proponent';
 
 const Students = () => {
 	const [loading, setLoading] = useState(true);
 	const [students, setStudents] = useState<StudentProps[]>([]);
 	const [departments, setDepartments] = useState<DepartmentStudentsProps[]>([]);
 	const [roles, setRoles] = useState<RolesStudentsProps[]>([]);
-	const [instructors, setInstructors] = useState<StudentsInstructorProps[]>([]);
+	const [instructors, setInstructors] = useState<InstructorStudentsProps[]>([]);
 	const [programs, setPrograms] = useState<ProgramsStudentsProps[]>([]);
+	const [proponents, setProponents] = useState<ProponentsProps[]>([]);
 	const fetchStudents = async () => {
 		try {
 			const res = await fetch(`${apiUrl}/students`, {
@@ -34,6 +36,7 @@ const Students = () => {
 				setDepartments(result.departments);
 				setRoles(result.roles);
 				setPrograms(result.programs);
+				setProponents(result.proponents);
 			}
 		} catch (error) {
 			console.log(error);
@@ -63,6 +66,7 @@ const Students = () => {
 				<>
 					<StudentTable
 						students={students}
+						proponents={proponents}
 						roles={roles}
 						programs={programs}
 						departments={departments}

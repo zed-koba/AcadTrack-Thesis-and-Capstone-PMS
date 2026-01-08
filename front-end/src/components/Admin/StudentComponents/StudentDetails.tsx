@@ -5,7 +5,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import type { ProponentsDetails } from '../interface/proponent';
+import type {
+	ProponentsDetails,
+	ProponentsDetailsProps,
+} from '../interface/proponent';
 import { Separator } from '@/components/ui/separator';
 import {
 	Briefcase,
@@ -27,6 +30,7 @@ const StudentDetails = ({
 	student,
 	open,
 	setOpen,
+	proponent,
 	role,
 	program,
 	department,
@@ -45,7 +49,7 @@ const StudentDetails = ({
 		{
 			label: 'Thesis Title',
 			icon: <FileText className="h-4 w-4" />,
-			value: student.thesis_title,
+			value: proponent === null ? 'Not Assigned' : proponent?.title,
 		},
 		{
 			label: 'Facebook Profile',
@@ -71,7 +75,7 @@ const StudentDetails = ({
 		{
 			label: 'Role',
 			icon: <Briefcase className="h-4 w-4" />,
-			value: role?.name,
+			value: role?.name ? role?.name : 'Not Assigned',
 		},
 		{
 			label: 'Department',
