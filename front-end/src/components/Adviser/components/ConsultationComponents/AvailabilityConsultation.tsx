@@ -311,7 +311,7 @@ const AvailabilityConsultation = ({
 														className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/20 border text-sm"
 													>
 														<span>
-															{to12HourTime(sched.start_time)} -{' '}
+															{to12HourTime(sched.start_time)} - {' '}
 															{to12HourTime(sched.end_time)}
 														</span>
 														<button className="text-destructive hover:text-destructive/80 transition-colors">

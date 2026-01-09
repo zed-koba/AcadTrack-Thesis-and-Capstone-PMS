@@ -13,7 +13,6 @@ import { Spinner } from '@/components/ui/spinner';
 const Proponents = () => {
 	const [proponents, setProponents] = useState<ProponentsProps[]>([]);
 	const [advisers, setAdvisers] = useState<AdvisersProponentProps[]>([]);
-	const [programs, setPrograms] = useState<ProgramsProponentProps[]>([]);
 	const [students, setStudents] = useState<StudentsProponentsProps[]>([]);
 	const [roles, setRoles] = useState<RolesProponentsProps[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -32,7 +31,6 @@ const Proponents = () => {
 			if (result.status === 200) {
 				setProponents(result.proponents);
 				setAdvisers(result.advisers);
-				setPrograms(result.programs);
 				setStudents(result.students);
 				setRoles(result.roles);
 			}

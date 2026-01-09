@@ -12,6 +12,7 @@ const ProponentsAutoComplete = ({
 	students,
 	selectedStudentsIds,
 	initialStudents,
+	proponents,
 	roles,
 	onSelectionChange,
 	placeholder = 'Search students...',
@@ -21,19 +22,24 @@ const ProponentsAutoComplete = ({
 	const [searchQuery, setSearchQuery] = useState('');
 	const [open, setOpen] = useState(false);
 	const [removedStudentIds, setRemovedStudentIds] = useState<number[]>([]);
+	const addedProponents = proponents.flatMap(p => p.details.map(d => d.student_id).filter((id): id is number => id !== undefined));
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const filteredStudents = students.filter((stud) => {
 		const searchLower = searchQuery.toLowerCase();
+
 		return (
-			stud.name.toLowerCase().includes(searchLower) ||
-			stud.student_id.toLowerCase().includes(searchLower)
+			!addedProponents.includes(stud.id) && (
+				stud.name.toLowerCase().includes(searchLower) ||
+				stud.student_id.toLowerCase().includes(searchLower))
 		);
 	});
-
+	console.log(addedProponents);
 	const selectedStudents = students.filter((s) =>
 		selectedStudentsIds.includes(s.id)
 	);
+
+
 	const availableStudents = filteredStudents.filter(
 		(s) => !selectedStudentsIds.includes(s.id)
 	);

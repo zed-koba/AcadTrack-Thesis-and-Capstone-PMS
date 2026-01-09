@@ -73,7 +73,7 @@ const StudentEdit = ({
 	onSuccess,
 }: StudentEditProps) => {
 	const [loading, setLoading] = useState(false);
-	const [selectInstructorId, setSelectInstructorId] = useState(0);
+	const [selectInstructorId, setSelectInstructorId] = useState(student.instructor_id);
 	const [instructorOpen, setInstructorOpen] = useState(false);
 
 	type formValues = z.infer<typeof studentSchema>;
@@ -161,7 +161,7 @@ const StudentEdit = ({
 	const filteredRoles = roles.filter(
 		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1
 	);
-
+	const filteredInstructor = instructors.filter((ins) => ins.department_id === selectedDepartmentId);
 	const selectedInstructor = instructors.find(
 		(i) => i.id === selectInstructorId
 	);
@@ -180,6 +180,7 @@ const StudentEdit = ({
 				facebook_profile: student.facebook_profile,
 				selectedDepartmentId: student.department_id,
 			});
+			setSelectInstructorId(student.instructor_id);
 		}
 	}, [form, student]);
 	return (
@@ -252,81 +253,7 @@ const StudentEdit = ({
 								}}
 							/>
 						</div>
-						<form.Field
-							name="instructor"
-							children={(field) => {
-								const isInvalid =
-									field.state.meta.isTouched && !field.state.meta.isValid;
-								return (
-									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Instructor</FieldLabel>
-										<Popover
-											open={instructorOpen}
-											onOpenChange={setInstructorOpen}
-										>
-											<PopoverTrigger asChild>
-												<Button
-													variant="outline"
-													role="combobox"
-													aria-expanded={instructorOpen}
-													className={cn(
-														'w-full justify-between',
-														field.state.value === 0
-															? 'text-muted-foreground'
-															: 'text-white'
-													)}
-												>
-													{selectedInstructor
-														? selectedInstructor.name
-														: 'Search and select instructor'}
-													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-												</Button>
-											</PopoverTrigger>
-											<PopoverContent className="w-[400px] p-0" align="start">
-												<Command>
-													<CommandInput placeholder="Search adviser...." />
-													<CommandList>
-														<CommandEmpty>No instructor found.</CommandEmpty>
-														<CommandGroup>
-															{instructors.map((adv) => (
-																<CommandItem
-																	key={adv.id}
-																	value={`${adv.name} ${String(adv.id)}`}
-																	onSelect={() => {
-																		field.setValue(adv.id);
-																		setSelectInstructorId(adv.id);
-																		setInstructorOpen(false);
-																	}}
-																	className={cn(
-																		'',
-																		selectInstructorId === adv.id
-																			? 'bg-blue-600! text-white hover:bg-blue-600!'
-																			: 'hover:bg-card/50'
-																	)}
-																>
-																	<Check
-																		className={cn(
-																			'h-4 w-4',
-																			Number(field.state.value) === adv.id
-																				? 'opacity-100 text-white'
-																				: 'opacity-0'
-																		)}
-																	/>
-																	{adv.name}
-																</CommandItem>
-															))}
-														</CommandGroup>
-													</CommandList>
-												</Command>
-											</PopoverContent>
-										</Popover>
-										{isInvalid && (
-											<FieldError errors={field.state.meta.errors} />
-										)}
-									</Field>
-								);
-							}}
-						/>
+
 						<div className="grid grid-cols-2 gap-4">
 							<form.Field
 								name="semester"
@@ -430,6 +357,82 @@ const StudentEdit = ({
 												))}
 											</SelectContent>
 										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<form.Field
+							name="instructor"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Instructor</FieldLabel>
+										<Popover
+											open={instructorOpen}
+											onOpenChange={setInstructorOpen}
+										>
+											<PopoverTrigger asChild>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={instructorOpen}
+													disabled={selectedDepartmentId === 0 ? true : false}
+													className={cn(
+														'w-full justify-between',
+														field.state.value === 0
+															? 'text-muted-foreground'
+															: 'text-white'
+													)}
+												>
+													{selectedInstructor
+														? selectedInstructor.name
+														: 'Search and select instructor'}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-[400px] p-0" align="start">
+												<Command>
+													<CommandInput placeholder="Search adviser...." />
+													<CommandList>
+														<CommandEmpty>No instructor found.</CommandEmpty>
+														<CommandGroup>
+															{filteredInstructor.map((adv) => (
+																<CommandItem
+																	key={adv.id}
+																	value={`${adv.name} ${String(adv.id)}`}
+																	onSelect={() => {
+																		field.setValue(adv.id);
+																		setSelectInstructorId(adv.id);
+																		setInstructorOpen(false);
+																	}}
+																	className={cn(
+																		'',
+																		selectInstructorId === adv.id
+																			? 'bg-blue-600! text-white hover:bg-blue-600!'
+																			: 'hover:bg-card/50'
+																	)}
+																>
+																	<Check
+																		className={cn(
+																			'h-4 w-4',
+																			Number(field.state.value) === adv.id
+																				? 'opacity-100 text-white'
+																				: 'opacity-0'
+																		)}
+																	/>
+																	{adv.name}
+																</CommandItem>
+															))}
+														</CommandGroup>
+													</CommandList>
+												</Command>
+											</PopoverContent>
+										</Popover>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}

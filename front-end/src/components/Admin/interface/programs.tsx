@@ -1,3 +1,5 @@
+import type { ProponentsProps } from "./proponent";
+
 export type ProgramsProps = {
 	id: number;
 	name: string;
@@ -41,6 +43,7 @@ export type ProgramsDashboardProps = {
 };
 
 export type ProgramsTableProps = {
+	proponents: ProponentsProps[];
 	programs: ProgramsProps[];
 	departments: DepartmentProgramsProps[];
 	loading: boolean;

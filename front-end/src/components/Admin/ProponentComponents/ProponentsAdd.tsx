@@ -53,6 +53,7 @@ const proponentSchema = z.object({
 });
 
 const ProponentsAdd = ({
+	proponents,
 	students,
 	advisers,
 	roles,
@@ -107,7 +108,7 @@ const ProponentsAdd = ({
 					return JSON.stringify(payLoad);
 				}
 				form.reset();
-				if (result.status === 200) {
+				if (result.status === 201) {
 					toast.success(result.message);
 					setOpen(false);
 					refresh?.();
@@ -297,6 +298,7 @@ const ProponentsAdd = ({
 													students={students}
 													initialStudents={[]}
 													roles={roles}
+													proponents={proponents}
 													selectedStudentsIds={field.state.value ?? []}
 													onSelectionChange={field.handleChange}
 													placeholder="Search for students by name or ID..."

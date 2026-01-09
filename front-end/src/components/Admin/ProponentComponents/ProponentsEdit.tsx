@@ -57,6 +57,7 @@ const ProponentsEdit = ({
 	roles,
 	advisers,
 	onSuccess,
+	proponents,
 	open,
 	setOpen,
 }: ProponentsEditProps) => {
@@ -141,7 +142,7 @@ const ProponentsEdit = ({
 				title: proponent.title,
 				adviser: proponent.adviser_id,
 				studentsId: updatedStudentsIds,
-			});
+			}); ``
 			setUpdatedStudentsIds(studentsIds);
 			setSelectedAdviserId(proponent.adviser_id);
 		}
@@ -312,6 +313,7 @@ const ProponentsEdit = ({
 												<ProponentsAutoComplete
 													roles={roles}
 													students={students}
+													proponents={proponents}
 													selectedStudentsIds={updatedStudentsIds ?? []}
 													onSelectionChange={handleSelectedIds}
 													initialStudents={studentsIds}

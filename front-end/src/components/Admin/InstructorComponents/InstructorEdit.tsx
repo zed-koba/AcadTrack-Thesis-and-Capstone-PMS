@@ -83,7 +83,7 @@ const InstructorEdit = ({
 					(value.suffix === 'none' ? '' : value.suffix),
 				contact_number: value.contact_number,
 				department_id: value.selectedDepartmentId,
-
+				email: value.email,
 				status: value.status,
 			};
 			try {

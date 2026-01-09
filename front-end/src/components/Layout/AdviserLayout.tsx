@@ -10,7 +10,7 @@ const AdviserLayout = () => {
 		{ label: 'Consultation', to: '/Adviser/Consultation', icon: <Calendar /> },
 	];
 	return (
-		<div className="flex gap-5 content-start relative">
+		<div className="flex gap-5 content-start h-full relative">
 			<Sidebar navItem={navItem} />
 			<main className="px-4 py-5 bg-background grow relative">
 				<Outlet />

@@ -102,7 +102,7 @@ class InstructorsController extends Controller
             DB::commit();
             return response()->json([
                 'status' => 201,
-                'message' => 'Instructor updated sucessfully'
+                'message' => 'Instructor updated sucessfully',
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();

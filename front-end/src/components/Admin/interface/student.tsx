@@ -53,6 +53,7 @@ export type StudentsTableProps = {
 export type InstructorStudentsProps = {
 	id: number;
 	name: string;
+	department_id: number;
 };
 
 export type StudentAddProps = {

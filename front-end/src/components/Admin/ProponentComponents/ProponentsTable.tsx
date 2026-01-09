@@ -142,6 +142,7 @@ const ProponentsTable = ({
 					<div className="space-y-6 text-white">
 						<ProponentsAdd
 							students={students}
+							proponents={proponents}
 							advisers={advisers}
 							roles={roles}
 							refresh={refresh}
@@ -272,6 +273,7 @@ const ProponentsTable = ({
 											advisers={advisers}
 											roles={roles}
 											open={open}
+											proponents={proponents}
 											setOpen={setOpen}
 											proponent={selectedProponent}
 											onSuccess={refresh}

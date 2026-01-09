@@ -40,6 +40,7 @@ export type ProponentsTableProps = {
 	refresh?: () => void;
 };
 export type ProponentAddProps = {
+	proponents: ProponentsProps[];
 	advisers: AdvisersProponentProps[];
 	students: StudentsProponentsProps[];
 	roles: RolesProponentsProps[];
@@ -48,6 +49,7 @@ export type ProponentAddProps = {
 
 export type ProponentsAutoCompleteProps = {
 	students: StudentsProponentsProps[];
+	proponents: ProponentsProps[];
 	selectedStudentsIds: number[];
 	initialStudents: number[];
 	roles: RolesProponentsProps[];
@@ -60,6 +62,7 @@ export type ProponentsEditProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	proponent: ProponentsProps;
+	proponents: ProponentsProps[];
 	roles: RolesProponentsProps[];
 	advisers: AdvisersProponentProps[];
 	students: StudentsProponentsProps[];
