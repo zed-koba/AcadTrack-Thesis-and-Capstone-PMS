@@ -20,7 +20,7 @@ const buttonVariants = cva(
 					'hover:bg-blue-600 hover:text-white font-semibold cursor-pointer dark:hover:bg-accent/50',
 				link: 'text-primary underline-offset-4 hover:underline',
 				primary:
-					'bg-blue-600 text-white shadow-xs border-none hover:bg-blue-600/80',
+					'bg-primary text-primary-foreground shadow-xs border-none hover:bg-primary/80',
 				edit: 'bg-green-600 text-white shadow-xs border-none hover:bg-green-600/80',
 				details:
 					'bg-blue-500 text-white shadow-xs border-none hover:bg-blue-500/80',
@@ -28,8 +28,8 @@ const buttonVariants = cva(
 					'bg-red-600 text-white shadow-xs border-none hover:bg-red-600/80',
 			},
 			size: {
-				default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-				sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+				default: 'h-10 px-4 py-2 has-[>svg]:px-3',
+				sm: 'h-8 rounded-sm gap-1.5 px-3 has-[>svg]:px-2.5',
 				lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
 				icon: 'size-9',
 				'icon-sm': 'size-8',

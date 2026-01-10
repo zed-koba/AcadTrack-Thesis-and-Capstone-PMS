@@ -1,5 +1,7 @@
 import { Spinner } from '@/components/ui/spinner';
 import { useState } from 'react';
+import DocumentDashboard from '../components/DocumentDashboard';
+import DocumentContent from '../components/DocumentContent';
 
 const Document = () => {
 	const [loading, setLoading] = useState(false);
@@ -20,6 +22,8 @@ const Document = () => {
 				</div>
 			) : (
 				<>
+					<DocumentDashboard />
+					<DocumentContent />
 					{/* <ConsultationDashboard weeklies={weeklies} />
 					<ConsultationContent
 						weeklies={weeklies}
