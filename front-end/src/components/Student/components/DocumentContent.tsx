@@ -1,13 +1,14 @@
-import { Button } from '@/components/ui/button';
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 } from '@/components/ui/input-group';
-import { Plus, Search, Upload } from 'lucide-react';
+import { Search } from 'lucide-react';
 import DocumentCard from './DocumentCard';
+import DocumentUploadDialog from './DocumentUploadDialog';
+import type { DocumentContentProps } from '../interface/document';
 
-const DocumentContent = () => {
+const DocumentContent = ({ documents, refresh }: DocumentContentProps) => {
 	return (
 		<>
 			<section className="space-y-4 w-full">
@@ -24,13 +25,10 @@ const DocumentContent = () => {
 								</InputGroupAddon>
 							</InputGroup>
 						</div>
-						<Button variant="primary">
-							<Upload className="h-4 w-4 mr-2" />
-							Upload Document
-						</Button>
+						<DocumentUploadDialog refresh={refresh} />
 					</div>
 					<div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2">
-						<DocumentCard />
+						<DocumentCard documents={documents} />
 					</div>
 				</div>
 			</section>

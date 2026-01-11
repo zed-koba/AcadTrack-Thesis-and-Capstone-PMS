@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\ProgramsController;
 use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
+use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
 
 // Route::get('/user', function (Request $request) {
@@ -80,3 +81,8 @@ Route::prefix("adviser")->group(function() {
     Route::post("weekly/add", [AdviserWeeklyController::class, "storeWeekly"]);
     Route::put("{id}/weekly/update", [AdviserWeeklyController::class,"updateSchedule"]);
 });
+
+Route::prefix("student")->group(function() {
+    Route::get('{id}/documents', [DocumentsController::class, 'getDocuments']);
+    Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
+}); 

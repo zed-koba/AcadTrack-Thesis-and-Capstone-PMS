@@ -1,11 +1,38 @@
 import { Spinner } from '@/components/ui/spinner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DocumentDashboard from '../components/DocumentDashboard';
 import DocumentContent from '../components/DocumentContent';
+import { DocumentProps } from '../interface/document';
+import { apiStudentUrl } from '@/components/Routes/http';
 
 const Document = () => {
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 
+	const fetchDocuments = async () => {
+		try {
+			const res = await fetch(`${apiStudentUrl}/1/documents`, {
+				method: 'GET',
+				headers: {
+					'Content-type': 'application/json',
+					Accept: 'application/json',
+				},
+			});
+
+			const result = await res.json();
+			if (!res.ok) throw new Error('Failed to fetch data');
+			if (result.status === 200) {
+				setDocuments(result.document);
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+	useEffect(() => {
+		fetchDocuments();
+	}, []);
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
@@ -22,14 +49,8 @@ const Document = () => {
 				</div>
 			) : (
 				<>
-					<DocumentDashboard />
-					<DocumentContent />
-					{/* <ConsultationDashboard weeklies={weeklies} />
-					<ConsultationContent
-						weeklies={weeklies}
-						availabilities={availabilities}
-						refresh={fetchAvaibilities}
-					/> */}
+					<DocumentDashboard documents={documents} />
+					<DocumentContent documents={documents} refresh={fetchDocuments} />
 				</>
 			)}
 		</>
