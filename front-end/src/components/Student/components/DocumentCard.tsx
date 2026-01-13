@@ -12,11 +12,18 @@ import type { DocumentProps, DocumentCardProps } from '../interface/document';
 import { formatDate } from '@/components/functions/functions';
 import { useState } from 'react';
 import DocumentViewDialog from './DocumentViewDialog';
+import { cn } from '@/lib/utils';
 
 const DocumentCard = ({ documents }: DocumentCardProps) => {
 	const [selectedDocument, setSelectedDocument] =
 		useState<DocumentProps | null>(null);
 	const [open, setOpen] = useState(false);
+	const statusColor = {
+		pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
+		'under review': 'bg-success/20 border-success/40 text-success',
+		'need revision': 'bg-red-500/20 border-red500/40 text-red-500',
+		'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
+	};
 	return (
 		<>
 			{documents.map((doc) => (
@@ -41,7 +48,16 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 									</p>
 								</div>
 							</div>
-							<div className="py-0.5 px-3 flex gap-1 items-center text-amber-500 bg-amber-500/20  rounded-full mt-1 border-amber-500/40 border">
+							<div
+								className={cn(
+									'py-0.5 px-3 flex gap-1 items-center text-amber-500 rounded-full mt-1 border',
+									doc.status === 'pending' && statusColor.pending,
+									doc.status === 'under review' && statusColor['under review'],
+									doc.status === 'need revision' &&
+										statusColor['need revision'],
+									doc.status === 'approved' && statusColor.approved
+								)}
+							>
 								<Clock className="h-3 w-3" />
 								<p className="text-xs font-medium capitalize">{doc.status}</p>
 							</div>

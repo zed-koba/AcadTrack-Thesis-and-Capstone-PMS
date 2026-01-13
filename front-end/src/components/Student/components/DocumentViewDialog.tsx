@@ -10,7 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { formatDate } from '@/components/functions/functions';
+import {
+	downloadDocument,
+	formatDate,
+	formatDateWithTime,
+} from '@/components/functions/functions';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 
@@ -55,60 +59,39 @@ const DocumentViewDialog = ({
 						</TabsList>
 						<ScrollArea className="h-[400px] mt-4">
 							<TabsContent value="comments" className="space-y-4 m-0">
-								<Card>
-									<CardHeader>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-2">
-												<span className="font-medium text-sm">
-													Romnick Reyes
-												</span>
-												<div
-													className={cn(
-														'py-0.5 px-3 flex gap-1 items-center text-primary bg-primary/20  rounded-full',
-														commentsColorType['general']
-													)}
-												>
-													<p className="text-xs font-medium capitalize">
-														General
-													</p>
+								{document.comments.map((com) => (
+									<Card>
+										<CardHeader>
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-2">
+													<span className="font-medium text-sm">
+														Romnick Reyes
+													</span>
+													<div
+														className={cn(
+															'py-0.5 px-3 flex gap-1 items-center text-primary bg-primary/20  rounded-full',
+															com.comment_type === 'approval'
+																? commentsColorType.approval
+																: com.comment_type === 'need revision'
+																? commentsColorType['revision-request']
+																: commentsColorType.general
+														)}
+													>
+														<p className="text-xs font-medium capitalize">
+															{com.comment_type}
+														</p>
+													</div>
 												</div>
-											</div>
-											<span className="text-xs text-muted-foreground">
-												{formatDate(document.created_at)}
-											</span>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<p className="text-sm">asdsda</p>
-									</CardContent>
-								</Card>
-								<Card>
-									<CardHeader>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-2">
-												<span className="font-medium text-sm">
-													Romnick Reyes
+												<span className="text-xs text-muted-foreground">
+													{formatDateWithTime(document.created_at)}
 												</span>
-												<div
-													className={cn(
-														'py-0.5 px-3 flex gap-1 items-center text-primary  rounded-full',
-														commentsColorType['revision-request']
-													)}
-												>
-													<p className="text-xs font-medium capitalize">
-														Need Revision
-													</p>
-												</div>
 											</div>
-											<span className="text-xs text-muted-foreground">
-												{formatDate(document.created_at)}
-											</span>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<p className="text-sm">Revise</p>
-									</CardContent>
-								</Card>
+										</CardHeader>
+										<CardContent>
+											<p className="text-sm">{com.comment}</p>
+										</CardContent>
+									</Card>
+								))}
 							</TabsContent>
 						</ScrollArea>
 					</Tabs>
@@ -118,7 +101,11 @@ const DocumentViewDialog = ({
 						<Button variant="outline" onClick={() => setOpen(false)}>
 							Close
 						</Button>
-						<Button>
+						<Button
+							onClick={() => {
+								downloadDocument(document.id, document.original_name);
+							}}
+						>
 							<Download className="h-4 w-4 mr-2" />
 							Download Latest
 						</Button>

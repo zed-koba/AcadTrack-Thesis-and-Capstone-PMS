@@ -39,8 +39,18 @@ export type DocumentProps = {
 			};
 		};
 	};
+	comments: CommentProps[];
 };
 
+export type CommentProps = {
+	id: number;
+	document_id: number;
+	adviser_id: number;
+	comment: string;
+	comment_type: string;
+	created_at: string;
+	updated_at: string;
+};
 export type DocumentUploadProps = {
 	refresh?: () => void;
 };

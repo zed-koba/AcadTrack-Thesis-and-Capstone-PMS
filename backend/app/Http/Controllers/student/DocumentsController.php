@@ -21,6 +21,7 @@ class DocumentsController extends Controller
             'student.instructor:id,name',
             'student.account:id,email',
             'student.proponentDetail.proponent:id,proponents_id,title',
+            'comments'
         )->get();
 
         return response()->json([

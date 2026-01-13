@@ -7,7 +7,8 @@ import {
 	Eye,
 	FileText,
 	History,
-	MessageSquare,
+	Search,
+	SlidersHorizontal,
 } from 'lucide-react';
 import type { ViewDocumentsProps } from '../../interface/adviserdocument';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,8 +17,19 @@ import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import DocumentDetails from './DocumentDetails';
 import { cn } from '@/lib/utils';
-import { apiStudentUrl } from '@/components/Routes/http';
-import { toast } from 'sonner';
+
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from '@/components/ui/input-group';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 
 const ViewDocuments = ({
 	documents,
@@ -37,7 +49,7 @@ const ViewDocuments = ({
 
 	return (
 		<>
-			<div className="flex gap-2 text-white items-center p-2">
+			<div className="flex gap-2 text-white items-center p-2 m-0">
 				<Button
 					variant="ghost"
 					onClick={() => {
@@ -47,6 +59,29 @@ const ViewDocuments = ({
 					<ArrowLeft className="w-4 h-4" />
 					{documents[0].student.name}
 				</Button>
+			</div>
+			<div className="flex justify-between wrap-normal flex-wrap">
+				<div className="grid grid-cols-2 grow shrink-0">
+					<div className="flex gap-2">
+						<InputGroup>
+							<InputGroupInput placeholder="Search documents.." />
+							<InputGroupAddon>
+								<Search className="h-5 w-5" />
+							</InputGroupAddon>
+							<InputGroupAddon align="inline-end">0 results...</InputGroupAddon>
+						</InputGroup>
+						<Select>
+							<SelectTrigger className="w-40">
+								<SlidersHorizontal className="h-4 w-4 mr-2" />
+								<SelectValue placeholder="Filter by" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="newest">Newest First</SelectItem>
+								<SelectItem value="oldest">Oldest First</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
 			</div>
 			<div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
 				{documents.map((doc) => (
