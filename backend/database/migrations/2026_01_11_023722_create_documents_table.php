@@ -22,6 +22,11 @@ return new class extends Migration
             $table->string('path');
             $table->string('mime_type', 100);
             $table->unsignedBigInteger('size');
+            $table->foreignId('parent_document_id')
+                ->nullable()
+                ->constrained('documents')
+                ->cascadeOnDelete();
+            $table->integer('version')->default(1);
             $table->timestamps();
         });
     }

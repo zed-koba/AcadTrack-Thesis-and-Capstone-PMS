@@ -8,10 +8,36 @@ export type DocumentProps = {
 	status: string;
 	path: string;
 	mime_type: string;
+	parent_document_id: number;
+	version: number;
 	created_at: string;
 	updated_at: string;
 	student: {
 		name: string;
+		student_id: string;
+		section: string;
+		program: {
+			name: string;
+			code: string;
+		};
+		department: {
+			name: string;
+			code: string;
+		};
+		instructor: {
+			name: string;
+		};
+		account: {
+			email: string;
+		};
+		role: {
+			name: string;
+		};
+		proponent_detail: {
+			proponent: {
+				title: string;
+			};
+		};
 	};
 };
 

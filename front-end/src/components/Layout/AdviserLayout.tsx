@@ -1,13 +1,14 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
-import { Calendar, LayoutDashboard } from 'lucide-react';
+import { Calendar, FileText, LayoutDashboard } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 
 const AdviserLayout = () => {
 	const navItem: NavItem[] = [
 		{ label: 'Dashboard', to: '/Adviser', icon: <LayoutDashboard /> },
 		{ label: 'Consultation', to: '/Adviser/Consultation', icon: <Calendar /> },
+		{ label: 'Documents', to: '/Adviser/Documents', icon: <FileText /> },
 	];
 	return (
 		<div className="flex gap-5 content-start h-full relative">

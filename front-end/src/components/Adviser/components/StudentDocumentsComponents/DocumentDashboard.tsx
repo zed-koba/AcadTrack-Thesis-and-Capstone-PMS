@@ -6,7 +6,7 @@ import {
 	FileExclamationPoint,
 	FileText,
 } from 'lucide-react';
-import type { DocumentDashboardProps } from '../interface/document';
+import type { DocumentDashboardProps } from '@/components/Student/interface/document';
 
 const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 	const pendingLength = documents.filter((d) => d.status === 'pending').length;

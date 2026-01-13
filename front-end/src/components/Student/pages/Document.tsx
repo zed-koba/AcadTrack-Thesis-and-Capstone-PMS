@@ -2,7 +2,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import DocumentDashboard from '../components/DocumentDashboard';
 import DocumentContent from '../components/DocumentContent';
-import { DocumentProps } from '../interface/document';
+import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/components/Routes/http';
 
 const Document = () => {

@@ -7,6 +7,7 @@ import AdminProponents from '@/components/Admin/pages/Proponents';
 import { default as AdminDashboard } from '../Admin/pages/Dashboard';
 import { default as AdviserDashboard } from '../Adviser/pages/Dashboard';
 import { default as StudentDashboard } from '../Student/pages/Dashboard';
+import { default as AdviserStudentDocument } from '../Adviser/pages/StudentDocument';
 import { default as StudentDocument } from '../Student/pages/Document';
 import AdminLayout from '../Layout/AdminLayout';
 import AdviserLayout from '../Layout/AdviserLayout';
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
 				element: <AdviserDashboard />,
 			},
 			{ path: 'Consultation', element: <AdviserConsultation /> },
+			{ path: 'Documents', element: <AdviserStudentDocument /> },
 		],
 	},
 	{

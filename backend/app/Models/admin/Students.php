@@ -3,6 +3,7 @@
 namespace App\Models\admin;
 
 use App\Models\adviser\AdviserWeekly;
+use App\Models\student\Documents;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,20 +34,20 @@ class Students extends Model
         return $this->belongsTo(Departments::class, 'department_id');
     }
 
-    public function programs():BelongsTo {
+    public function program():BelongsTo {
         return $this->belongsTo(Programs::class,'program_id');
     }
 
-    public function roles():BelongsTo {
+    public function role():BelongsTo {
         return $this->belongsTo(Role::class,'role_id');
     }
 
-    public function proponent():HasOne {
+    public function proponentDetail():HasOne {
         return $this->hasOne(ProponentsDetails::class, 'student_id');
     }
 
-    public function instructor():HasOne {
-        return $this->hasOne(Instructors::class, 'instructor_id');
+    public function instructor():BelongsTo {
+        return $this->belongsTo(Instructors::class, 'instructor_id');
     }
 
     public function account(): BelongsTo {
@@ -55,5 +56,9 @@ class Students extends Model
 
     public function weeklySchedule():HasMany {
         return $this->hasMany(AdviserWeekly::class, 'student_id');
+    }
+    
+    public function document():HasMany {
+        return $this->hasMany(Documents::class, 'student_id');
     }
 }

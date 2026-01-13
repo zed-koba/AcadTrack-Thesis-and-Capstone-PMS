@@ -1,7 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, FileText, MessageSquare } from 'lucide-react';
-import { DocumentProps, type DocumentCardProps } from '../interface/document';
+import {
+	Calendar,
+	Clock,
+	Eye,
+	FileText,
+	History,
+	MessageSquare,
+} from 'lucide-react';
+import type { DocumentProps, DocumentCardProps } from '../interface/document';
 import { formatDate } from '@/components/functions/functions';
 import { useState } from 'react';
 import DocumentViewDialog from './DocumentViewDialog';
@@ -17,17 +24,24 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 					<CardHeader className="pb-3">
 						<div className="flex items-start justify-between">
 							<div className="flex items-center gap-3">
-								<div className="p-3 rounded-lg bg-primary/10">
-									<FileText className="h-5 w-5 text-primary" />
+								<div className="p-3 rounded-xl bg-primary/10">
+									<FileText className="h-6 w-6 text-primary" />
 								</div>
 								<div>
 									<CardTitle className="text-base">{doc.title_name}</CardTitle>
-									<p className="text-xs text-muted-foreground mt-1">
-										Version 1 • Submitted {formatDate(doc.created_at)}
+									<p className="text-xs text-muted-foreground flex gap-2 items-center">
+										<div className="inline-flex gap-1 items-center">
+											<History className="h-3.5 w-3.5" />
+											v1{' '}
+										</div>
+										<div className="inline-flex gap-1 items-center">
+											<Calendar className="h-3.5 w-3.5" />{' '}
+											{formatDate(doc.created_at)}
+										</div>
 									</p>
 								</div>
 							</div>
-							<div className="py-0.5 px-3 flex gap-1 items-center text-amber-500 bg-amber-500/20  rounded-full">
+							<div className="py-0.5 px-3 flex gap-1 items-center text-amber-500 bg-amber-500/20  rounded-full mt-1 border-amber-500/40 border">
 								<Clock className="h-3 w-3" />
 								<p className="text-xs font-medium capitalize">{doc.status}</p>
 							</div>
@@ -44,14 +58,15 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 								</span>
 								<span className="flex items-center gap-1"></span>
 							</div>
+
 							<Button
-								variant="outline"
 								size="sm"
 								onClick={() => {
 									setSelectedDocument(doc);
 									setOpen(true);
 								}}
 							>
+								<Eye className="h-4 w-4 mr-0.5" />
 								View Details
 							</Button>
 						</div>

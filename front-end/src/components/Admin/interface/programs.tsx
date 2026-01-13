@@ -1,4 +1,4 @@
-import type { ProponentsProps } from "./proponent";
+import type { ProponentsProps } from './proponent';
 
 export type ProgramsProps = {
 	id: number;
@@ -43,7 +43,7 @@ export type ProgramsDashboardProps = {
 };
 
 export type ProgramsTableProps = {
-	proponents: ProponentsProps[];
+	// proponents: ProponentsProps[];
 	programs: ProgramsProps[];
 	departments: DepartmentProgramsProps[];
 	loading: boolean;
