@@ -15,19 +15,21 @@ import DocumentViewDialog from './DocumentViewDialog';
 import { cn } from '@/lib/utils';
 
 const DocumentCard = ({ documents }: DocumentCardProps) => {
-	const [selectedDocument, setSelectedDocument] =
-		useState<DocumentProps | null>(null);
+	const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(
+		null
+	);
+	const mainDocuments = documents.filter((d) => d.parent_document_id === null);
 	const [open, setOpen] = useState(false);
 	const statusColor = {
 		pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
 		'under review': 'bg-success/20 border-success/40 text-success',
-		'need revision': 'bg-red-500/20 border-red500/40 text-red-500',
+		'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
 		'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
 	};
 	return (
 		<>
-			{documents.map((doc) => (
-				<Card className="hover:shadow-md transition-shadow">
+			{mainDocuments.map((doc) => (
+				<Card key={doc.id} className="hover:shadow-md transition-shadow">
 					<CardHeader className="pb-3">
 						<div className="flex items-start justify-between">
 							<div className="flex items-center gap-3">
@@ -36,7 +38,7 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 								</div>
 								<div>
 									<CardTitle className="text-base">{doc.title_name}</CardTitle>
-									<p className="text-xs text-muted-foreground flex gap-2 items-center">
+									<div className="text-xs text-muted-foreground flex gap-2 items-center">
 										<div className="inline-flex gap-1 items-center">
 											<History className="h-3.5 w-3.5" />
 											v1{' '}
@@ -45,7 +47,7 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 											<Calendar className="h-3.5 w-3.5" />{' '}
 											{formatDate(doc.created_at)}
 										</div>
-									</p>
+									</div>
 								</div>
 							</div>
 							<div
@@ -78,7 +80,7 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 							<Button
 								size="sm"
 								onClick={() => {
-									setSelectedDocument(doc);
+									setSelectedDocumentId(doc.id);
 									setOpen(true);
 								}}
 							>
@@ -87,9 +89,10 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 							</Button>
 						</div>
 					</CardContent>
-					{selectedDocument && (
+					{selectedDocumentId !== null && (
 						<DocumentViewDialog
-							document={selectedDocument}
+							documents={documents}
+							selectedDocumentId={selectedDocumentId}
 							open={open}
 							setOpen={setOpen}
 						/>

@@ -35,6 +35,7 @@ class DocumentsController extends Controller
         $rules = [
             'title_name' => 'required|string',
             'file' => 'required|file|mimes:pdf|max:10240',
+            'parent_document_id' => 'nullable|integer|exists:documents,id',
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -49,6 +50,16 @@ class DocumentsController extends Controller
             $file = $request->file('file');
             $path = $file->store('documents', 'public');
 
+            $parentDocumentId = null;
+            $version = 1;
+
+            if ($request->filled('parent_document_id')) {
+            $parentDocumentId = $request->parent_document_id;
+            $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
+                ->max('version');
+            $version = ($latestVersion ?? 1) + 1;
+            }
+
             $document = Documents::create([
                 'student_id' => 1,
                 'title_name' => $request->title_name,
@@ -58,6 +69,8 @@ class DocumentsController extends Controller
                 'path' => $path,
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize(),
+                'parent_document_id' => $parentDocumentId,
+                'version' => $version,
             ]);
             DB::commit();
 

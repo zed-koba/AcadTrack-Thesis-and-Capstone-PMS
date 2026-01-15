@@ -39,11 +39,12 @@ const ViewDocuments = ({
 	const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(
 		null
 	);
+	const mainDocuments = documents.filter((d) => d.parent_document_id === null);
 	const [open, setOpen] = useState(false);
 	const statusColor = {
 		pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
 		'under review': 'bg-success/20 border-success/40 text-success',
-		'need revision': 'bg-red-500/20 border-red500/40 text-red-500',
+		'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
 		'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
 	};
 
@@ -84,7 +85,7 @@ const ViewDocuments = ({
 				</div>
 			</div>
 			<div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
-				{documents.map((doc) => (
+				{mainDocuments.map((doc) => (
 					<Card className="transition-all duration-200 hover:shadow-md border">
 						<CardHeader className="pb-3">
 							<div className="flex items-start justify-between">

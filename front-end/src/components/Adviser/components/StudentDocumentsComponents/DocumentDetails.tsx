@@ -21,6 +21,7 @@ import {
 	Users,
 	Send,
 	Check,
+	Hash,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -30,10 +31,11 @@ import {
 	downloadDocument,
 	formatDate,
 	formatDateWithTime,
+	formatFileSize,
 } from '@/components/functions/functions';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -73,10 +75,17 @@ const DocumentDetails = ({
 	const [comments, setComments] = useState<DocumentCommentsProps[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [submitLoading, setSubmitLoading] = useState(false);
-	const document = documents.find((d) => d.id === selectedDocumentId);
-	const versions = documents
-		.filter((d) => d.parent_document_id === selectedDocumentId)
-		.reverse();
+	const document = useMemo(() => {
+		return documents.find((d) => d.id === selectedDocumentId);
+	}, [documents, selectedDocumentId]);
+
+	const versions = useMemo(() => {
+		const childVersions = documents
+			.filter((d) => d.parent_document_id === selectedDocumentId)
+			.reverse();
+
+		return document ? [document, ...childVersions] : childVersions;
+	}, [documents, selectedDocumentId, document]);
 	type formValues = z.infer<typeof commentSchema>;
 	const defaultValues: formValues = {
 		comment_type: 'general',
@@ -130,7 +139,11 @@ const DocumentDetails = ({
 			}
 		},
 	});
+	useEffect(() => {
+		console.log('documents changed', documents);
+	}, [documents]);
 	if (!selectedDocumentId) return;
+
 	const fetchComments = async () => {
 		setSubmitLoading(true);
 		try {
@@ -499,73 +512,74 @@ const DocumentDetails = ({
 											<div className="absolute left-4 top-8 bottom-4 w-0.5 bg-border" />
 
 											<div className="space-y-6">
-												{/* {document.versions
+												{versions
 													.slice()
 													.reverse()
-													.map((version, index) => ( */}
-												<div className="relative flex gap-4">
-													{/* Timeline dot */}
-													<div
-														// className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-														// 	index === 0
-														// 		? 'bg-primary text-primary-foreground'
-														// 		: 'bg-muted border-2 border-border'
-														// }`}
-														className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0`}
-													>
-														{/* {index === 0 ? ( */}
-														<FileCheck className="h-4 w-4" />
-														{/* ) : (
-															<Hash className="h-4 w-4 text-muted-foreground" />
-														)} */}
-													</div>
-
-													{/* Content */}
-													<div className="flex-1 pb-2">
-														<div className="flex items-start justify-between">
-															<div>
-																<p className="font-medium text-sm">
-																	Version
-																	{/* {version.version} */}
-																	{/* {index === 0 && ( */}
-																	<Badge
-																		variant="outline"
-																		className="ml-2 text-xs"
-																	>
-																		Current
-																	</Badge>
-																	{/* )} */}
-																</p>
-																<p className="text-sm text-muted-foreground mt-0.5">
-																	PDF.pdf
-																</p>
-															</div>
-															<Button
-																variant="ghost"
-																size="sm"
-																className="shrink-0"
+													.map((version, index) => (
+														<div
+															key={version.id}
+															className="relative flex gap-4"
+														>
+															<div
+																className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+																	index === 0
+																		? 'bg-primary text-primary-foreground'
+																		: 'bg-muted border-2 border-border'
+																}`}
 															>
-																<Download className="h-4 w-4 mr-1.5" />
-																Download
-															</Button>
-														</div>
-														<div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-															<span className="flex items-center gap-1">
-																<Calendar className="h-3.5 w-3.5" />
-																{/* {format(
+																{index === 0 ? (
+																	<FileCheck className="h-4 w-4" />
+																) : (
+																	<Hash className="h-4 w-4 text-muted-foreground" />
+																)}
+															</div>
+
+															{/* Content */}
+															<div className="flex-1 pb-2">
+																<div className="flex items-start justify-between">
+																	<div>
+																		<p className="font-medium text-sm">
+																			Version
+																			{version.version}
+																			{index === 0 && (
+																				<Badge
+																					variant="outline"
+																					className="ml-2 text-xs"
+																				>
+																					Current
+																				</Badge>
+																			)}
+																		</p>
+																		<p className="text-sm text-muted-foreground mt-0.5">
+																			{version.original_name}
+																		</p>
+																	</div>
+																	<Button
+																		variant="ghost"
+																		size="sm"
+																		className="shrink-0"
+																	>
+																		<Download className="h-4 w-4 mr-1.5" />
+																		Download
+																	</Button>
+																</div>
+																<div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+																	<span className="flex items-center gap-1">
+																		<Calendar className="h-3.5 w-3.5" />
+																		{/* {format(
 																			version.uploadedAt,
 																			"MMM d, yyyy 'at' h:mm a"
 																		)} */}
-																Jan 6, 2026
-															</span>
-															<span className="flex items-center gap-1">
-																<FileText className="h-3.5 w-3.5" />
-																{/* {version.fileSize} */} 1.8 MB
-															</span>
+																		{formatDate(version.created_at)}
+																	</span>
+																	<span className="flex items-center gap-1">
+																		<FileText className="h-3.5 w-3.5" />
+																		{formatFileSize(version.size)} MB
+																	</span>
+																</div>
+															</div>
 														</div>
-													</div>
-												</div>
-												{/* ))} */}
+													))}
 											</div>
 										</div>
 									</CardContent>

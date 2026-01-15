@@ -56,7 +56,10 @@ const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 			<div className="flex flex-col gap-5 mt-5 w-full text-white">
 				<section className="grid lg:grid-cols-5 sm:grid-cols-2 gap-2 mb-6">
 					{dashboard.map((board) => (
-						<div className="border bg-card rounded-md p-4 flex gap-3 justify-start items-start">
+						<div
+							key={board.label}
+							className="border bg-card rounded-md p-4 flex gap-3 justify-start items-start"
+						>
 							<div
 								className={cn(
 									'flex justify-center items-center p-3 rounded-md',

@@ -8,6 +8,7 @@ export type DocumentProps = {
 	status: string;
 	path: string;
 	mime_type: string;
+	size: number;
 	parent_document_id: number;
 	version: number;
 	created_at: string;
@@ -65,10 +66,4 @@ export type DocumentCardProps = {
 };
 export type DocumentDashboardProps = {
 	documents: DocumentProps[];
-};
-
-export type DocumentViewDialogProps = {
-	document: DocumentProps;
-	open: boolean;
-	setOpen: (open: boolean) => void;
 };

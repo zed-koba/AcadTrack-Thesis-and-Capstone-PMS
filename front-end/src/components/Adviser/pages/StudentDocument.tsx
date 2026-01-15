@@ -21,7 +21,7 @@ const StudentDocument = () => {
 			const result = await res.json();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
-				setDocuments(result.document);
+				await setDocuments(result.document);
 			}
 		} catch (error) {
 			console.log(error);

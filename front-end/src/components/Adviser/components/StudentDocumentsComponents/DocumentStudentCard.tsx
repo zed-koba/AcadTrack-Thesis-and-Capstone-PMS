@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ActivityIcon, Bell, User2 } from 'lucide-react';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import { formatDate } from '@/components/functions/functions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import type { StudentCardProps } from '../../interface/adviserdocument';
 

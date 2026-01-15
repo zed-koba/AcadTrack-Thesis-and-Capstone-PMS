@@ -18,6 +18,7 @@ const DocumentContent = ({ documents, refresh }: DocumentContentProps) => {
 	const [selectedStudentDocuments, setSelectedStudentDocuments] = useState<
 		DocumentProps[]
 	>([]);
+	console.log(selectedStudentDocuments);
 	return (
 		<>
 			<section className="space-y-4 w-full">

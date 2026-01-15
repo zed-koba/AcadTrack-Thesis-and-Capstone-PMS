@@ -49,3 +49,15 @@ export const downloadDocument = async (docId: number, name: string) => {
 		toast.error('Download failed');
 	}
 };
+
+export function formatFileSize(sizeInBytes: number): string {
+	if (sizeInBytes < 1024) {
+		return `${sizeInBytes} B`; // bytes
+	} else if (sizeInBytes < 1024 * 1024) {
+		const kb = sizeInBytes / 1024;
+		return `${kb.toFixed(2)} KB`; // kilobytes
+	} else {
+		const mb = sizeInBytes / (1024 * 1024);
+		return `${mb.toFixed(2)} MB`; // megabytes
+	}
+}
