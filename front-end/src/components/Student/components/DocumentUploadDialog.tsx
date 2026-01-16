@@ -48,48 +48,48 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 				return;
 			}
 			setLoading(true);
-			if (navigator.onLine) {
-				const formData = new FormData();
-				formData.append('file', selectedFile);
-				formData.append('title_name', value.document_title);
-				formData.append('description', value.description ?? '');
-				try {
-					const res = await fetch(`${apiStudentUrl}/documents/add`, {
-						method: 'POST',
-						body: formData,
-					});
-					const result = await res.json();
-					if (result.status == 422) {
-						const errors = result.errors as Record<string, string[]>;
-						Object.values(errors).forEach((errorMessages) =>
-							errorMessages.forEach((message) => {
-								toast.error(message);
-							})
-						);
-						return;
-					} else if (result.status == 500) {
-						toast.error(result.message);
-						console.log(result.error);
-						return;
-					}
-					if (!res.ok) {
-						console.log(result.status);
-						console.log('Failed to fetch data ' + JSON.stringify(formData));
-						return;
-					}
-					if (result.status == 201) {
-						form.reset();
-						setSelectedFile(null);
-						toast.success(result.message);
-						setOpen(false);
-						refresh?.();
-					}
-				} catch (error) {
-					console.log(error);
-				} finally {
-					setLoading(false);
+
+			const formData = new FormData();
+			formData.append('file', selectedFile);
+			formData.append('title_name', value.document_title);
+			formData.append('description', value.description ?? '');
+			try {
+				const res = await fetch(`${apiStudentUrl}/documents/add`, {
+					method: 'POST',
+					body: formData,
+				});
+				const result = await res.json();
+				if (result.status == 422) {
+					const errors = result.errors as Record<string, string[]>;
+					Object.values(errors).forEach((errorMessages) =>
+						errorMessages.forEach((message) => {
+							toast.error(message);
+						})
+					);
+					return;
+				} else if (result.status == 500) {
+					toast.error(result.message);
+					console.log(result.error);
+					return;
 				}
+				if (!res.ok) {
+					console.log(result.status);
+					console.log('Failed to fetch data ' + JSON.stringify(formData));
+					return;
+				}
+				if (result.status == 201) {
+					form.reset();
+					setSelectedFile(null);
+					toast.success(result.message);
+					setOpen(false);
+					refresh?.();
+				}
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setLoading(false);
 			}
+
 		},
 	});
 	const handleDrag = (e: React.DragEvent) => {
@@ -230,11 +230,10 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 										</div>
 									) : (
 										<div
-											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-												dragActive
+											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
 													? 'border-primary bg-primary/5'
 													: 'border-muted-foreground/25'
-											}`}
+												}`}
 											onDragEnter={handleDrag}
 											onDragLeave={handleDrag}
 											onDragOver={handleDrag}

@@ -56,7 +56,7 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 									doc.status === 'pending' && statusColor.pending,
 									doc.status === 'under review' && statusColor['under review'],
 									doc.status === 'need revision' &&
-										statusColor['need revision'],
+									statusColor['need revision'],
 									doc.status === 'approved' && statusColor.approved
 								)}
 							>
@@ -72,7 +72,7 @@ const DocumentCard = ({ documents }: DocumentCardProps) => {
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-4 text-sm text-muted-foreground">
 								<span className="flex items-center gap-1">
-									<MessageSquare className="h-4 w-4" />5 comments
+									<MessageSquare className="h-4 w-4" />{doc.comments.length} comments
 								</span>
 								<span className="flex items-center gap-1"></span>
 							</div>

@@ -35,7 +35,7 @@ class DocumentsController extends Controller
         $rules = [
             'title_name' => 'required|string',
             'file' => 'required|file|mimes:pdf|max:10240',
-            'parent_document_id' => 'nullable|integer|exists:documents,id',
+            'parent_document_id' => 'nullable|string|exists:documents,id',
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -52,12 +52,13 @@ class DocumentsController extends Controller
 
             $parentDocumentId = null;
             $version = 1;
-
+            $status = "pending";
             if ($request->filled('parent_document_id')) {
-            $parentDocumentId = $request->parent_document_id;
-            $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
-                ->max('version');
-            $version = ($latestVersion ?? 1) + 1;
+                $parentDocumentId = $request->parent_document_id;
+                $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
+                    ->max('version');
+                $version = ($latestVersion ?? 1) + 1;
+                $getDocument = Documents::find($request->parent_document_id)->update(['status' => 'pending']);
             }
 
             $document = Documents::create([
@@ -71,7 +72,8 @@ class DocumentsController extends Controller
                 'size' => $file->getSize(),
                 'parent_document_id' => $parentDocumentId,
                 'version' => $version,
-            ]);
+                'status' => $status,
+                ]);
             DB::commit();
 
             return response()->json([

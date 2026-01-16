@@ -40,6 +40,7 @@ const ViewDocuments = ({
 		null
 	);
 	const mainDocuments = documents.filter((d) => d.parent_document_id === null);
+
 	const [open, setOpen] = useState(false);
 	const statusColor = {
 		pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
@@ -114,9 +115,9 @@ const ViewDocuments = ({
 										'py-0.5 px-3 flex gap-1 items-center rounded-full mt-1 border',
 										doc.status === 'pending' && statusColor.pending,
 										doc.status === 'under review' &&
-											statusColor['under review'],
+										statusColor['under review'],
 										doc.status === 'need revision' &&
-											statusColor['need revision'],
+										statusColor['need revision'],
 										doc.status === 'approved' && statusColor.approved
 									)}
 								>
@@ -142,16 +143,7 @@ const ViewDocuments = ({
 									<Eye className="h-4 w-4 mr-0.5" />
 									View Details
 								</Button>
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => {
-										downloadDocument(doc.id, doc.original_name);
-									}}
-								>
-									<Download className="h-4 w-4 mr-0.5" />
-									Download PDF
-								</Button>
+
 							</div>
 						</CardContent>
 						{selectedDocumentId !== null && (

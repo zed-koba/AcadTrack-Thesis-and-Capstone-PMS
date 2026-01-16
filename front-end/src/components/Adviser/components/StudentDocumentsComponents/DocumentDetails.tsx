@@ -81,11 +81,16 @@ const DocumentDetails = ({
 
 	const versions = useMemo(() => {
 		const childVersions = documents
-			.filter((d) => d.parent_document_id === selectedDocumentId)
-			.reverse();
+			.filter(d => d.parent_document_id === document?.id)
+			.sort((a, b) => b.version - a.version);
+		console.log(documents);
+		const allVersions = document
+			? [document, ...childVersions]
+			: childVersions;
 
-		return document ? [document, ...childVersions] : childVersions;
+		return allVersions.sort((a, b) => b.version - a.version);
 	}, [documents, selectedDocumentId, document]);
+
 	type formValues = z.infer<typeof commentSchema>;
 	const defaultValues: formValues = {
 		comment_type: 'general',
@@ -140,8 +145,8 @@ const DocumentDetails = ({
 		},
 	});
 	useEffect(() => {
-		console.log('documents changed', documents);
-	}, [documents]);
+		fetchComments();
+	}, []);
 	if (!selectedDocumentId) return;
 
 	const fetchComments = async () => {
@@ -267,13 +272,13 @@ const DocumentDetails = ({
 														className={cn(
 															'py-0.5 px-3 inline-flex gap-1 items-center rounded-full mt-1 border',
 															document?.status === 'pending' &&
-																statusColor.pending,
+															statusColor.pending,
 															document?.status === 'under review' &&
-																statusColor['under review'],
+															statusColor['under review'],
 															document?.status === 'need revision' &&
-																statusColor['need revision'],
+															statusColor['need revision'],
 															document?.status === 'approved' &&
-																statusColor.approved
+															statusColor.approved
 														)}
 													>
 														<Clock className="h-3 w-3" />
@@ -347,15 +352,15 @@ const DocumentDetails = ({
 									</CardHeader>
 									<CardContent>
 										<div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-											<div className="text-center p-4 rounded-lg bg-muted/50">
+											<div className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/30" onClick={() => setActiveTab('history')}>
 												<p className="text-2xl font-bold text-primary">
-													{versions.length + 1}
+													{versions.length}
 												</p>
 												<p className="text-xs text-muted-foreground mt-1">
 													Versions Submitted
 												</p>
 											</div>
-											<div className="text-center p-4 rounded-lg bg-muted/50">
+											<div className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/30" onClick={() => setActiveTab('comments')}>
 												<p className="text-2xl font-bold text-primary">
 													{comments.length}
 												</p>
@@ -431,7 +436,7 @@ const DocumentDetails = ({
 													{document?.student.proponent_detail === null
 														? 'Not Assigned'
 														: document?.student.proponent_detail.proponent
-																.title}
+															.title}
 												</p>
 											</div>
 											<div>
@@ -513,19 +518,16 @@ const DocumentDetails = ({
 
 											<div className="space-y-6">
 												{versions
-													.slice()
-													.reverse()
 													.map((version, index) => (
 														<div
 															key={version.id}
 															className="relative flex gap-4"
 														>
 															<div
-																className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-																	index === 0
-																		? 'bg-primary text-primary-foreground'
-																		: 'bg-muted border-2 border-border'
-																}`}
+																className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${index === 0
+																	? 'bg-primary text-primary-foreground'
+																	: 'bg-muted border-2 border-border'
+																	}`}
 															>
 																{index === 0 ? (
 																	<FileCheck className="h-4 w-4" />
@@ -558,6 +560,12 @@ const DocumentDetails = ({
 																		variant="ghost"
 																		size="sm"
 																		className="shrink-0"
+																		onClick={() =>
+																			downloadDocument(
+																				version.id,
+																				version.original_name
+																			)
+																		}
 																	>
 																		<Download className="h-4 w-4 mr-1.5" />
 																		Download
@@ -621,9 +629,9 @@ const DocumentDetails = ({
 																onValueChange={(v) =>
 																	field.handleChange(
 																		v as
-																			| 'general'
-																			| 'need revision'
-																			| 'approved'
+																		| 'general'
+																		| 'need revision'
+																		| 'approved'
 																	)
 																}
 															>
@@ -745,8 +753,8 @@ const DocumentDetails = ({
 																	com.comment_type === 'approval'
 																		? commentsColorType.approval
 																		: com.comment_type === 'need revision'
-																		? commentsColorType['revision-request']
-																		: commentsColorType.general
+																			? commentsColorType['revision-request']
+																			: commentsColorType.general
 																)}
 															>
 																{com.comment_type}
@@ -772,8 +780,8 @@ const DocumentDetails = ({
 						<Button
 							onClick={() =>
 								downloadDocument(
-									selectedDocumentId,
-									document?.original_name as string
+									versions[0].id,
+									versions[0].original_name as string
 								)
 							}
 						>

@@ -47,8 +47,7 @@ import type {
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { file } from 'zod';
+
 
 const DocumentViewDialog = ({
 	documents,
@@ -65,13 +64,19 @@ const DocumentViewDialog = ({
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const versions = useMemo(() => {
 		const childVersions = documents
-			.filter((d) => d.parent_document_id === selectedDocumentId)
-			.reverse();
+			.filter(d => d.parent_document_id === selectedDocumentId)
+			.sort((a, b) => b.version - a.version);
 
-		return document ? [document, ...childVersions] : childVersions;
+		const allVersions = document
+			? [document, ...childVersions]
+			: childVersions;
+
+		return allVersions.sort((a, b) => b.version - a.version);
 	}, [documents, selectedDocumentId, document]);
 	const [loading, setLoading] = useState(false);
+	const [uploadLoading, setuploadLoading] = useState(false);
 	const isDisabled: boolean = loading || Boolean(!selectedFile);
+	console.log(versions);
 	const fetchComments = async () => {
 		setLoading(true);
 		try {
@@ -93,68 +98,69 @@ const DocumentViewDialog = ({
 			setLoading(false);
 		}
 	};
+	useEffect(() => {
+		fetchComments();
+	}, []);
 	const uploadRevision = async () => {
 		if (!selectedFile) {
 			toast.error('Please select a PDF File');
 			return;
 		}
-		if (navigator.onLine) {
-			const formData = new FormData();
-			formData.append('file', selectedFile);
-			formData.append(
-				'title_name',
-				versions.length === 0
-					? document?.title_name +
-							'Revision' +
-							' v' +
-							((document?.version as number) + 1)
-					: document?.title_name +
-							'Revision' +
-							' v' +
-							((versions[0].version as number) + 1)
-			);
-			formData.append('description', document?.description ?? '');
-			formData.append(
-				'parent_document_id',
-				versions.length === 0
-					? String(document?.id)
-					: String(versions[0].parent_document_id)
-			);
-			try {
-				const res = await fetch(`${apiStudentUrl}/documents/add`, {
-					method: 'POST',
-					body: formData,
-				});
-				const result = await res.json();
-				if (result.status == 422) {
-					const errors = result.errors as Record<string, string[]>;
-					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) => {
-							toast.error(message);
-						})
-					);
-					return;
-				} else if (result.status == 500) {
-					toast.error(result.message);
-					console.log(result.error);
-					return;
-				}
-				if (!res.ok) {
-					console.log(result.status);
-					console.log('Failed to fetch data ' + JSON.stringify(formData));
-					return;
-				}
-				if (result.status == 201) {
-					setSelectedFile(null);
-					toast.success(result.message);
-					setOpen(false);
-					refresh?.();
-				}
-			} catch (error) {
-				console.log(error);
-			} finally {
-				setLoading(false);
+
+		setuploadLoading(true);
+		const formData = new FormData();
+		formData.append('file', selectedFile);
+		formData.append(
+			'title_name',
+			versions.length === 0
+				? document?.title_name +
+				'Revision' +
+				' v' +
+				((document?.version as number) + 1)
+				: document?.title_name +
+				'Revision' +
+				' v' +
+				((versions[0].version as number) + 1)
+		);
+		formData.append('description', document?.description ?? '');
+		formData.append(
+			'parent_document_id',
+			versions.length === 1 ? String(versions[0].id) : String(versions[0].parent_document_id)
+		);
+		try {
+			const res = await fetch(`${apiStudentUrl}/documents/add`, {
+				method: 'POST',
+				body: formData,
+			});
+			const result = await res.json();
+			if (result.status == 422) {
+				const errors = result.errors as Record<string, string[]>;
+				Object.values(errors).forEach((errorMessages) =>
+					errorMessages.forEach((message) => {
+						toast.error(message);
+					})
+				);
+				return;
+			} else if (result.status == 500) {
+				toast.error(result.message);
+				console.log(result.error);
+				return;
 			}
+			if (!res.ok) {
+				console.log(result.status);
+				console.log('Failed to fetch data ' + JSON.stringify(formData));
+				return;
+			}
+			if (result.status == 201) {
+				setSelectedFile(null);
+				toast.success(result.message);
+				setOpen(false);
+				refresh?.();
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setuploadLoading(false);
 		}
 	};
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -171,9 +177,9 @@ const DocumentViewDialog = ({
 		'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
 	};
 	const canUploadRevision =
-		(document?.status === 'need revision' && versions.length === 0) ||
-		(versions.length > 0 && versions[0].status === 'need revision');
-
+		(versions[0].status === 'need revision' && versions.length === 1) ||
+		(versions.length > 1 && versions[0].status === 'need revision');
+	console.log(canUploadRevision, versions[0].status === 'need revision');
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
 			const file = e.target.files[0];
@@ -292,13 +298,13 @@ const DocumentViewDialog = ({
 														className={cn(
 															'py-0.5 px-3 inline-flex gap-1 items-center rounded-full mt-1 border',
 															document?.status === 'pending' &&
-																statusColor.pending,
+															statusColor.pending,
 															document?.status === 'under review' &&
-																statusColor['under review'],
+															statusColor['under review'],
 															document?.status === 'need revision' &&
-																statusColor['need revision'],
+															statusColor['need revision'],
 															document?.status === 'approved' &&
-																statusColor.approved
+															statusColor.approved
 														)}
 													>
 														<Clock className="h-3 w-3" />
@@ -413,7 +419,7 @@ const DocumentViewDialog = ({
 										<div className="grid grid-cols-2 md:grid-cols-2 gap-4">
 											<div className="text-center p-4 rounded-lg bg-muted/50">
 												<p className="text-2xl font-bold text-primary">
-													{versions.length + 1}
+													{versions.length}
 												</p>
 												<p className="text-xs text-muted-foreground mt-1">
 													Versions Submitted
@@ -474,8 +480,8 @@ const DocumentViewDialog = ({
 																	com.comment_type === 'approval'
 																		? commentsColorType.approval
 																		: com.comment_type === 'need revision'
-																		? commentsColorType['revision-request']
-																		: commentsColorType.general
+																			? commentsColorType['revision-request']
+																			: commentsColorType.general
 																)}
 															>
 																{com.comment_type}
@@ -503,19 +509,16 @@ const DocumentViewDialog = ({
 
 											<div className="space-y-6">
 												{versions
-													.slice()
-													.reverse()
 													.map((version, index) => (
 														<div
 															key={version.id}
 															className="relative flex gap-4"
 														>
 															<div
-																className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-																	index === 0
-																		? 'bg-primary text-primary-foreground'
-																		: 'bg-muted border-2 border-border'
-																}`}
+																className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${index === 0
+																	? 'bg-primary text-primary-foreground'
+																	: 'bg-muted border-2 border-border'
+																	}`}
 															>
 																{index === 0 ? (
 																	<FileCheck className="h-4 w-4" />
@@ -596,7 +599,7 @@ const DocumentViewDialog = ({
 								disabled={isDisabled}
 								variant="edit"
 							>
-								{loading ? (
+								{uploadLoading ? (
 									<>
 										<Spinner className="h-4 w-4 mr-2 animate-spin" />
 										Uploading...
