@@ -4,10 +4,16 @@ import { useEffect, useState } from 'react';
 import DocumentDashboard from '../components/StudentDocumentsComponents/DocumentDashboard';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import DocumentContent from '../components/StudentDocumentsComponents/DocumentContent';
+import { ProponentsProps } from '@/components/Admin/interface/proponent';
+import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
 
 const StudentDocument = () => {
 	const [loading, setLoading] = useState(true);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
+	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [selectedDocument, setSelectedDocument] =
+		useState<DocumentProps | null>(null);
+
 	const fetchDocuments = async () => {
 		try {
 			const res = await fetch(`${apiStudentUrl}/1/documents`, {
@@ -22,16 +28,30 @@ const StudentDocument = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
 				await setDocuments(result.document);
+				await setProjects(result.projects);
+				return result.document;
 			}
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setLoading(false);
 		}
+		return [];
 	};
 	useEffect(() => {
 		fetchDocuments();
 	}, []);
+	const refresh = async () => {
+		const updatedDocs = await fetchDocuments();
+
+		// if a document is selected, update it from the new list
+		if (selectedDocument) {
+			const updatedSelected = updatedDocs.find(
+				(doc: { id: number }) => doc.id === selectedDocument.id,
+			);
+			setSelectedDocument(updatedSelected || null);
+		}
+	};
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
@@ -49,7 +69,14 @@ const StudentDocument = () => {
 			) : (
 				<>
 					<DocumentDashboard documents={documents} />
-					<DocumentContent documents={documents} refresh={fetchDocuments} />
+					<DocumentContent
+						projects={projects}
+						documents={documents}
+						refresh={refresh}
+						loading={loading}
+						selectedDocument={selectedDocument}
+						setSelectedDocument={setSelectedDocument}
+					/>
 				</>
 			)}
 		</>

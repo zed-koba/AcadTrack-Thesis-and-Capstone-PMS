@@ -1,3 +1,5 @@
+import type { ProponentsProps } from '@/components/Admin/interface/proponent';
+
 export type DocumentProps = {
 	id: number;
 	student_id: number;
@@ -9,37 +11,12 @@ export type DocumentProps = {
 	path: string;
 	mime_type: string;
 	size: number;
-	parent_document_id: number;
+	parent_document_id: number | null;
 	version: number;
+	chapter: number;
 	created_at: string;
 	updated_at: string;
-	student: {
-		name: string;
-		student_id: string;
-		section: string;
-		program: {
-			name: string;
-			code: string;
-		};
-		department: {
-			name: string;
-			code: string;
-		};
-		instructor: {
-			name: string;
-		};
-		account: {
-			email: string;
-		};
-		role: {
-			name: string;
-		};
-		proponent_detail: {
-			proponent: {
-				title: string;
-			};
-		};
-	};
+	versions: DocumentProps[];
 	comments: CommentProps[];
 };
 
@@ -58,6 +35,7 @@ export type DocumentUploadProps = {
 
 export type DocumentContentProps = {
 	documents: DocumentProps[];
+	projects: ProponentsProps[];
 	refresh?: () => void;
 };
 

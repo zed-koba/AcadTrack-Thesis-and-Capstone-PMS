@@ -27,6 +27,7 @@ return new class extends Migration
                 ->constrained('documents')
                 ->cascadeOnDelete();
             $table->integer('version')->default(1);
+            $table->integer('chapter')->default(1);
             $table->timestamps();
         });
     }

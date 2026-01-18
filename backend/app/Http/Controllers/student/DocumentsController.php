@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\student;
 
 use App\Http\Controllers\Controller;
+use App\Models\admin\Proponents;
 use App\Models\student\Documents;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,19 +15,13 @@ class DocumentsController extends Controller
     public function getDocuments($id)
     {
         $document = Documents::where("student_id", $id)->with(
-            'student:id,name,section,student_id,program_id,department_id,instructor_id,account_id,role_id',
-            'student.program:id,name,code',
-            'student.role:id,name',
-            'student.department:id,name,code',
-            'student.instructor:id,name',
-            'student.account:id,email',
-            'student.proponentDetail.proponent:id,proponents_id,title',
             'comments'
         )->get();
-
+        $projects = Proponents::with('details.student:id,student_id,name','adviser')->orderBy('created_at', 'asc')->get();
         return response()->json([
             'status' => 200,
             'document' => $document,
+            'projects' => $projects,
         ], 200);
     }
 

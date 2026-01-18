@@ -1,5 +1,7 @@
 import { toast } from 'sonner';
 import { apiStudentUrl } from '../Routes/http';
+import type { JSX } from 'react/jsx-runtime';
+import { CircleCheckBig, Clock, Eye, FileExclamationPoint } from 'lucide-react';
 
 export function formatDate(dateString: string) {
 	const date = new Date(dateString);
@@ -53,11 +55,21 @@ export const downloadDocument = async (docId: number, name: string) => {
 export function formatFileSize(sizeInBytes: number): string {
 	if (sizeInBytes < 1024) {
 		return `${sizeInBytes} B`; // bytes
-	} else if (sizeInBytes < 1024 * 1024) {
-		const kb = sizeInBytes / 1024;
-		return `${kb.toFixed(2)} KB`; // kilobytes
 	} else {
 		const mb = sizeInBytes / (1024 * 1024);
 		return `${mb.toFixed(2)} MB`; // megabytes
 	}
 }
+
+export const statusColor: Record<string, string> = {
+	pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
+	'under review': 'bg-success/20 border-success/40 text-success',
+	'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
+	'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
+};
+export const chapterStatusIcon: Record<string, JSX.Element> = {
+	pending: <Clock />,
+	'under review': <Eye />,
+	'need revision': <FileExclamationPoint />,
+	'approved': <CircleCheckBig />,
+};

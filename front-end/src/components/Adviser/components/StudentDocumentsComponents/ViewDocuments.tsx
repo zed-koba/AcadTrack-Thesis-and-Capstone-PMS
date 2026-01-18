@@ -1,164 +1,94 @@
-import { Button } from '@/components/ui/button';
-import {
-	ArrowLeft,
-	Calendar,
-	Clock,
-	Download,
-	Eye,
-	FileText,
-	History,
-	Search,
-	SlidersHorizontal,
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, Folder, FolderOpen } from 'lucide-react';
 import type { ViewDocumentsProps } from '../../interface/adviserdocument';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { downloadDocument, formatDate } from '@/components/functions/functions';
-import { Separator } from '@/components/ui/separator';
+import {
+	chapterStatusIcon,
+	formatDate,
+	statusColor,
+} from '@/components/functions/functions';
 import { useState } from 'react';
-import DocumentDetails from './DocumentDetails';
 import { cn } from '@/lib/utils';
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupInput,
-} from '@/components/ui/input-group';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
+import DocumentItem from './DocumentItem';
+import { Badge } from '@/components/ui/badge';
 
 const ViewDocuments = ({
-	documents,
-	setSelectedStudent,
+	chapter,
+	isExpanded,
+	onToggle,
+	onSelectDocument,
 	refresh,
 }: ViewDocumentsProps) => {
-	const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(
-		null
-	);
-	const mainDocuments = documents.filter((d) => d.parent_document_id === null);
-
 	const [open, setOpen] = useState(false);
-	const statusColor = {
-		pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
-		'under review': 'bg-success/20 border-success/40 text-success',
-		'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
-		'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
-	};
 
 	return (
-		<>
-			<div className="flex gap-2 text-white items-center p-2 m-0">
-				<Button
-					variant="ghost"
-					onClick={() => {
-						setSelectedStudent(true);
-					}}
-				>
-					<ArrowLeft className="w-4 h-4" />
-					{documents[0].student.name}
-				</Button>
-			</div>
-			<div className="flex justify-between wrap-normal flex-wrap">
-				<div className="grid grid-cols-2 grow shrink-0">
-					<div className="flex gap-2">
-						<InputGroup>
-							<InputGroupInput placeholder="Search documents.." />
-							<InputGroupAddon>
-								<Search className="h-5 w-5" />
-							</InputGroupAddon>
-							<InputGroupAddon align="inline-end">0 results...</InputGroupAddon>
-						</InputGroup>
-						<Select>
-							<SelectTrigger className="w-40">
-								<SlidersHorizontal className="h-4 w-4 mr-2" />
-								<SelectValue placeholder="Filter by" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="newest">Newest First</SelectItem>
-								<SelectItem value="oldest">Oldest First</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-				</div>
-			</div>
-			<div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
-				{mainDocuments.map((doc) => (
-					<Card className="transition-all duration-200 hover:shadow-md border">
-						<CardHeader className="pb-3">
-							<div className="flex items-start justify-between">
-								<div className="flex items-center gap-3">
-									<div className="p-3 rounded-xl bg-primary/10">
-										<FileText className="h-6 w-6 text-primary" />
-									</div>
-									<div>
-										<CardTitle className="text-base">
-											{doc.title_name}
-										</CardTitle>
-										<div className="text-xs text-muted-foreground flex gap-2 items-center">
-											<div className="inline-flex gap-1 items-center">
-												<History className="h-3.5 w-3.5" />
-												v1{' '}
-											</div>
-											<div className="inline-flex gap-1 items-center">
-												<Calendar className="h-3.5 w-3.5" />{' '}
-												{formatDate(doc.created_at)}
-											</div>
-										</div>
-									</div>
-								</div>
-								<div
+		<Collapsible open={isExpanded} onOpenChange={onToggle}>
+			<div className="rounded-lg border border-border/50 bg-background overflow-hidden">
+				<CollapsibleTrigger asChild>
+					<button className="w-full flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors text-left cursor-pointer">
+						<div className="flex items-center gap-2">
+							{isExpanded ? (
+								<ChevronDown className="h-3 w-3 text-muted-foreground cursor-pointer" />
+							) : (
+								<ChevronRight className="h-3 w-3 text-muted-foreground cursor-pointer" />
+							)}
+							{isExpanded ? (
+								<FolderOpen className="h-4 w-4 text-primary cursor-pointer" />
+							) : (
+								<Folder className="h-4 w-4 text-muted-foreground cursor-pointer" />
+							)}
+						</div>
+						<div className="flex-1 min-w-0">
+							<div className="flex items-center gap-2">
+								<span className="text-sm font-medium">
+									Chapter {chapter.chapter}
+								</span>
+								<Badge
+									variant="outline"
 									className={cn(
-										'py-0.5 px-3 flex gap-1 items-center rounded-full mt-1 border',
-										doc.status === 'pending' && statusColor.pending,
-										doc.status === 'under review' &&
-										statusColor['under review'],
-										doc.status === 'need revision' &&
-										statusColor['need revision'],
-										doc.status === 'approved' && statusColor.approved
+										'text-xs capitalize',
+										statusColor[chapter.documents[0]?.status || 'pending'],
 									)}
 								>
-									<Clock className="h-3 w-3" />
-									<p className="text-xs font-medium capitalize">{doc.status}</p>
-								</div>
+									{chapterStatusIcon[chapter.documents[0]?.status || 'pending']}
+									{chapter.documents[0]?.status}
+								</Badge>
 							</div>
-						</CardHeader>
-						<CardContent>
-							<p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-								{doc.description}
+							<p className="text-xs text-muted-foreground mt-0.5">
+								{chapter.documents.length} document
+								{chapter.documents.length !== 1 ? 's' : ''} • Last Updated:{' '}
+								{formatDate(chapter.documents[0]?.updated_at)}
 							</p>
-							<Separator className="mt-2 mb-4" />
-							<div className="flex items-center gap-2">
-								<Button
-									size="sm"
-									className="flex-1 sm:flex-none"
-									onClick={() => {
-										setSelectedDocumentId(doc.id);
-										setOpen(true);
-									}}
-								>
-									<Eye className="h-4 w-4 mr-0.5" />
-									View Details
-								</Button>
+						</div>
+					</button>
+				</CollapsibleTrigger>
 
+				<CollapsibleContent>
+					<div className="border-t border-border/50 bg-muted/20 px-5 py-2">
+						{chapter.documents.length === 0 ? (
+							<div className="text-center py-4 text-muted-foreground text-sm">
+								No documents uploaded yet
 							</div>
-						</CardContent>
-						{selectedDocumentId !== null && (
-							<DocumentDetails
-								selectedDocumentId={selectedDocumentId}
-								documents={documents}
-								open={open}
-								setOpen={setOpen}
-								refresh={refresh}
-							/>
+						) : (
+							<div className="space-y-1">
+								{chapter.documents.map((doc) => (
+									<DocumentItem
+										key={doc.id}
+										currentDocument={doc}
+										onSelectDocument={onSelectDocument}
+										refresh={refresh}
+									/>
+								))}
+							</div>
 						)}
-					</Card>
-				))}
+					</div>
+				</CollapsibleContent>
 			</div>
-		</>
+		</Collapsible>
 	);
 };
 
