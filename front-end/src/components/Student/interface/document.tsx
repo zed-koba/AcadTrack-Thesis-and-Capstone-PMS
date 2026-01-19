@@ -1,4 +1,5 @@
 import type { ProponentsProps } from '@/components/Admin/interface/proponent';
+import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
 export type DocumentProps = {
 	id: number;
@@ -35,7 +36,7 @@ export type DocumentUploadProps = {
 
 export type DocumentContentProps = {
 	documents: DocumentProps[];
-	projects: ProponentsProps[];
+	project: ProponentsDocumentsProps;
 	refresh?: () => void;
 };
 

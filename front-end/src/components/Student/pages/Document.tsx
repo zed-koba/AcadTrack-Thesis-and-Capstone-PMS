@@ -11,7 +11,7 @@ const Document = () => {
 
 	const fetchDocuments = async () => {
 		try {
-			const res = await fetch(`${apiStudentUrl}/1/documents`, {
+			const res = await fetch(`${apiStudentUrl}/documents`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',

@@ -11,13 +11,13 @@ import type { DocumentDashboardProps } from '@/components/Student/interface/docu
 const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 	const pendingLength = documents.filter((d) => d.status === 'pending').length;
 	const underReviewLength = documents.filter(
-		(d) => d.status === 'under review'
+		(d) => d.status === 'under review',
 	).length;
 	const needRevisionLength = documents.filter(
-		(d) => d.status === 'need revision'
+		(d) => d.status === 'need revision',
 	).length;
 	const approvedLength = documents.filter(
-		(d) => d.status === 'approved'
+		(d) => d.status === 'approved',
 	).length;
 	const dashboard = [
 		{
@@ -56,11 +56,14 @@ const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 			<div className="flex flex-col gap-5 mt-5 w-full text-white">
 				<section className="grid lg:grid-cols-5 sm:grid-cols-2 gap-2 mb-6">
 					{dashboard.map((board) => (
-						<div className="border bg-card rounded-md p-4 flex gap-3 justify-start items-start">
+						<div
+							key={board.label}
+							className="border bg-card rounded-md p-4 flex gap-3 justify-start items-start"
+						>
 							<div
 								className={cn(
 									'flex justify-center items-center p-3 rounded-md',
-									board.color
+									board.color,
 								)}
 							>
 								{board.icon}

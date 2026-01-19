@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class DocumentsController extends Controller
 {
-    public function getDocuments($id)
+    public function getDocuments()
     {
-        $document = Documents::where("student_id", $id)->with(
+        $document = Documents::with(
             'comments'
-        )->get();
+        )->orderBy('created_at', 'desc')->get();
         $projects = Proponents::with('details.student:id,student_id,name','adviser')->orderBy('created_at', 'asc')->get();
         return response()->json([
             'status' => 200,

@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { BookOpen, Calendar, MessageSquare, User } from 'lucide-react';
+import { BookOpen, Calendar, MessageSquare, User, X } from 'lucide-react';
 import type { DocumentCommentsProps } from '../../interface/adviserdocument';
 import CommentAddDialog from './CommentAddDialog';
 import {
@@ -16,10 +16,19 @@ const DocumentsComments = ({
 	document,
 	refresh,
 	loading,
+	adviser,
+	setSelectedDocument,
 }: DocumentCommentsProps) => {
 	return (
 		<>
-			<Card className="border-border">
+			<Card className="border-border relative">
+				<div
+					className="absolute top-2 right-2 cursor-pointer text-muted-foreground text-sm"
+					onClick={() => setSelectedDocument(null)}
+				>
+					{' '}
+					<X className="w-4 h-4" />
+				</div>
 				<CardHeader className="pb-4 border-b border-border">
 					<div className="flex items-center justify-between gap-4">
 						<div className="flex items-center gap-3">
@@ -67,7 +76,10 @@ const DocumentsComments = ({
 												.slice()
 												.reverse()
 												.map((com) => (
-													<div className="p-4 rounded-lg border border-border bg-muted/30">
+													<div
+														key={com.id}
+														className="p-4 rounded-lg border border-border bg-muted/30"
+													>
 														<div className="flex items-start justify-between mb-2">
 															<div className="flex items-center gap-2">
 																<div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -75,7 +87,7 @@ const DocumentsComments = ({
 																</div>
 																<div>
 																	<p className="text-sm font-medium">
-																		Romnick Reyes
+																		{adviser?.name}
 																	</p>
 																	<p className="text-xs text-muted-foreground">
 																		{formatDateWithTime(com.created_at)}
@@ -86,15 +98,15 @@ const DocumentsComments = ({
 																variant="outline"
 																className={cn(
 																	'text-xs capitalize',
-																	statusColor[document.status || 'pending'],
+																	statusColor[com.comment_type || 'pending'],
 																)}
 															>
 																{
 																	chapterStatusIcon[
-																		document.status || 'pending'
+																		com.comment_type || 'pending'
 																	]
 																}
-																{document.status}
+																{com.comment_type}
 															</Badge>
 														</div>
 														<p className="text-sm pl-10">{com.comment}</p>

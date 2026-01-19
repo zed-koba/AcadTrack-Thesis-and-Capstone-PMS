@@ -3,7 +3,10 @@ import type {
 	ProponentsDetailsProps,
 	ProponentsProps,
 } from '@/components/Admin/interface/proponent';
-import type { DocumentProps } from '@/components/Student/interface/document';
+import type {
+	CommentProps,
+	DocumentProps,
+} from '@/components/Student/interface/document';
 
 export type ChapterDocumentsProps = {
 	chapter: number;
@@ -14,12 +17,18 @@ export type ViewDocumentsProps = {
 	isExpanded: boolean;
 	onToggle: () => void;
 	onSelectDocument: (document: DocumentProps) => void;
+	selectedDocument: DocumentProps | null;
+	setProjectAdviser: (adviser: AdviserProps) => void;
+	projectAdviser: AdviserProps;
 	refresh?: () => void;
 };
 
 export type DocumentItemProps = {
 	currentDocument: DocumentProps;
+	projectAdviser: AdviserProps;
 	onSelectDocument: (document: DocumentProps) => void;
+	selectedDocument: DocumentProps | null;
+	setProjectAdviser: (adviser: AdviserProps) => void;
 	refresh?: () => void;
 };
 
@@ -45,10 +54,10 @@ export type DetailsDocumentsProps = {
 		id: number;
 	};
 };
-
+export type ProjectWithStatus = ProponentsDocumentsProps & { status?: string };
 export type AdviserDocumentContentProps = {
 	documents: DocumentProps[];
-	projects: ProponentsDocumentsProps[];
+	projects: ProjectWithStatus[];
 	refresh?: () => void;
 	selectedDocument: DocumentProps | null;
 	setSelectedDocument: (document: DocumentProps | null) => void;
@@ -57,12 +66,16 @@ export type AdviserDocumentContentProps = {
 
 export type ProjectCollapseProps = {
 	documents: DocumentProps[];
-	project: ProponentsDocumentsProps;
+	project: ProjectWithStatus;
 	isExpanded: boolean;
 	expandedChapters: Set<number>;
+	projectAdviser: AdviserProps;
+	onStatusChange: (projectId: number, newStatus: string) => void;
 	onToggle: () => void;
 	onToggleChapter: (chapterId: number) => void;
 	onSelectDocument: (document: DocumentProps) => void;
+	selectedDocument: DocumentProps | null;
+	setProjectAdviser: (adviser: AdviserProps) => void;
 	refresh?: () => void;
 };
 export type ViewDetailsProps = {
@@ -84,6 +97,8 @@ export type CommentsProps = {
 
 export type DocumentCommentsProps = {
 	document: DocumentProps | null;
+	adviser: AdviserProps | null;
 	refresh?: () => void;
 	loading: boolean;
+	setSelectedDocument: (document: DocumentProps | null) => void;
 };

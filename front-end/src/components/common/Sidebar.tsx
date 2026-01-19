@@ -8,10 +8,10 @@ const Sidebar = ({ navItem }: NavItemProps) => {
 	return (
 		<>
 			<aside
-				className="z-40 w-64 h-screen shrink-0 border-r"
+				className="z-40 w-64 shrink-0 border-r min-h-screen h-auto"
 				aria-label="Sidebar"
 			>
-				<div className="h-full px-3 py-4 h-full bg-[#161B22]">
+				<div className="h-full px-3 py-4 bg-[#161B22]">
 					<ul className="space-y-2 font-medium pt-1">
 						<li>
 							<a

@@ -11,7 +11,7 @@ import {
 	User2,
 	Users,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import type { ProjectCollapseProps } from '../../interface/adviserdocument';
 import {
@@ -21,7 +21,12 @@ import {
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { formatDate } from '@/components/functions/functions';
+import {
+	chapterStatusIcon,
+	formatDate,
+	getProjectStatus,
+	statusColor,
+} from '@/components/functions/functions';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import ViewDocuments from './ViewDocuments';
 
@@ -32,8 +37,12 @@ const DocumentProjectCard = ({
 	isExpanded,
 	expandedChapters,
 	onToggle,
+	projectAdviser,
 	onToggleChapter,
+	setProjectAdviser,
+	onStatusChange,
 	onSelectDocument,
+	selectedDocument,
 }: ProjectCollapseProps) => {
 	const [open, setOpen] = useState(false);
 	const studentIds = project.details.map((detail) => detail.student_id);
@@ -41,13 +50,13 @@ const DocumentProjectCard = ({
 		studentIds.includes(d.student_id),
 	);
 	const chaptersGrouped = useMemo(() => {
-		if (filterDocuments.length === 0) return [];
-		const parents = documents.filter((d) => d.parent_document_id === null);
+		const parents = filterDocuments.filter(
+			(d) => d.parent_document_id === null,
+		);
 		const groupedDocuments = parents.map((parent) => {
-			const versions = documents
+			const versions = filterDocuments
 				.filter((d) => d.parent_document_id === parent.id)
 				.sort((a, b) => b.version - a.version);
-
 			return { ...parent, versions };
 		});
 		const byChapter: Record<number, typeof groupedDocuments> = {};
@@ -61,6 +70,19 @@ const DocumentProjectCard = ({
 			documents: docs,
 		}));
 	}, [documents, filterDocuments]);
+
+	const status = useMemo(
+		() =>
+			chaptersGrouped.length === 0
+				? 'no documents'
+				: getProjectStatus(chaptersGrouped),
+		[chaptersGrouped],
+	);
+	useEffect(() => {
+		if (onStatusChange) {
+			onStatusChange(project.id, status ?? 'no documents');
+		}
+	}, [status, onStatusChange, project.id]);
 
 	return (
 		<Collapsible open={isExpanded} onOpenChange={onToggle}>
@@ -91,6 +113,25 @@ const DocumentProjectCard = ({
 						<div className="flex-1 min-w-0">
 							<div className="flex items-center gap-2 flex-wrap">
 								<span className="font-semibold truncate">{project.title}</span>
+								<Badge
+									className={cn(
+										'gap-1 shrink-0 capitalize',
+										statusColor[
+											getProjectStatus(
+												chaptersGrouped,
+											) as keyof typeof statusColor
+										],
+									)}
+								>
+									{
+										chapterStatusIcon[
+											getProjectStatus(
+												chaptersGrouped,
+											) as keyof typeof chapterStatusIcon
+										]
+									}
+									{getProjectStatus(chaptersGrouped)}
+								</Badge>
 							</div>
 							<div className="flex items-center gap-4 text-xs text-muted-foreground mt-1 flex-wrap">
 								<span className="flex items-center gap-1">
@@ -132,6 +173,9 @@ const DocumentProjectCard = ({
 										isExpanded={expandedChapters.has(chapter.chapter)}
 										onToggle={() => onToggleChapter(chapter.chapter)}
 										onSelectDocument={onSelectDocument}
+										projectAdviser={projectAdviser}
+										setProjectAdviser={setProjectAdviser}
+										selectedDocument={selectedDocument}
 										refresh={refresh}
 									/>
 								))}

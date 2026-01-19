@@ -1,21 +1,15 @@
 import { cn } from '@/lib/utils';
-import {
-	CircleCheckBig,
-	Clock,
-	Download,
-	Eye,
-	FileExclamationPoint,
-	FileText,
-	MoreVertical,
-} from 'lucide-react';
-import { useState, type JSX } from 'react';
+import { Clock, Download, Eye, FileText, MoreVertical } from 'lucide-react';
+import { useState } from 'react';
 import type { DocumentItemProps } from '../../interface/adviserdocument';
 import { Badge } from '@/components/ui/badge';
 import {
+	chapterStatusIcon,
 	downloadDocument,
 	formatDate,
 	formatDateWithTime,
 	formatFileSize,
+	statusColor,
 } from '@/components/functions/functions';
 import {
 	DropdownMenu,
@@ -28,21 +22,12 @@ import { Button } from '@/components/ui/button';
 const DocumentItem = ({
 	currentDocument,
 	onSelectDocument,
+	selectedDocument,
+	setProjectAdviser,
+	projectAdviser,
 	refresh,
 }: DocumentItemProps) => {
 	const [showVersions, setShowVersions] = useState(true);
-	const statusColor: Record<string, string> = {
-		pending: 'bg-amber-500/20 border-amber-500/40 text-amber-500',
-		'under review': 'bg-success/20 border-success/40 text-success',
-		'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
-		'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
-	};
-	const chapterStatusIcon: Record<string, JSX.Element> = {
-		pending: <Clock />,
-		'under review': <Eye />,
-		'need revision': <FileExclamationPoint />,
-		'approved': <CircleCheckBig />,
-	};
 
 	const checkVersion =
 		currentDocument.versions.length > 0
@@ -52,11 +37,15 @@ const DocumentItem = ({
 		<div className="space-y-1">
 			<div
 				className={cn(
-					'flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 transition-colors',
+					'flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer',
 					checkVersion.version &&
-						'bg-primary/20 border border-primary/50 hover:bg-primary/30 cursor-pointer',
+						checkVersion.id === selectedDocument?.id &&
+						'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 				)}
-				onClick={() => onSelectDocument(checkVersion)}
+				onClick={() => {
+					onSelectDocument(checkVersion);
+					setProjectAdviser(projectAdviser);
+				}}
 			>
 				<FileText className="h-4 w-4 text-muted-foreground shrink-0" />
 				<div className="flex-1 min-w-0">
@@ -127,13 +116,25 @@ const DocumentItem = ({
 						return (
 							<div
 								key={version.id}
-								className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4"
-								onClick={() => onSelectDocument(version)}
+								className={cn(
+									'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
+									version === selectedDocument &&
+										'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+								)}
+								onClick={() => {
+									onSelectDocument(version);
+									setProjectAdviser(projectAdviser);
+								}}
 							>
 								<FileText className="h-3 w-3 text-muted-foreground shrink-0" />
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center gap-2">
-										<span className="text-muted-foreground truncate">
+										<span
+											className={cn(
+												'text-muted-foreground truncate',
+												version.id === selectedDocument?.id && 'text-white',
+											)}
+										>
 											{version.original_name}
 										</span>
 										<Badge variant="outline" className="text-[10px] px-1 py-0">
@@ -162,13 +163,25 @@ const DocumentItem = ({
 						);
 					})}
 					<div
-						className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4"
-						onClick={() => onSelectDocument(currentDocument)}
+						className={cn(
+							'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
+							currentDocument.id === selectedDocument?.id &&
+								'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+						)}
+						onClick={() => {
+							onSelectDocument(currentDocument);
+							setProjectAdviser(projectAdviser);
+						}}
 					>
 						<FileText className="h-3 w-3 text-muted-foreground shrink-0" />
 						<div className="flex-1 min-w-0">
 							<div className="flex items-center gap-2">
-								<span className="text-muted-foreground truncate">
+								<span
+									className={cn(
+										'text-muted-foreground truncate',
+										currentDocument.id === selectedDocument?.id && 'text-white',
+									)}
+								>
 									{currentDocument.original_name}
 								</span>
 								<Badge variant="outline" className="text-[10px] px-1 py-0">

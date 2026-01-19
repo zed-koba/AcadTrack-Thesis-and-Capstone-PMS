@@ -87,7 +87,7 @@ Route::prefix("adviser")->group(function() {
 });
 
 Route::prefix("student")->group(function() {
-    Route::get('{id}/documents', [DocumentsController::class, 'getDocuments']);
+    Route::get('documents', [DocumentsController::class, 'getDocuments']);
     Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
     Route::get('{id}/download/pdf', [DocumentsController::class,'downloadDocument']);
 }); 

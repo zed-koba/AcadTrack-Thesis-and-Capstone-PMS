@@ -5,7 +5,7 @@ import {
 	formatDate,
 	statusColor,
 } from '@/components/functions/functions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
 	Collapsible,
@@ -21,6 +21,9 @@ const ViewDocuments = ({
 	isExpanded,
 	onToggle,
 	onSelectDocument,
+	selectedDocument,
+	setProjectAdviser,
+	projectAdviser,
 	refresh,
 }: ViewDocumentsProps) => {
 	const [open, setOpen] = useState(false);
@@ -51,11 +54,23 @@ const ViewDocuments = ({
 									variant="outline"
 									className={cn(
 										'text-xs capitalize',
-										statusColor[chapter.documents[0]?.status || 'pending'],
+										statusColor[
+											chapter.documents[0].versions.length === 0
+												? chapter.documents[0]?.status
+												: chapter.documents[0].versions[0].status
+										],
 									)}
 								>
-									{chapterStatusIcon[chapter.documents[0]?.status || 'pending']}
-									{chapter.documents[0]?.status}
+									{
+										chapterStatusIcon[
+											chapter.documents[0].versions.length === 0
+												? chapter.documents[0]?.status
+												: chapter.documents[0].versions[0].status
+										]
+									}
+									{chapter.documents[0].versions.length === 0
+										? chapter.documents[0]?.status
+										: chapter.documents[0].versions[0].status}
 								</Badge>
 							</div>
 							<p className="text-xs text-muted-foreground mt-0.5">
@@ -80,6 +95,9 @@ const ViewDocuments = ({
 										key={doc.id}
 										currentDocument={doc}
 										onSelectDocument={onSelectDocument}
+										selectedDocument={selectedDocument}
+										projectAdviser={projectAdviser}
+										setProjectAdviser={setProjectAdviser}
 										refresh={refresh}
 									/>
 								))}

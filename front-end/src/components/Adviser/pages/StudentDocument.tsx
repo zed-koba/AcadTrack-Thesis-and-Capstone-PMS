@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import DocumentDashboard from '../components/StudentDocumentsComponents/DocumentDashboard';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import DocumentContent from '../components/StudentDocumentsComponents/DocumentContent';
-import { ProponentsProps } from '@/components/Admin/interface/proponent';
 import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
 
 const StudentDocument = () => {
@@ -16,7 +15,7 @@ const StudentDocument = () => {
 
 	const fetchDocuments = async () => {
 		try {
-			const res = await fetch(`${apiStudentUrl}/1/documents`, {
+			const res = await fetch(`${apiStudentUrl}/documents`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',
