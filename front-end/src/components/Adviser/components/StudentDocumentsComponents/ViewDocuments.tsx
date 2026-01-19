@@ -48,7 +48,7 @@ const ViewDocuments = ({
 						<div className="flex-1 min-w-0">
 							<div className="flex items-center gap-2">
 								<span className="text-sm font-medium">
-									Chapter {chapter.chapter}
+									Chapter {chapter ? chapter.chapter : '1'}
 								</span>
 								<Badge
 									variant="outline"
@@ -74,9 +74,12 @@ const ViewDocuments = ({
 								</Badge>
 							</div>
 							<p className="text-xs text-muted-foreground mt-0.5">
-								{chapter.documents.length} document
-								{chapter.documents.length !== 1 ? 's' : ''} • Last Updated:{' '}
-								{formatDate(chapter.documents[0]?.updated_at)}
+								{chapter ? chapter.documents.length : '0'} document
+								{chapter && chapter.documents.length !== 1 ? 's' : ''} • Last
+								Updated:{' '}
+								{chapter
+									? formatDate(chapter.documents[0]?.updated_at)
+									: 'Not Assigned'}
 							</p>
 						</div>
 					</button>

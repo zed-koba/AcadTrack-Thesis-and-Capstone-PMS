@@ -1,18 +1,15 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-	ActivityIcon,
 	BookOpen,
 	Calendar,
 	ChevronDown,
 	ChevronRight,
 	Folder,
+	FolderOpen,
 	User,
-	User2,
 	Users,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Separator } from '@/components/ui/separator';
+
 import type { ProjectCollapseProps } from '../../interface/adviserdocument';
 import {
 	Collapsible,
@@ -27,7 +24,7 @@ import {
 	getProjectStatus,
 	statusColor,
 } from '@/components/functions/functions';
-import type { DocumentProps } from '@/components/Student/interface/document';
+
 import ViewDocuments from './ViewDocuments';
 
 const DocumentProjectCard = ({
@@ -46,6 +43,7 @@ const DocumentProjectCard = ({
 }: ProjectCollapseProps) => {
 	const [open, setOpen] = useState(false);
 	const studentIds = project.details.map((detail) => detail.student_id);
+	const [extraChapter, setExtraChapter] = useState(false);
 	const filterDocuments = documents.filter((d) =>
 		studentIds.includes(d.student_id),
 	);
@@ -70,7 +68,6 @@ const DocumentProjectCard = ({
 			documents: docs,
 		}));
 	}, [documents, filterDocuments]);
-
 	const status = useMemo(
 		() =>
 			chaptersGrouped.length === 0
@@ -83,7 +80,6 @@ const DocumentProjectCard = ({
 			onStatusChange(project.id, status ?? 'no documents');
 		}
 	}, [status, onStatusChange, project.id]);
-
 	return (
 		<Collapsible open={isExpanded} onOpenChange={onToggle}>
 			<div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow ">
@@ -114,6 +110,7 @@ const DocumentProjectCard = ({
 							<div className="flex items-center gap-2 flex-wrap">
 								<span className="font-semibold truncate">{project.title}</span>
 								<Badge
+									variant="outline"
 									className={cn(
 										'gap-1 shrink-0 capitalize',
 										statusColor[
@@ -159,28 +156,71 @@ const DocumentProjectCard = ({
 
 				<CollapsibleContent>
 					<div className="border-t border-border bg-muted/10">
-						{studentIds.length === 0 ? (
-							<div className="text-center py-6 text-muted-foreground text-sm">
-								No students assigned to this project or no documents uploaded
-								yet
-							</div>
-						) : (
-							<div className="p-4 space-y-2">
-								{chaptersGrouped.map((chapter) => (
-									<ViewDocuments
-										key={chapter.chapter}
-										chapter={chapter}
-										isExpanded={expandedChapters.has(chapter.chapter)}
-										onToggle={() => onToggleChapter(chapter.chapter)}
-										onSelectDocument={onSelectDocument}
-										projectAdviser={projectAdviser}
-										setProjectAdviser={setProjectAdviser}
-										selectedDocument={selectedDocument}
-										refresh={refresh}
-									/>
-								))}
-							</div>
-						)}
+						<div className="p-4 space-y-2">
+							{chaptersGrouped.map((chapter) => (
+								<ViewDocuments
+									key={chapter.chapter}
+									chapter={chapter}
+									isExpanded={expandedChapters.has(chapter.chapter)}
+									onToggle={() => onToggleChapter(chapter.chapter)}
+									onSelectDocument={onSelectDocument}
+									projectAdviser={projectAdviser}
+									setProjectAdviser={setProjectAdviser}
+									selectedDocument={selectedDocument}
+									refresh={refresh}
+								/>
+							))}
+							{(getProjectStatus(chaptersGrouped) === 'approved' ||
+								chaptersGrouped.length === 0) && (
+								<Collapsible open={extraChapter} onOpenChange={setExtraChapter}>
+									<div className="rounded-lg border border-border/50 bg-background overflow-hidden">
+										<CollapsibleTrigger asChild>
+											<button className="w-full flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors text-left cursor-pointer">
+												<div className="flex items-center gap-2">
+													{extraChapter ? (
+														<ChevronDown className="h-3 w-3 text-muted-foreground cursor-pointer" />
+													) : (
+														<ChevronRight className="h-3 w-3 text-muted-foreground cursor-pointer" />
+													)}
+													{extraChapter ? (
+														<FolderOpen className="h-4 w-4 text-primary cursor-pointer" />
+													) : (
+														<Folder className="h-4 w-4 text-muted-foreground cursor-pointer" />
+													)}
+												</div>
+												<div className="flex-1 min-w-0">
+													<div className="flex items-center gap-2">
+														<span className="text-sm font-medium">
+															Chapter{' '}
+															{chaptersGrouped.length === 0
+																? '1'
+																: chaptersGrouped[chaptersGrouped.length - 1]
+																		.chapter + 1}
+														</span>
+														<Badge
+															variant="outline"
+															className={cn('text-xs capitalize')}
+														>
+															No Document
+														</Badge>
+													</div>
+													<p className="text-xs text-muted-foreground mt-0.5">
+														0 document • Last Updated: Not Assigned
+													</p>
+												</div>
+											</button>
+										</CollapsibleTrigger>
+										<CollapsibleContent>
+											<div className="border-t border-border/50 bg-muted/20 px-5 py-2">
+												<div className="text-center py-4 text-muted-foreground text-sm">
+													No documents uploaded yet
+												</div>
+											</div>
+										</CollapsibleContent>
+									</div>
+								</Collapsible>
+							)}
+						</div>
 					</div>
 				</CollapsibleContent>
 			</div>

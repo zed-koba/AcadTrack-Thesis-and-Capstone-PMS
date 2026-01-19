@@ -77,7 +77,7 @@ export const chapterStatusIcon: Record<string, JSX.Element> = {
 };
 
 export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
-	if (chaptersGrouped.length === 0) return null;
+	if (chaptersGrouped.length === 0) return 'No Document';
 
 	const lastChapter = chaptersGrouped.at(-1);
 	if (!lastChapter || lastChapter.documents.length === 0) return null;

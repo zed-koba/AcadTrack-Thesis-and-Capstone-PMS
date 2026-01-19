@@ -5,48 +5,32 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import type { DocumentUploadProps } from '../interface/document';
+import type { DocumentRevisionProps } from '../interface/document';
 import React, { useState } from 'react';
 import z from 'zod';
 import { useForm } from '@tanstack/react-form';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Field, FieldLabel } from '@/components/ui/field';
+
 import { toast } from 'sonner';
-import { FileText, Upload, X } from 'lucide-react';
+import { AlertCircle, FileText, FileUp, Upload, X } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { apiStudentUrl } from '@/components/Routes/http';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
-const uploadSchema = z.object({
-	chapter: z.number().min(1, 'Select a chapter'),
-	document_title: z.string().min(2, 'Title required'),
-	description: z.string().nullable().optional(),
-});
+const uploadSchema = z.object({});
 
-const DocumentUploadDialog = ({
-	totalChapters,
-	checkLastChapterStatus,
+const DocumentRevisionDialog = ({
+	document,
 	refresh,
-}: DocumentUploadProps) => {
+}: DocumentRevisionProps) => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	type formValues = z.infer<typeof uploadSchema>;
-	const defaultValues: formValues = {
-		document_title: '',
-		description: '',
-		chapter: 0,
-	};
+	const defaultValues: formValues = {};
 
 	const form = useForm({
 		defaultValues,
@@ -55,18 +39,22 @@ const DocumentUploadDialog = ({
 			onSubmit: uploadSchema,
 		},
 
-		onSubmit: async ({ value }) => {
+		onSubmit: async () => {
 			if (!selectedFile) {
 				toast.error('Please select a PDF File');
 				return;
 			}
-			setLoading(true);
 
+			setLoading(true);
 			const formData = new FormData();
 			formData.append('file', selectedFile);
-			formData.append('chapter', String(value.chapter));
-			formData.append('title_name', value.document_title);
-			formData.append('description', value.description ?? '');
+			formData.append(
+				'title_name',
+				document?.title_name + '_v' + (document?.version + 1),
+			);
+			formData.append('description', document?.description ?? '');
+			formData.append('parent_document_id', String(document.id));
+			formData.append('chapter', String(document?.chapter));
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {
 					method: 'POST',
@@ -80,7 +68,6 @@ const DocumentUploadDialog = ({
 							toast.error(message);
 						}),
 					);
-
 					return;
 				} else if (result.status == 500) {
 					toast.error(result.message);
@@ -93,12 +80,10 @@ const DocumentUploadDialog = ({
 					return;
 				}
 				if (result.status == 201) {
-					form.reset();
 					setSelectedFile(null);
 					toast.success(result.message);
 					setOpen(false);
 					refresh?.();
-					console.log(result.documents);
 				}
 			} catch (error) {
 				console.log(error);
@@ -150,17 +135,15 @@ const DocumentUploadDialog = ({
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogTrigger asChild>
-					<Button variant="primary">
-						<Upload className="h-4 w-4 mr-2" />
-						Upload Document
+					<Button variant="primary" className="bg-red-500 hover:bg-red-500/80">
+						<FileUp className="h-4 w-4 mr-2" />
+						Submit Revision
 					</Button>
 				</DialogTrigger>
 				<DialogContent className="text-white">
 					<DialogHeader>
-						<DialogTitle>Upload Document</DialogTitle>
-						<DialogDescription>
-							Upload a PDF document for adviser review and feedback
-						</DialogDescription>
+						<DialogTitle>Submit Revision</DialogTitle>
+						<DialogDescription>Upload a revised version for</DialogDescription>
 					</DialogHeader>
 
 					<div className="space-y-4 py-4">
@@ -171,109 +154,26 @@ const DocumentUploadDialog = ({
 							}}
 						>
 							<div className="flex flex-col gap-5">
-								<form.Field
-									name="chapter"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>
-													Select Chapter: *
-												</FieldLabel>
-												<Select
-													name={field.name}
-													onValueChange={(v) => field.handleChange(Number(v))}
-												>
-													<SelectTrigger
-														className="w-auto"
-														aria-invalid={isInvalid}
-														id={field.name}
-													>
-														<SelectValue placeholder="Select a Chapter" />
-													</SelectTrigger>
-													<SelectContent>
-														{Array.from({ length: totalChapters }, (_, i) => (
-															<SelectItem value={String(i + 1)}>
-																Chapter {i + 1}
-															</SelectItem>
-														))}
-														{(checkLastChapterStatus ||
-															totalChapters === 0) && (
-															<SelectItem value={String(totalChapters + 1)}>
-																Chapter {totalChapters + 1}
-															</SelectItem>
-														)}
-													</SelectContent>
-												</Select>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-								<form.Field
-									name="document_title"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>
-													Document Title *
-												</FieldLabel>
-												<Input
-													id={field.name}
-													name={field.name}
-													value={field.state.value}
-													onBlur={field.handleBlur}
-													onChange={(e) => field.handleChange(e.target.value)}
-													aria-invalid={isInvalid}
-													placeholder={'Ex. Rationale Draft Review'}
-													autoComplete="off"
-												/>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-								<form.Field
-									name="description"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid} orientation="responsive">
-												<FieldLabel htmlFor={field.name}>
-													Description (Optional)
-												</FieldLabel>
-												<Textarea
-													id={field.name}
-													name={field.name}
-													onBlur={field.handleBlur}
-													onChange={(e) => field.handleChange(e.target.value)}
-													aria-invalid={isInvalid}
-													placeholder={
-														'Brief description about the document...'
-													}
-													autoComplete="off"
-													className="resize-none w-full h-30"
-												/>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-
+								<div className="p-4 rounded-lg bg-muted/30 space-y-2">
+									<div className="flex items-center justify-between">
+										<span className="text-sm font-medium">
+											{document.title_name}
+										</span>
+										<Badge
+											variant="outline"
+											className="bg-red-500/20 border-red-500/40 text-red-500"
+										>
+											<AlertCircle className="h-3 w-3 mr-1" />
+											Needs Revision
+										</Badge>
+									</div>
+									<p className="text-xs text-muted-foreground">
+										Current version: v{document.version} • New version will be:
+										v{document.version + 1}
+									</p>
+								</div>
 								<Field>
-									<FieldLabel>PDF File *</FieldLabel>
+									<FieldLabel>Revised PDF File *</FieldLabel>
 									{selectedFile ? (
 										<div className="flex items-center justify-between p-3 rounded-lg border bg-muted/50">
 											<div className="flex items-center gap-2">
@@ -351,4 +251,4 @@ const DocumentUploadDialog = ({
 	);
 };
 
-export default DocumentUploadDialog;
+export default DocumentRevisionDialog;

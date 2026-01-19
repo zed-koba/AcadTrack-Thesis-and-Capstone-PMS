@@ -4,11 +4,14 @@ import DocumentDashboard from '../components/DocumentDashboard';
 import DocumentContent from '../components/DocumentContent';
 import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/components/Routes/http';
+import { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
+import type { ProponentsDetailsProps } from '@/components/Admin/interface/proponent';
 
 const Document = () => {
 	const [loading, setLoading] = useState(true);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
-
+	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [project, setProject] = useState<ProponentsDocumentsProps | null>(null);
 	const fetchDocuments = async () => {
 		try {
 			const res = await fetch(`${apiStudentUrl}/documents`, {
@@ -22,12 +25,25 @@ const Document = () => {
 			const result = await res.json();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
-				setDocuments(result.document);
+				await setDocuments(result.document);
+				await setProjects(result.projects);
+				setProject(
+					result.projects.find((p: ProponentsDocumentsProps) =>
+						p.details.some((detail) => detail.student.id === 1),
+					) ?? null,
+				);
+				return result.document;
 			}
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setLoading(false);
+
+			// console.log(
+			// 	projects.find((p) =>
+			// 		p.details.some((detail) => detail.student.id === 1),
+			// 	),
+			// );
 		}
 	};
 	useEffect(() => {
@@ -50,7 +66,11 @@ const Document = () => {
 			) : (
 				<>
 					<DocumentDashboard documents={documents} />
-					<DocumentContent documents={documents} refresh={fetchDocuments} />
+					<DocumentContent
+						documents={documents}
+						project={project}
+						refresh={fetchDocuments}
+					/>
 				</>
 			)}
 		</>

@@ -1,7 +1,14 @@
 import { cn } from '@/lib/utils';
-import { Clock, Download, Eye, FileText, MoreVertical } from 'lucide-react';
+import {
+	Clock,
+	Download,
+	Eye,
+	FileText,
+	MoreVertical,
+	User,
+} from 'lucide-react';
 import { useState } from 'react';
-import type { DocumentItemProps } from '../../interface/adviserdocument';
+
 import { Badge } from '@/components/ui/badge';
 import {
 	chapterStatusIcon,
@@ -19,20 +26,29 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
-const DocumentItem = ({
+import DocumentViewDialog from './DocumentViewDialog';
+import type { ChapterItemProps, DocumentProps } from '../interface/document';
+
+const ChapterItem = ({
 	currentDocument,
-	onSelectDocument,
-	selectedDocument,
-	setProjectAdviser,
 	projectAdviser,
 	refresh,
-}: DocumentItemProps) => {
+}: ChapterItemProps) => {
 	const [showVersions, setShowVersions] = useState(true);
-
+	const [selectedDocument, setSelectedDocument] =
+		useState<DocumentProps | null>(null);
+	const [open, setOpen] = useState(false);
 	const checkVersion =
 		currentDocument.versions.length > 0
 			? currentDocument.versions[0]
 			: currentDocument;
+	const handleDialogChange = (isOpen: boolean) => {
+		setOpen(isOpen);
+
+		if (!isOpen) {
+			setSelectedDocument(null);
+		}
+	};
 	return (
 		<div className="space-y-1">
 			<div
@@ -43,8 +59,8 @@ const DocumentItem = ({
 						'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 				)}
 				onClick={() => {
-					onSelectDocument(checkVersion);
-					if (projectAdviser) setProjectAdviser(projectAdviser);
+					setSelectedDocument(checkVersion);
+					setOpen(true);
 				}}
 			>
 				<FileText className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -60,7 +76,10 @@ const DocumentItem = ({
 					<div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
 						<span>{checkVersion.original_name}</span>
 						<span>{formatFileSize(checkVersion.size)}</span>
-						<span>{formatDate(currentDocument.created_at)}</span>
+						<span>{formatDate(checkVersion.created_at)}</span>
+						<span className="flex gap-1 items-center">
+							<User className="w-3.5 h-3.5" /> {checkVersion.student.name}
+						</span>
 					</div>
 				</div>
 
@@ -88,9 +107,13 @@ const DocumentItem = ({
 							View Details
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onClick={() =>
-								downloadDocument(currentDocument.id, checkVersion.original_name)
-							}
+							onClick={(e) => {
+								e.stopPropagation();
+								downloadDocument(
+									currentDocument.id,
+									checkVersion.original_name,
+								);
+							}}
 						>
 							<Download className="h-4 w-4 mr-2" />
 							Download
@@ -118,12 +141,12 @@ const DocumentItem = ({
 								key={version.id}
 								className={cn(
 									'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
-									version === selectedDocument &&
+									version.id === selectedDocument?.id &&
 										'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 								)}
 								onClick={() => {
-									onSelectDocument(version);
-									if (projectAdviser) setProjectAdviser(projectAdviser);
+									setSelectedDocument(version);
+									setOpen(true);
 								}}
 							>
 								<FileText className="h-3 w-3 text-muted-foreground shrink-0" />
@@ -141,8 +164,12 @@ const DocumentItem = ({
 											v{version.version}
 										</Badge>
 									</div>
-									<span className="text-xs text-muted-foreground">
+									<span className="text-xs text-muted-foreground flex items-center gap-3">
 										{formatDateWithTime(version.created_at)}
+										<span className="flex gap-1 items-center">
+											<User className="w-3.5 h-3.5" />{' '}
+											{checkVersion.student.name}
+										</span>
 									</span>
 								</div>
 								<Badge className={cn('gap-1 text-xs capitalize', vStatus)}>
@@ -169,8 +196,8 @@ const DocumentItem = ({
 								'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 						)}
 						onClick={() => {
-							onSelectDocument(currentDocument);
-							if (projectAdviser) setProjectAdviser(projectAdviser);
+							setSelectedDocument(currentDocument);
+							setOpen(true);
 						}}
 					>
 						<FileText className="h-3 w-3 text-muted-foreground shrink-0" />
@@ -188,8 +215,11 @@ const DocumentItem = ({
 									v{currentDocument.version}
 								</Badge>
 							</div>
-							<span className="text-xs text-muted-foreground">
+							<span className="text-xs text-muted-foreground flex items-center gap-3">
 								{formatDateWithTime(currentDocument.created_at)}
+								<span className="flex gap-1 items-center">
+									<User className="w-3.5 h-3.5" /> {checkVersion.student.name}
+								</span>
 							</span>
 						</div>
 						<Badge
@@ -217,8 +247,17 @@ const DocumentItem = ({
 					</div>
 				</div>
 			)}
+			{selectedDocument && (
+				<DocumentViewDialog
+					document={selectedDocument}
+					open={open}
+					projectAdviser={projectAdviser}
+					setOpen={handleDialogChange}
+					selectedDocumentId={1}
+				/>
+			)}
 		</div>
 	);
 };
 
-export default DocumentItem;
+export default ChapterItem;

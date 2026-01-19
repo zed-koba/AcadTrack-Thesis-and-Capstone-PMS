@@ -19,13 +19,13 @@ export type ViewDocumentsProps = {
 	onSelectDocument: (document: DocumentProps) => void;
 	selectedDocument: DocumentProps | null;
 	setProjectAdviser: (adviser: AdviserProps) => void;
-	projectAdviser: AdviserProps;
+	projectAdviser: AdviserProps | null;
 	refresh?: () => void;
 };
 
 export type DocumentItemProps = {
 	currentDocument: DocumentProps;
-	projectAdviser: AdviserProps;
+	projectAdviser: AdviserProps | null;
 	onSelectDocument: (document: DocumentProps) => void;
 	selectedDocument: DocumentProps | null;
 	setProjectAdviser: (adviser: AdviserProps) => void;
@@ -80,9 +80,10 @@ export type ProjectCollapseProps = {
 };
 export type ViewDetailsProps = {
 	selectedDocumentId: number;
-	documents: DocumentProps[];
+	document: DocumentProps;
 	open: boolean;
 	setOpen: (open: boolean) => void;
+	projectAdviser: AdviserProps | null;
 	refresh?: () => void;
 };
 

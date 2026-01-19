@@ -15,9 +15,10 @@ class DocumentsController extends Controller
     public function getDocuments()
     {
         $document = Documents::with(
-            'comments'
+            'comments',
+            'student:id,student_id,name'
         )->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with('details.student:id,student_id,name','adviser')->orderBy('created_at', 'asc')->get();
+        $projects = Proponents::with('details.student:id,student_id,name', 'adviser')->orderBy('created_at', 'asc')->get();
         return response()->json([
             'status' => 200,
             'document' => $document,
@@ -31,6 +32,7 @@ class DocumentsController extends Controller
             'title_name' => 'required|string',
             'file' => 'required|file|mimes:pdf|max:10240',
             'parent_document_id' => 'nullable|string|exists:documents,id',
+            'chapter' => 'integer|required'
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -53,11 +55,11 @@ class DocumentsController extends Controller
                 $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
                     ->max('version');
                 $version = ($latestVersion ?? 1) + 1;
-                $getDocument = Documents::find($request->parent_document_id)->update(['status' => 'pending']);
+                
             }
 
             $document = Documents::create([
-                'student_id' => 1,
+                'student_id' => 2,
                 'title_name' => $request->title_name,
                 'description' => $request->description,
                 'original_name' => $file->getClientOriginalName(),
@@ -67,13 +69,15 @@ class DocumentsController extends Controller
                 'size' => $file->getSize(),
                 'parent_document_id' => $parentDocumentId,
                 'version' => $version,
+                'chapter' => $request->chapter,
                 'status' => $status,
-                ]);
-            DB::commit();
+            ]);
 
+            DB::commit();
             return response()->json([
                 'status' => 201,
                 'message' => 'Document uploaded succesfully',
+                
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
