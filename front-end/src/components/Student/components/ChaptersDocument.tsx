@@ -29,7 +29,14 @@ const ChaptersDocument = ({
 			: chapter.documents[0].versions[0];
 	return (
 		<Collapsible open={isExpanded} onOpenChange={onToggle}>
-			<div className="rounded-lg border border-border/50 bg-background overflow-hidden">
+			<div
+				className={cn(
+					'rounded-lg border border-border/50 bg-background overflow-hidden',
+					document.status === 'need revision'
+						? 'border-red-500/50'
+						: 'border-border/50',
+				)}
+			>
 				<CollapsibleTrigger asChild>
 					<div className="flex items-center justify-between">
 						<button className="w-full flex items-center gap-3 p-3 transition-colors text-left cursor-pointer">

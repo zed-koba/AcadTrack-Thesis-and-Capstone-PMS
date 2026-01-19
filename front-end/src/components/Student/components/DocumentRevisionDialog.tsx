@@ -50,10 +50,13 @@ const DocumentRevisionDialog = ({
 			formData.append('file', selectedFile);
 			formData.append(
 				'title_name',
-				document?.title_name + '_v' + (document?.version + 1),
+				'Chapter ' + document.chapter + '_v' + (document?.version + 1),
 			);
 			formData.append('description', document?.description ?? '');
-			formData.append('parent_document_id', String(document.id));
+			formData.append(
+				'parent_document_id',
+				String(document.parent_document_id),
+			);
 			formData.append('chapter', String(document?.chapter));
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {

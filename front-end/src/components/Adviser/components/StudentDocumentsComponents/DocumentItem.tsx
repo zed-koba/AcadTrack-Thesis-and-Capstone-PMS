@@ -1,5 +1,15 @@
 import { cn } from '@/lib/utils';
-import { Clock, Download, Eye, FileText, MoreVertical } from 'lucide-react';
+import {
+	Calendar,
+	Clock,
+	Download,
+	Eye,
+	File,
+	FileText,
+	MessageCircle,
+	MoreVertical,
+	User,
+} from 'lucide-react';
 import { useState } from 'react';
 import type { DocumentItemProps } from '../../interface/adviserdocument';
 import { Badge } from '@/components/ui/badge';
@@ -58,9 +68,21 @@ const DocumentItem = ({
 						</Badge>
 					</div>
 					<div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-						<span>{checkVersion.original_name}</span>
-						<span>{formatFileSize(checkVersion.size)}</span>
-						<span>{formatDate(currentDocument.created_at)}</span>
+						<span className="flex gap-1 items-center">
+							{checkVersion.original_name}
+						</span>
+						<span className="flex gap-1 items-center">
+							<MessageCircle className="w-3.5 h-3.5" />{' '}
+							{checkVersion.comments.length} comment{' '}
+							{checkVersion.comments.length > 1 ? 's' : ''}
+						</span>
+						<span className="flex gap-1 items-center">
+							<Calendar className="w-3.5 h-3.5" />{' '}
+							{formatDate(checkVersion.created_at)}
+						</span>
+						<span className="flex gap-1 items-center">
+							<User className="w-3.5 h-3.5" /> {checkVersion.student.name}
+						</span>
 					</div>
 				</div>
 
@@ -88,9 +110,13 @@ const DocumentItem = ({
 							View Details
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onClick={() =>
-								downloadDocument(currentDocument.id, checkVersion.original_name)
-							}
+							onClick={(e) => {
+								downloadDocument(
+									currentDocument.id,
+									checkVersion.original_name,
+								);
+								e.stopPropagation();
+							}}
 						>
 							<Download className="h-4 w-4 mr-2" />
 							Download
@@ -141,8 +167,19 @@ const DocumentItem = ({
 											v{version.version}
 										</Badge>
 									</div>
-									<span className="text-xs text-muted-foreground">
-										{formatDateWithTime(version.created_at)}
+									<span className="text-xs text-muted-foreground flex items-center gap-3">
+										<span className="flex gap-1 items-center">
+											{formatDateWithTime(version.created_at)}
+										</span>
+										<span className="flex gap-1 items-center">
+											<MessageCircle className="w-3.5 h-3.5" />
+											{version.comments.length} comment
+											{version.comments.length > 1 ? 's' : ''}
+										</span>
+										<span className="flex gap-1 items-center">
+											<User className="w-3.5 h-3.5" />{' '}
+											{checkVersion.student.name}
+										</span>
 									</span>
 								</div>
 								<Badge className={cn('gap-1 text-xs capitalize', vStatus)}>
@@ -153,9 +190,10 @@ const DocumentItem = ({
 									variant="ghost"
 									size="icon"
 									className="h-6 w-6"
-									onClick={() =>
-										downloadDocument(version.id, version.original_name)
-									}
+									onClick={(e) => {
+										downloadDocument(version.id, version.original_name);
+										e.stopPropagation();
+									}}
 								>
 									<Download className="h-3 w-3" />
 								</Button>
@@ -188,8 +226,19 @@ const DocumentItem = ({
 									v{currentDocument.version}
 								</Badge>
 							</div>
-							<span className="text-xs text-muted-foreground">
-								{formatDateWithTime(currentDocument.created_at)}
+							<span className="text-xs text-muted-foreground flex items-center gap-3">
+								<span className="flex gap-1 items-center">
+									{formatDateWithTime(currentDocument.created_at)}
+								</span>
+								<span className="flex gap-1 items-center">
+									<MessageCircle className="w-3.5 h-3.5" />
+									{currentDocument.comments.length} comment
+									{currentDocument.comments.length > 1 ? 's' : ''}
+								</span>
+								<span className="flex gap-1 items-center">
+									<User className="w-3.5 h-3.5" />{' '}
+									{currentDocument.student.name}
+								</span>
 							</span>
 						</div>
 						<Badge
@@ -205,12 +254,13 @@ const DocumentItem = ({
 							variant="ghost"
 							size="icon"
 							className="h-6 w-6"
-							onClick={() =>
+							onClick={(e) => {
 								downloadDocument(
 									currentDocument.id,
 									currentDocument.original_name,
-								)
-							}
+								);
+								e.stopPropagation();
+							}}
 						>
 							<Download className="h-3 w-3" />
 						</Button>

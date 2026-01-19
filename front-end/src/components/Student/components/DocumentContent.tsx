@@ -92,8 +92,8 @@ const DocumentContent = ({
 											Documents Chapters
 										</CardTitle>
 										<p className="text-sm text-muted-foreground mt-0.5">
-											{chaptersGrouped.length} chapters • {documents.length}{' '}
-											total submitted documents
+											{filteredChaptersGrouped.length} chapters •{' '}
+											{filterDocuments.length} total submitted documents
 										</p>
 									</div>
 								</div>

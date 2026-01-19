@@ -1,9 +1,12 @@
 import { cn } from '@/lib/utils';
 import {
+	Calendar,
 	Clock,
 	Download,
 	Eye,
+	File,
 	FileText,
+	MessageCircle,
 	MoreVertical,
 	User,
 } from 'lucide-react';
@@ -15,7 +18,6 @@ import {
 	downloadDocument,
 	formatDate,
 	formatDateWithTime,
-	formatFileSize,
 	statusColor,
 } from '@/components/functions/functions';
 import {
@@ -74,9 +76,18 @@ const ChapterItem = ({
 						</Badge>
 					</div>
 					<div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-						<span>{checkVersion.original_name}</span>
-						<span>{formatFileSize(checkVersion.size)}</span>
-						<span>{formatDate(checkVersion.created_at)}</span>
+						<span className="flex gap-1 items-center">
+							{checkVersion.original_name}
+						</span>
+						<span className="flex gap-1 items-center">
+							<MessageCircle className="w-3.5 h-3.5" />{' '}
+							{checkVersion.comments.length} comment{' '}
+							{checkVersion.comments.length > 1 ? 's' : ''}
+						</span>
+						<span className="flex gap-1 items-center">
+							<Calendar className="w-3.5 h-3.5" />{' '}
+							{formatDate(checkVersion.created_at)}
+						</span>
 						<span className="flex gap-1 items-center">
 							<User className="w-3.5 h-3.5" /> {checkVersion.student.name}
 						</span>
@@ -119,7 +130,12 @@ const ChapterItem = ({
 							Download
 						</DropdownMenuItem>
 						{currentDocument.versions.length > 0 && (
-							<DropdownMenuItem onClick={() => setShowVersions(!showVersions)}>
+							<DropdownMenuItem
+								onClick={(e) => {
+									setShowVersions(!showVersions);
+									e.stopPropagation();
+								}}
+							>
 								<Clock className="h-4 w-4 mr-2" />
 								{showVersions ? 'Hide' : 'Show'} Version History (
 								{currentDocument.versions.length})
@@ -165,7 +181,14 @@ const ChapterItem = ({
 										</Badge>
 									</div>
 									<span className="text-xs text-muted-foreground flex items-center gap-3">
-										{formatDateWithTime(version.created_at)}
+										<span className="flex gap-1 items-center">
+											{formatDateWithTime(version.created_at)}
+										</span>
+										<span className="flex gap-1 items-center">
+											<MessageCircle className="w-3.5 h-3.5" />
+											{version.comments.length} comment
+											{version.comments.length > 1 ? 's' : ''}
+										</span>
 										<span className="flex gap-1 items-center">
 											<User className="w-3.5 h-3.5" />{' '}
 											{checkVersion.student.name}
@@ -216,9 +239,17 @@ const ChapterItem = ({
 								</Badge>
 							</div>
 							<span className="text-xs text-muted-foreground flex items-center gap-3">
-								{formatDateWithTime(currentDocument.created_at)}
 								<span className="flex gap-1 items-center">
-									<User className="w-3.5 h-3.5" /> {checkVersion.student.name}
+									{formatDateWithTime(currentDocument.created_at)}
+								</span>
+								<span className="flex gap-1 items-center">
+									<MessageCircle className="w-3.5 h-3.5" />
+									{currentDocument.comments.length} comment
+									{currentDocument.comments.length > 1 ? 's' : ''}
+								</span>
+								<span className="flex gap-1 items-center">
+									<User className="w-3.5 h-3.5" />{' '}
+									{currentDocument.student.name}
 								</span>
 							</span>
 						</div>

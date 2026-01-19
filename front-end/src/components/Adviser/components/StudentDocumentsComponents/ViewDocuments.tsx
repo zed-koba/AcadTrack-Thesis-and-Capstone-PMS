@@ -27,10 +27,14 @@ const ViewDocuments = ({
 	refresh,
 }: ViewDocumentsProps) => {
 	const [open, setOpen] = useState(false);
+	const status =
+		chapter.documents[0].versions.length === 0
+			? chapter.documents[0]?.status
+			: chapter.documents[0].versions[0].status;
 
 	return (
 		<Collapsible open={isExpanded} onOpenChange={onToggle}>
-			<div className="rounded-lg border border-border/50 bg-background overflow-hidden">
+			<div className={cn('rounded-lg border bg-background overflow-hidden')}>
 				<CollapsibleTrigger asChild>
 					<button className="w-full flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors text-left cursor-pointer">
 						<div className="flex items-center gap-2">
@@ -52,25 +56,10 @@ const ViewDocuments = ({
 								</span>
 								<Badge
 									variant="outline"
-									className={cn(
-										'text-xs capitalize',
-										statusColor[
-											chapter.documents[0].versions.length === 0
-												? chapter.documents[0]?.status
-												: chapter.documents[0].versions[0].status
-										],
-									)}
+									className={cn('text-xs capitalize', statusColor[status])}
 								>
-									{
-										chapterStatusIcon[
-											chapter.documents[0].versions.length === 0
-												? chapter.documents[0]?.status
-												: chapter.documents[0].versions[0].status
-										]
-									}
-									{chapter.documents[0].versions.length === 0
-										? chapter.documents[0]?.status
-										: chapter.documents[0].versions[0].status}
+									{chapterStatusIcon[status]}
+									{status}
 								</Badge>
 							</div>
 							<p className="text-xs text-muted-foreground mt-0.5">
