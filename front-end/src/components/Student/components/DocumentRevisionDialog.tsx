@@ -60,7 +60,7 @@ const DocumentRevisionDialog = ({
 			formData.append('description', document?.description ?? '');
 			formData.append(
 				'parent_document_id',
-				String(document.parent_document_id),
+				String(document.parent_document_id === null ? document.id : document.parent_document_id),
 			);
 			formData.append('chapter', String(document?.chapter));
 			try {
@@ -198,11 +198,10 @@ const DocumentRevisionDialog = ({
 										</div>
 									) : (
 										<div
-											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-												dragActive
-													? 'border-primary bg-primary/5'
-													: 'border-muted-foreground/25'
-											}`}
+											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
+												? 'border-primary bg-primary/5'
+												: 'border-muted-foreground/25'
+												}`}
 											onDragEnter={handleDrag}
 											onDragLeave={handleDrag}
 											onDragOver={handleDrag}
