@@ -94,6 +94,10 @@ class StudentsController extends Controller
                 $role = Role::find($request->role_id);
                 $role->increment('assigned');
             }
+            if($request->program_id != null) {
+                $program = Programs::find($request->program_id);
+                $program->increment('students_count');
+            }
             DB::commit();
             return response()->json([
                 'status' => 201,

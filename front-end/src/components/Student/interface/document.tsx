@@ -46,7 +46,10 @@ export type DocumentUploadProps = {
 };
 export type DocumentRevisionProps = {
 	document: DocumentProps;
+	open: boolean;
+	setOpen: (open: boolean) => void;
 	refresh?: () => void;
+	setSubmitRevision: (submitRevision: boolean) => void;
 };
 
 export type DocumentContentProps = {
@@ -60,6 +63,7 @@ export type DocumentCardProps = {
 };
 export type DocumentDashboardProps = {
 	documents: DocumentProps[];
+	project: ProponentsDocumentsProps | null;
 };
 
 export type ChapterItemProps = {

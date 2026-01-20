@@ -51,6 +51,7 @@ const ChapterItem = ({
 			setSelectedDocument(null);
 		}
 	};
+	const checkIfVersionLatest = selectedDocument === checkVersion;
 	return (
 		<div className="space-y-1">
 			<div
@@ -285,6 +286,8 @@ const ChapterItem = ({
 					projectAdviser={projectAdviser}
 					setOpen={handleDialogChange}
 					selectedDocumentId={1}
+					refresh={refresh}
+					checkIfLatestVersion={checkIfVersionLatest}
 				/>
 			)}
 		</div>

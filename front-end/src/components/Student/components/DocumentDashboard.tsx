@@ -1,29 +1,43 @@
 import { cn } from '@/lib/utils';
 import {
+	BookOpen,
 	CircleCheckBig,
 	Clock,
 	Eye,
 	FileExclamationPoint,
 	FileText,
+	RotateCcw,
 } from 'lucide-react';
 import type { DocumentDashboardProps } from '../interface/document';
+import { studentId } from '@/components/functions/functions';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
-	const pendingLength = documents.filter((d) => d.status === 'pending').length;
-	const underReviewLength = documents.filter(
-		(d) => d.status === 'under review'
+const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
+	const studentIds = project?.details.map((v) => v.student_id);
+	const filterStudent = documents.filter((d) =>
+		studentIds?.includes(d.student_id),
+	);
+	const pendingLength = filterStudent.filter(
+		(d) => d.status === 'pending',
 	).length;
-	const needRevisionLength = documents.filter(
-		(d) => d.status === 'need revision'
+	const underReviewLength = filterStudent.filter(
+		(d) => d.status === 'under review',
 	).length;
-	const approvedLength = documents.filter(
-		(d) => d.status === 'approved'
+	const needRevisionLength = filterStudent.filter(
+		(d) => d.status === 'need revision',
+	).length;
+	const approvedLength = filterStudent.filter(
+		(d) => d.status === 'approved',
+	).length;
+	const revisedLength = filterStudent.filter(
+		(d) => d.status === 'revised',
 	).length;
 	const dashboard = [
 		{
 			color: 'bg-blue-500/20',
 			icon: <FileText className="w-5 h-5 text-blue-500" />,
-			value: documents.length,
+			value: filterStudent.length,
 			label: 'Total Documents',
 		},
 		{
@@ -45,6 +59,12 @@ const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 			label: 'Need Revision',
 		},
 		{
+			color: 'bg-teal-500/10',
+			icon: <RotateCcw className="w-5 h-5 text-teal-500" />,
+			value: revisedLength,
+			label: 'Revised',
+		},
+		{
 			color: 'bg-green-500/10',
 			icon: <CircleCheckBig className="w-5 h-5 text-green-500" />,
 			value: approvedLength,
@@ -53,8 +73,8 @@ const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 	];
 	return (
 		<>
-			<div className="flex flex-col gap-5 mt-5 w-full text-white">
-				<section className="grid lg:grid-cols-5 sm:grid-cols-2 gap-2 mb-6">
+			<div className="flex flex-col gap-3 mt-5 w-full text-white">
+				<section className="grid lg:grid-cols-6 sm:grid-cols-2 gap-2">
 					{dashboard.map((board) => (
 						<div
 							key={board.label}
@@ -63,7 +83,7 @@ const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 							<div
 								className={cn(
 									'flex justify-center items-center p-3 rounded-md',
-									board.color
+									board.color,
 								)}
 							>
 								{board.icon}
@@ -77,6 +97,33 @@ const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
 						</div>
 					))}
 				</section>
+				<Card className="mb-6">
+					<CardContent className="px-4 py-1">
+						<div className="flex items-start gap-4">
+							<div className="p-3 rounded-xl bg-primary/10">
+								<BookOpen className="h-6 w-6 text-primary" />
+							</div>
+							<div className="flex-1">
+								<h2 className="font-semibold text-lg">{project?.title}</h2>
+								<div className="flex items-center gap-4 text-sm text-muted-foreground">
+									<span>
+										Adviser:{' '}
+										<strong className="text-white">
+											{project?.adviser.name}
+										</strong>
+									</span>
+									<span>•</span>
+									<span>{project?.details[0].student.program.name}</span>
+									<span>•</span>
+									<Badge variant="secondary">
+										{project?.details.length} member
+										{project?.details.length !== 1 ? 's' : ''}
+									</Badge>
+								</div>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
 			</div>
 		</>
 	);

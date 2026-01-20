@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import ChapterItem from './ChapterItem';
 import type { ChaptersProps } from '../interface/document';
 import DocumentRevisionDialog from './DocumentRevisionDialog';
+import { useState } from 'react';
 
 const ChaptersDocument = ({
 	chapter,
@@ -23,6 +24,7 @@ const ChaptersDocument = ({
 	projectAdviser,
 	refresh,
 }: ChaptersProps) => {
+	const [revisionOpen, setRevisionOpen] = useState(false);
 	const document =
 		chapter.documents[0].versions.length === 0
 			? chapter.documents[0]
@@ -33,7 +35,7 @@ const ChaptersDocument = ({
 				className={cn(
 					'rounded-lg border border-border/50 bg-background overflow-hidden',
 					document.status === 'need revision'
-						? 'border-red-500/50'
+						? 'border-red-500/50 shadow-sm shadow-red-500/50'
 						: 'border-border/50',
 				)}
 			>
@@ -77,7 +79,13 @@ const ChaptersDocument = ({
 						</button>
 						<div className="p-4 pr-5" onClick={(e) => e.stopPropagation()}>
 							{document.status === 'need revision' && (
-								<DocumentRevisionDialog document={document} refresh={refresh} />
+								<DocumentRevisionDialog
+									document={document}
+									open={revisionOpen}
+									setOpen={setRevisionOpen}
+									refresh={refresh}
+									setSubmitRevision={setRevisionOpen}
+								/>
 							)}
 						</div>
 					</div>

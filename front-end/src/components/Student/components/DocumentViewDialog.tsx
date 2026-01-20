@@ -4,50 +4,25 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import type { DocumentViewDialogProps } from '../interface/document';
-import {
-	FileText,
-	MessageSquare,
-	History,
-	Download,
-	FileCheck,
-	Calendar,
-	User,
-	Clock,
-	AlertCircle,
-	Upload,
-	FileWarning,
-	X,
-	Hash,
-} from 'lucide-react';
+
+import { FileText, MessageSquare, User } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+
 import { cn } from '@/lib/utils';
 import {
-	downloadDocument,
+	chapterStatusIcon,
 	formatDate,
 	formatDateWithTime,
-	formatFileSize,
 	statusColor,
 } from '@/components/functions/functions';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { apiAdviserUrl, apiStudentUrl } from '@/components/Routes/http';
-import type {
-	DocumentCommentsProps,
-	ViewDetailsProps,
-} from '@/components/Adviser/interface/adviserdocument';
+import { useState } from 'react';
+
+import type { ViewDetailsProps } from '@/components/Adviser/interface/adviserdocument';
 import { Badge } from '@/components/ui/badge';
-import { Spinner } from '@/components/ui/spinner';
-import { toast } from 'sonner';
+import DocumentRevisionDialog from './DocumentRevisionDialog';
 
 const DocumentViewDialog = ({
 	document,
@@ -56,80 +31,17 @@ const DocumentViewDialog = ({
 	open,
 	setOpen,
 	refresh,
+	checkIfLatestVersion,
 }: ViewDetailsProps) => {
 	const [activeTab, setActiveTab] = useState('comments');
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
-	const [loading, setLoading] = useState(false);
-	const [uploadLoading, setuploadLoading] = useState(false);
-	const isDisabled: boolean = loading || Boolean(!selectedFile);
-	const uploadRevision = async () => {
-		if (!selectedFile) {
-			toast.error('Please select a PDF File');
-			return;
-		}
-
-		setuploadLoading(true);
-		const formData = new FormData();
-		formData.append('file', selectedFile);
-		formData.append('title_name', '');
-		formData.append('description', document?.description ?? '');
-		formData.append('parent_document_id', '');
-		try {
-			const res = await fetch(`${apiStudentUrl}/documents/add`, {
-				method: 'POST',
-				body: formData,
-			});
-			const result = await res.json();
-			if (result.status == 422) {
-				const errors = result.errors as Record<string, string[]>;
-				Object.values(errors).forEach((errorMessages) =>
-					errorMessages.forEach((message) => {
-						toast.error(message);
-					}),
-				);
-				return;
-			} else if (result.status == 500) {
-				toast.error(result.message);
-				console.log(result.error);
-				return;
-			}
-			if (!res.ok) {
-				console.log(result.status);
-				console.log('Failed to fetch data ' + JSON.stringify(formData));
-				return;
-			}
-			if (result.status == 201) {
-				setSelectedFile(null);
-				toast.success(result.message);
-				setOpen(false);
-				refresh?.();
-			}
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setuploadLoading(false);
-		}
-	};
-	const fileInputRef = useRef<HTMLInputElement | null>(null);
+	const [revisionOpen, setRevisionOpen] = useState(false);
+	const [submitRevision, setSubmitRevision] = useState(false);
 	if (!document) return null;
+	const handleSetSubmit = (submitRevision: boolean) => {
+		setSubmitRevision(submitRevision);
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files[0]) {
-			const file = e.target.files[0];
-			if (file.type === 'application/pdf') {
-				setSelectedFile(file);
-			} else {
-				toast.error('Invalid file type. Upload a PDF file');
-			}
-		}
+		if (!submitRevision) setOpen(false);
 	};
-	const handleButtonClick = () => {
-		fileInputRef.current?.click();
-	};
-	const removeFile = () => {
-		setSelectedFile(null);
-	};
-
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
@@ -148,6 +60,16 @@ const DocumentViewDialog = ({
 									</p>
 								</div>
 							</div>
+							<Badge
+								variant="outline"
+								className={cn(
+									'bg-primary/10 text-primary border-primary/20 capitalize',
+									statusColor[document.status],
+								)}
+							>
+								{chapterStatusIcon[document.status]}
+								{document.status}
+							</Badge>
 						</div>
 					</DialogHeader>
 					<Tabs
@@ -220,24 +142,14 @@ const DocumentViewDialog = ({
 						<Button variant="outline" onClick={() => setOpen(false)}>
 							Close
 						</Button>
-						{document.status === 'need revision' && (
-							<Button
-								onClick={uploadRevision}
-								disabled={isDisabled}
-								variant="edit"
-							>
-								{uploadLoading ? (
-									<>
-										<Spinner className="h-4 w-4 mr-2 animate-spin" />
-										Uploading...
-									</>
-								) : (
-									<>
-										<Upload className="h-4 w-4 mr-2" />
-										Upload Revision
-									</>
-								)}
-							</Button>
+						{document.status === 'need revision' && checkIfLatestVersion && (
+							<DocumentRevisionDialog
+								document={document}
+								refresh={refresh}
+								open={revisionOpen}
+								setOpen={setRevisionOpen}
+								setSubmitRevision={handleSetSubmit}
+							/>
 						)}
 					</div>
 				</DialogContent>

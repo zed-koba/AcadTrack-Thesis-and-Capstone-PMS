@@ -18,7 +18,7 @@ class DocumentsController extends Controller
             'comments',
             'student:id,student_id,name'
         )->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with('details.student:id,student_id,name', 'adviser')->orderBy('created_at', 'asc')->get();
+        $projects = Proponents::with('details.student:id,student_id,program_id,name','details.student.program:id,name,code','adviser')->orderBy('created_at', 'asc')->get();
         return response()->json([
             'status' => 200,
             'document' => $document,
@@ -55,11 +55,11 @@ class DocumentsController extends Controller
                 $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
                     ->max('version');
                 $version = ($latestVersion ?? 1) + 1;
-                
+                $currentDoc = Documents::findOrFail( $request->currentId)->update(['status' => 'revised']);
             }
 
             $document = Documents::create([
-                'student_id' => 2,
+                'student_id' => $request->student_id,
                 'title_name' => $request->title_name,
                 'description' => $request->description,
                 'original_name' => $file->getClientOriginalName(),

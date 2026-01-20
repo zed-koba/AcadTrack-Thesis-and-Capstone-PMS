@@ -1,7 +1,13 @@
 import { toast } from 'sonner';
 import { apiStudentUrl } from '../Routes/http';
 import type { JSX } from 'react/jsx-runtime';
-import { CircleCheckBig, Clock, Eye, FileExclamationPoint } from 'lucide-react';
+import {
+	CircleCheckBig,
+	Clock,
+	Eye,
+	FileExclamationPoint,
+	RefreshCcw,
+} from 'lucide-react';
 import type { ChapterDocumentsProps } from '../Adviser/interface/adviserdocument';
 
 export function formatDate(dateString: string) {
@@ -68,12 +74,14 @@ export const statusColor: Record<string, string> = {
 	'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
 	'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
 	'general': 'bg-primary/20 border-primary/40 text-primary',
+	'revised': 'bg-teal-500/20 border-teal-500/20 text-teal-500',
 };
 export const chapterStatusIcon: Record<string, JSX.Element> = {
 	pending: <Clock />,
 	'under review': <Eye />,
 	'need revision': <FileExclamationPoint />,
 	'approved': <CircleCheckBig />,
+	'revised': <RefreshCcw />,
 };
 
 export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
@@ -86,3 +94,5 @@ export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
 
 	return doc.versions.length > 0 ? doc.versions[0].status : doc.status;
 };
+
+export const studentId = 2;

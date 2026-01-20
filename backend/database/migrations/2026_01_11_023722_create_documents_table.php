@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('title_name');
             $table->string('stored_name');
-            $table->enum('status', ['pending', 'under review', 'need revision', 'approved'])->default('pending');
+            $table->enum('status', ['pending', 'under review', 'need revision', 'approved', 'revised'])->default('pending');
             $table->string('path');
             $table->string('mime_type', 100);
             $table->unsignedBigInteger('size');

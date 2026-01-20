@@ -52,6 +52,11 @@ export type DetailsDocumentsProps = {
 		name: string;
 		student_id: string;
 		id: number;
+		program: {
+			id: number;
+			name: string;
+			code: string;
+		};
 	};
 };
 export type ProjectWithStatus = ProponentsDocumentsProps & { status?: string };
@@ -85,6 +90,7 @@ export type ViewDetailsProps = {
 	setOpen: (open: boolean) => void;
 	projectAdviser: AdviserProps | null;
 	refresh?: () => void;
+	checkIfLatestVersion: boolean;
 };
 
 export type CommentsProps = {

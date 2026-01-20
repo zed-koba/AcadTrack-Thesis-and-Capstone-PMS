@@ -6,12 +6,14 @@ import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/components/Routes/http';
 import { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 import type { ProponentsDetailsProps } from '@/components/Admin/interface/proponent';
+import { studentId } from '@/components/functions/functions';
 
 const Document = () => {
 	const [loading, setLoading] = useState(true);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
 	const [project, setProject] = useState<ProponentsDocumentsProps | null>(null);
+
 	const fetchDocuments = async () => {
 		try {
 			const res = await fetch(`${apiStudentUrl}/documents`, {
@@ -29,7 +31,7 @@ const Document = () => {
 				await setProjects(result.projects);
 				setProject(
 					result.projects.find((p: ProponentsDocumentsProps) =>
-						p.details.some((detail) => detail.student.id === 1),
+						p.details.some((detail) => detail.student.id === studentId),
 					) ?? null,
 				);
 				return result.document;
@@ -49,6 +51,7 @@ const Document = () => {
 	useEffect(() => {
 		fetchDocuments();
 	}, []);
+
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
@@ -65,7 +68,7 @@ const Document = () => {
 				</div>
 			) : (
 				<>
-					<DocumentDashboard documents={documents} />
+					<DocumentDashboard documents={documents} project={project} />
 					<DocumentContent
 						documents={documents}
 						project={project}

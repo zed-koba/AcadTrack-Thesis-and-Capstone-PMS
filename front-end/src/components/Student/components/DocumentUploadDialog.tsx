@@ -25,6 +25,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { studentId } from '@/components/functions/functions';
 
 const uploadSchema = z.object({
 	chapter: z.number().min(1, 'Select a chapter'),
@@ -64,6 +65,7 @@ const DocumentUploadDialog = ({
 
 			const formData = new FormData();
 			formData.append('file', selectedFile);
+			formData.append('student_id', String(studentId));
 			formData.append('chapter', String(value.chapter));
 			formData.append('title_name', value.document_title);
 			formData.append('description', value.description ?? '');

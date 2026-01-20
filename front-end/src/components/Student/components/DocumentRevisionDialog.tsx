@@ -18,14 +18,17 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { apiStudentUrl } from '@/components/Routes/http';
 import { Badge } from '@/components/ui/badge';
+import { studentId } from '@/components/functions/functions';
 
 const uploadSchema = z.object({});
 
 const DocumentRevisionDialog = ({
 	document,
+	open,
+	setOpen,
 	refresh,
+	setSubmitRevision,
 }: DocumentRevisionProps) => {
-	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -48,6 +51,8 @@ const DocumentRevisionDialog = ({
 			setLoading(true);
 			const formData = new FormData();
 			formData.append('file', selectedFile);
+			formData.append('student_id', String(studentId));
+			formData.append('currentId', String(document.id));
 			formData.append(
 				'title_name',
 				'Chapter ' + document.chapter + '_v' + (document?.version + 1),
@@ -75,6 +80,7 @@ const DocumentRevisionDialog = ({
 				} else if (result.status == 500) {
 					toast.error(result.message);
 					console.log(result.error);
+
 					return;
 				}
 				if (!res.ok) {
@@ -86,6 +92,7 @@ const DocumentRevisionDialog = ({
 					setSelectedFile(null);
 					toast.success(result.message);
 					setOpen(false);
+					setSubmitRevision(false);
 					refresh?.();
 				}
 			} catch (error) {
@@ -237,11 +244,11 @@ const DocumentRevisionDialog = ({
 									<Button
 										className="cursor-pointer"
 										type="submit"
-										variant="primary"
+										variant="edit"
 										disabled={loading}
 									>
 										{loading ? <Spinner /> : ''}
-										{loading ? 'Uploading...' : 'Upload Document'}
+										{loading ? 'Submitting...' : 'Submit Revision'}
 										{loading ? '' : <Upload />}
 									</Button>
 								</div>

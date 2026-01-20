@@ -1,4 +1,4 @@
-import { Book, Folder, Search } from 'lucide-react';
+import { Book, Folder, Info, Search } from 'lucide-react';
 import DocumentCard from './ChaptersDocument';
 import DocumentUploadDialog from './DocumentUploadDialog';
 import type { DocumentContentProps } from '../interface/document';
@@ -8,16 +8,17 @@ import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ChaptersDocument from './ChaptersDocument';
-import { getProjectStatus } from '@/components/functions/functions';
+import { getProjectStatus, studentId } from '@/components/functions/functions';
 
 const DocumentContent = ({
 	documents,
 	project,
 	refresh,
 }: DocumentContentProps) => {
+	const studentIds = project?.details.map((v) => v.student_id);
 	const filterDocuments = useMemo(() => {
-		return documents.filter((doc) => doc.student_id === 2);
-	}, [documents]);
+		return documents.filter((doc) => studentIds?.includes(doc.student_id));
+	}, [documents, studentIds]);
 	const [expandedChapters, setExpandedChapters] = useState<Set<number>>(
 		new Set(),
 	);
@@ -76,6 +77,16 @@ const DocumentContent = ({
 	};
 	return (
 		<>
+			{getProjectStatus(filteredChaptersGrouped) === 'need revision' && (
+				<div className="flex items-center gap-3 p-4 mb-6 rounded-lg bg-red-500/10 border border-red-500/20">
+					<Info className="h-5 w-5 text-red-500 shrink-0" />
+					<p className="text-sm text-white">
+						<strong className="text-red-600">1 document </strong> need revision.
+						Click the "Submit Revision" button on the document to upload a
+						revised version.
+					</p>
+				</div>
+			)}
 			<section className="w-full h-auto">
 				<div
 					className={cn('relative text-white overflow-hidden  md:max-w-none')}
@@ -99,9 +110,9 @@ const DocumentContent = ({
 								</div>
 								<div className="flex items-center gap-2">
 									<DocumentUploadDialog
-										totalChapters={chaptersGrouped.length}
+										totalChapters={filteredChaptersGrouped.length}
 										checkLastChapterStatus={
-											getProjectStatus(chaptersGrouped) === 'approved'
+											getProjectStatus(filteredChaptersGrouped) === 'approved'
 												? true
 												: false
 										}
