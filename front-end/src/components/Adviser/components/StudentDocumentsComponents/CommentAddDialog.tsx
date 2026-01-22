@@ -95,11 +95,12 @@ const CommentAddDialog = ({
 			}
 		},
 	});
+	const statusRevised = document?.status === "revised";
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogTrigger asChild>
-					<Button variant="primary" size="sm">
+					<Button variant="primary" size="sm" disabled={statusRevised}>
 						{' '}
 						<MessageSquare className="w-4 h-4" /> Add Comment{' '}
 					</Button>

@@ -206,8 +206,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-													!isCompleted &&
-													'bg-muted text-muted-foreground',
+												!isCompleted &&
+												'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -286,7 +286,7 @@ const BookConsultationDialog = ({
 									</p>
 								</div>
 								<div className="grid gap-3">
-									{availableWindows.map((window) => (
+									{availableWindows.slice().reverse().map((window) => (
 										<button
 											key={window.id}
 											onClick={() => {
@@ -363,12 +363,12 @@ const BookConsultationDialog = ({
 												className={cn(
 													'p-3 rounded-lg border text-center transition-all',
 													booked &&
-														'opacity-40 cursor-not-allowed bg-muted border-border',
+													'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
-														!isSelected &&
-														'border-border hover:border-primary hover:bg-primary/5',
+													!isSelected &&
+													'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
-														'border-primary bg-primary text-primary-foreground',
+													'border-primary bg-primary text-primary-foreground',
 												)}
 											>
 												<p

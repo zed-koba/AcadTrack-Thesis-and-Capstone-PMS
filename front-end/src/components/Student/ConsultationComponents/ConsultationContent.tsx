@@ -145,7 +145,7 @@ const ConsultationContent = ({
 									<p className="text-muted-foreground mb-4">
 										No upcoming consultations
 									</p>
-									<Button>Book Your First Consultation</Button>
+									<Button onClick={() => setBookingDialog(true)}>Book Your First Consultation</Button>
 								</CardContent>
 							</Card>
 						) : (

@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { BookOpen, Calendar, MessageSquare, User, X } from 'lucide-react';
+import { BookOpen, Calendar, CircleAlert, MessageSquare, User, X } from 'lucide-react';
 import type { DocumentCommentsProps } from '../../interface/adviserdocument';
 import CommentAddDialog from './CommentAddDialog';
 import {
@@ -39,14 +39,15 @@ const DocumentsComments = ({
 								<CardTitle className="text-lg">
 									{document?.title_name}
 								</CardTitle>
-								<p className="text-sm text-muted-foreground mt-0.5">
+								<p className="text-sm text-muted-foreground mt-0.5 flex flex-wrap gap-2">
 									v{document?.version} •{' '}
-									<Calendar className="h-3 w-3 inline-block mb-0.5" />{' '}
-									{formatDateWithTime(document?.created_at as string)}
+									<span><Calendar className="h-3 w-3 inline-block mb-0.5" />{' '}
+										{formatDateWithTime(document?.created_at as string)}</span>
 								</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
+
 							<CommentAddDialog document={document} refresh={refresh} />
 						</div>
 					</div>
@@ -72,6 +73,11 @@ const DocumentsComments = ({
 									)}
 									{!loading && (
 										<div className="space-y-4">
+											{document?.status === 'revised' && (
+												<div className="p-4 bg-amber-500/10 rounded-lg border-amber-500/40 border text-amber-500 flex gap-2">
+													<CircleAlert className="h-12 w-12" />
+													<p className="text-sm font-medium">Comments are already disabled for this document as it has already been revised. Please refer to the lastest uploaded revision.</p>
+												</div>)}
 											{document?.comments
 												.slice()
 												.reverse()
@@ -103,7 +109,7 @@ const DocumentsComments = ({
 															>
 																{
 																	chapterStatusIcon[
-																		com.comment_type || 'pending'
+																	com.comment_type || 'pending'
 																	]
 																}
 																{com.comment_type}

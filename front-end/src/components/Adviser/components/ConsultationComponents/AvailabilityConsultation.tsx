@@ -62,6 +62,8 @@ const AvailabilityConsultation = ({
 		'6:00 PM',
 		'7:00 PM',
 	];
+
+	const durations = [15, 30, 45, 60];
 	type formValues = z.infer<typeof availabilitySchema>;
 	const defaultValues: formValues = {
 		day: '',
@@ -108,12 +110,18 @@ const AvailabilityConsultation = ({
 					console.log('Failed to fetch data ' + JSON.stringify(payLoad));
 					return JSON.stringify(payLoad);
 				}
-				form.reset();
+
 				if (result.status === 201) {
 					toast.success(result.message);
+
 					refresh?.();
 					setStartTime(undefined);
 					setEndTime(undefined);
+					form.reset({
+						day: selectedDay ?? 'Monday',
+						start_time: startTime ?? "",
+						end_time: endTime ?? "",
+					});
 				}
 			} catch (error) {
 				console.log(error);
@@ -169,6 +177,7 @@ const AvailabilityConsultation = ({
 														onValueChange={(v) => {
 															field.handleChange(v);
 															setSelectedDay(v);
+															field.setValue(v);
 															setStartTime(undefined);
 															setEndTime(undefined);
 														}}
@@ -287,6 +296,27 @@ const AvailabilityConsultation = ({
 								</FieldGroup>
 							</div>
 						</form>
+						{/* <div className="grid grid-cols-4 gap-2 items-end">
+							<div className="flex flex-col gap-2 text-white items-start">
+								<p className="font-medium text-sm">Set meeting duration: </p>
+								<Select
+									name="duration"
+									defaultValue=''
+									value="">
+									<SelectTrigger
+										id="duration"
+										className="w-full">
+										<SelectValue placeholder="Select a duration" />
+									</SelectTrigger>
+									<SelectContent>
+										{durations.map((dura) => (
+											<SelectItem key={dura} value={String(dura)}>{dura} minutes</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<Button variant="primary">Set Duration</Button>
+						</div> */}
 					</div>
 					<div className="space-y-4">
 						<h4 className="font-medium text-sm text-muted-foreground">
@@ -305,6 +335,12 @@ const AvailabilityConsultation = ({
 										<div className="flex flex-wrap gap-2">
 											{availabilities
 												.filter((avail) => avail.day === day)
+												.sort((a, b) => {
+													if (a.start_time !== b.start_time) {
+														return a.start_time.localeCompare(b.start_time);
+													}
+													return a.end_time.localeCompare(b.end_time);
+												})
 												.map((sched) => (
 													<div
 														key={sched.start_time + '-' + sched.end_time}

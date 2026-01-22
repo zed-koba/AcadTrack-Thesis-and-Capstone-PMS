@@ -104,7 +104,7 @@ export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
 	return doc.versions.length > 0 ? doc.versions[0].status : doc.status;
 };
 
-export const studentId = 3;
+export const studentId = 1;
 
 const dayToNumber: Record<string, number> = {
 	monday: 1,
