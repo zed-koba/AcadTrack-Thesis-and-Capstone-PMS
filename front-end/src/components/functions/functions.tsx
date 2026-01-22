@@ -2,13 +2,16 @@ import { toast } from 'sonner';
 import { apiStudentUrl } from '../Routes/http';
 import type { JSX } from 'react/jsx-runtime';
 import {
+	CalendarCheck,
 	CircleCheckBig,
 	Clock,
 	Eye,
 	FileExclamationPoint,
 	RefreshCcw,
+	X,
 } from 'lucide-react';
 import type { ChapterDocumentsProps } from '../Adviser/interface/adviserdocument';
+import type { AdviserWeeklyProps } from '../Adviser/interface/consultation';
 
 export function formatDate(dateString: string) {
 	const date = new Date(dateString);
@@ -83,6 +86,12 @@ export const chapterStatusIcon: Record<string, JSX.Element> = {
 	'approved': <CircleCheckBig />,
 	'revised': <RefreshCcw />,
 };
+export const consultationIcon: Record<string, JSX.Element> = {
+	pending: <Clock className="h-3 w-3 mr-1" />,
+	rejected: <X className="h-3 w-3 mr-1" />,
+	'approved': <CircleCheckBig className="h-3 w-3 mr-1" />,
+	'completed': <CalendarCheck className="h-3 w-3 mr-1" />,
+};
 
 export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
 	if (chaptersGrouped.length === 0) return 'No Document';
@@ -96,3 +105,67 @@ export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
 };
 
 export const studentId = 3;
+
+const dayToNumber: Record<string, number> = {
+	monday: 1,
+	tuesday: 2,
+	wednesday: 3,
+	thursday: 4,
+	friday: 5,
+	saturday: 6,
+	sunday: 7,
+};
+
+export const getDayNumber = (day: string): number => {
+	const key = day.toLowerCase();
+	if (!(key in dayToNumber)) {
+		throw new Error(`Invalid day: ${day}`);
+	}
+	return dayToNumber[key];
+};
+const now = new Date();
+export const upcomingSessions = (weeklies: AdviserWeeklyProps[]) => {
+	const getUpcoming = weeklies.filter((s) => {
+		const endDateTime = new Date(`${s.date}T${s.end_time}`);
+
+		return endDateTime > now;
+	});
+
+	return getUpcoming;
+};
+
+export const pastSessions = (weeklies: AdviserWeeklyProps[]) => {
+	const getUpcoming = weeklies.filter((s) => {
+		const endDateTime = new Date(`${s.date}T${s.end_time}`);
+
+		return endDateTime < now;
+	});
+
+	return getUpcoming;
+};
+
+export const getDateLabel = (dateStr: string): string => {
+	const target = new Date(dateStr);
+	const now = new Date();
+
+	// Normalize both to midnight
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	const tomorrow = new Date(today);
+	tomorrow.setDate(today.getDate() + 1);
+
+	const targetDay = new Date(
+		target.getFullYear(),
+		target.getMonth(),
+		target.getDate(),
+	);
+
+	if (targetDay.getTime() === tomorrow.getTime()) {
+		return 'Tomorrow';
+	}
+
+	return target.toLocaleDateString('en-US', {
+		weekday: 'short',
+		month: 'short',
+		day: 'numeric',
+	});
+};

@@ -1,0 +1,536 @@
+import { AlertDialogHeader } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import {
+	ArrowLeft,
+	ArrowRight,
+	CalendarIcon,
+	CheckCircle2,
+	Clock,
+	Loader2,
+	User,
+} from 'lucide-react';
+import type { BookConsultationprops } from '../interface/consultation';
+import { useMemo, useState } from 'react';
+import {
+	to12HourTime,
+	type AdviserAvailabilityProps,
+} from '@/components/Adviser/interface/consultation';
+import { Calendar } from '@/components/ui/calendar';
+import { format, getDay, isSameDay } from 'date-fns';
+import { getDayNumber } from '@/components/functions/functions';
+import { Textarea } from '@/components/ui/textarea';
+
+type Step = 'date' | 'window' | 'slot' | 'confirm';
+
+const BookConsultationDialog = ({
+	open,
+	setOpen,
+	project,
+	availabilities,
+	weeklies,
+	studentIds,
+}: BookConsultationprops) => {
+	const [currentStep, setCurrentStep] = useState<Step>('date');
+	const [selectedDate, setSelectedDate] = useState<Date>();
+	const [selectedSlot, setSelectedSlot] = useState<{
+		start: string;
+		end: string;
+	} | null>(null);
+	const [purpose, setPurpose] = useState('');
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [selectedWindow, setSelectedWindow] =
+		useState<AdviserAvailabilityProps | null>(null);
+	const filterWeeklies = weeklies.filter(
+		(w) =>
+			w.adviser_id == project?.adviser.id && studentIds.includes(w.student_id),
+	);
+	const generateSlotsForWindow = (
+		window: AdviserAvailabilityProps,
+	): { start: string; end: string }[] => {
+		const slots: { start: string; end: string }[] = [];
+		const [startH, startM] = window.start_time.split(':').map(Number);
+		const [endH, endM] = window.end_time.split(':').map(Number);
+		const duration = project?.adviser.duration ?? 15;
+
+		let currentMinutes = startH * 60 + startM;
+		const endMinutes = endH * 60 + endM;
+
+		while (currentMinutes + duration <= endMinutes) {
+			const slotStartH = Math.floor(currentMinutes / 60);
+			const slotStartM = currentMinutes % 60;
+			const slotEndMinutes = currentMinutes + duration;
+			const slotEndH = Math.floor(slotEndMinutes / 60);
+			const slotEndM = slotEndMinutes % 60;
+
+			slots.push({
+				start: `${slotStartH.toString().padStart(2, '0')}:${slotStartM.toString().padStart(2, '0')}`,
+				end: `${slotEndH.toString().padStart(2, '0')}:${slotEndM.toString().padStart(2, '0')}`,
+			});
+
+			currentMinutes += duration;
+		}
+
+		return slots;
+	};
+
+	// Check if a slot is booked
+	const isSlotBooked = (slot: { start: string; end: string }): boolean => {
+		if (!selectedDate) return false;
+
+		return filterWeeklies.some((booking) => {
+			if (booking.status === 'cancelled') return false;
+			if (!isSameDay(new Date(booking.date), selectedDate)) return false;
+
+			// Check for overlap
+			const slotStart = parseInt(slot.start.replace(':', ''));
+			const slotEnd = parseInt(slot.end.replace(':', ''));
+			const bookingStart = parseInt(booking.start_time.replace(':', ''));
+			const bookingEnd = parseInt(booking.end_time.replace(':', ''));
+
+			return slotStart < bookingEnd && slotEnd > bookingStart;
+		});
+	};
+
+	const handleOpenChange = (open: boolean) => {
+		if (!open) {
+			setCurrentStep('date');
+			setSelectedDate(undefined);
+			setSelectedWindow(null);
+			setSelectedSlot(null);
+			setPurpose('');
+		}
+		setOpen(open);
+	};
+	const steps = [
+		{ id: 'date', label: 'Date', icon: CalendarIcon },
+		{ id: 'window', label: 'Window', icon: Clock },
+		{ id: 'slot', label: 'Time', icon: Clock },
+		{ id: 'confirm', label: 'Confirm', icon: CheckCircle2 },
+	];
+
+	const stepIndex = steps.findIndex((s) => s.id === currentStep);
+
+	//Check if current day has availability
+	const dateHasAvailability = (checkDate: Date): boolean => {
+		const dayOfWeek = getDay(checkDate);
+		return availabilities.some((slot) => getDayNumber(slot.day) === dayOfWeek);
+	};
+
+	// Get availability windows for selected date
+	const availableWindows = useMemo(() => {
+		if (!selectedDate) return [];
+		const dayOfWeek = getDay(selectedDate);
+		return availabilities.filter(
+			(slot) => getDayNumber(slot.day) === dayOfWeek,
+		);
+	}, [selectedDate, availabilities]);
+
+	//Step Navigation
+	//Next step condition
+	const goNext = () => {
+		const steps: Step[] = ['date', 'window', 'slot', 'confirm'];
+		const currentIndex = steps.indexOf(currentStep);
+		if (currentIndex < steps.length - 1) {
+			setCurrentStep(steps[currentIndex + 1]);
+		}
+	};
+	//Condition the go back button or cancel
+	const goBack = () => {
+		const steps: Step[] = ['date', 'window', 'slot', 'confirm'];
+		const currentIndex = steps.indexOf(currentStep);
+		if (currentIndex > 0) {
+			// Reset dependent selections
+			if (currentStep === 'window') {
+				setSelectedWindow(null);
+				setSelectedSlot(null);
+			} else if (currentStep === 'slot') {
+				setSelectedSlot(null);
+			}
+			setCurrentStep(steps[currentIndex - 1]);
+		}
+	};
+
+	//Check if requireds are filled
+	const canProceed = (): boolean => {
+		switch (currentStep) {
+			case 'date':
+				return !!selectedDate;
+			case 'window':
+				return !!selectedWindow;
+			case 'slot':
+				return !!selectedSlot;
+			case 'confirm':
+				return !!purpose.trim();
+			default:
+				return false;
+		}
+	};
+
+	return (
+		<>
+			<Dialog open={open} onOpenChange={handleOpenChange}>
+				<DialogContent className="sm:max-w-[600px] bg-card border-border p-0 gap-0 overflow-hidden">
+					{/* Header */}
+					<AlertDialogHeader className="p-6 pb-4 border-b border-border">
+						<div className="flex items-center gap-3">
+							<div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+								<User className="h-5 w-5 text-primary" />
+							</div>
+							<div>
+								<DialogTitle className="text-xl font-semibold">
+									Book Consultation
+								</DialogTitle>
+								<p className="text-sm text-muted-foreground">
+									with {project?.adviser.name} • {project?.adviser.duration} min
+									session
+								</p>
+							</div>
+						</div>
+					</AlertDialogHeader>
+
+					{/* Progress Steps */}
+					<div className="px-6 py-4 border-b border-border bg-muted/30">
+						<div className="flex items-center justify-between">
+							{steps.map((step, index) => {
+								const StepIcon = step.icon;
+								const isActive = step.id === currentStep;
+								const isCompleted = index < stepIndex;
+
+								return (
+									<div key={step.id} className="flex items-center gap-2.5">
+										<div
+											className={cn(
+												'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
+												isActive && 'bg-primary text-primary-foreground',
+												isCompleted && 'bg-primary/20 text-primary',
+												!isActive &&
+													!isCompleted &&
+													'bg-muted text-muted-foreground',
+											)}
+										>
+											<StepIcon className="h-4 w-4" />
+											<span className="hidden sm:inline">{step.label}</span>
+										</div>
+										{index < steps.length - 1 && (
+											<div
+												className={cn(
+													'h-0.5 w-8 mx-2',
+													index < stepIndex ? 'bg-primary' : 'bg-border',
+												)}
+											/>
+										)}
+									</div>
+								);
+							})}
+						</div>
+					</div>
+
+					{/* Step Content */}
+					<div className="p-6 min-h-80">
+						{/* Step 1: Select Date */}
+						{currentStep === 'date' && (
+							<div className="space-y-4">
+								<div>
+									<h3 className="font-semibold text-lg">Select a Date</h3>
+									<p className="text-sm text-muted-foreground">
+										Choose from available days marked on the calendar
+									</p>
+								</div>
+								<div className="flex justify-center">
+									<Calendar
+										mode="single"
+										selected={selectedDate}
+										onSelect={(date) => {
+											setSelectedDate(date);
+											setSelectedWindow(null);
+											setSelectedSlot(null);
+										}}
+										disabled={(date) =>
+											date < new Date() || !dateHasAvailability(date)
+										}
+										className="rounded-md border border-border pointer-events-auto"
+										modifiers={{
+											available: (date) =>
+												dateHasAvailability(date) && date >= new Date(),
+										}}
+										modifiersStyles={{
+											available: {
+												backgroundColor: 'hsl(var(--primary) / 0.1)',
+												borderRadius: '4px',
+											},
+										}}
+									/>
+								</div>
+								{selectedDate && (
+									<div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-center">
+										<p className="text-sm font-medium">
+											Selected:{' '}
+											<span className="text-primary">
+												{format(selectedDate, 'EEEE, MMMM d, yyyy')}
+											</span>
+										</p>
+									</div>
+								)}
+							</div>
+						)}
+						{/* Step 2: Select Availability Window */}
+						{currentStep === 'window' && (
+							<div className="space-y-4">
+								<div>
+									<h3 className="font-semibold text-lg">Select Time Window</h3>
+									<p className="text-sm text-muted-foreground">
+										Choose from {project?.adviser.name}'s available time windows
+										on {selectedDate && format(selectedDate, 'MMM d')}
+									</p>
+								</div>
+								<div className="grid gap-3">
+									{availableWindows.map((window) => (
+										<button
+											key={window.id}
+											onClick={() => {
+												setSelectedWindow(window);
+												setSelectedSlot(null);
+											}}
+											className={cn(
+												'p-4 rounded-lg border-2 text-left transition-all',
+												selectedWindow?.id === window.id
+													? 'border-primary bg-primary/10'
+													: 'border-border hover:border-primary/50 hover:bg-muted/50',
+											)}
+										>
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-3">
+													<div
+														className={cn(
+															'h-10 w-10 rounded-lg flex items-center justify-center',
+															selectedWindow?.id === window.id
+																? 'bg-primary'
+																: 'bg-muted',
+														)}
+													>
+														<Clock
+															className={cn(
+																'h-5 w-5',
+																selectedWindow?.id === window.id
+																	? 'text-primary-foreground'
+																	: 'text-muted-foreground',
+															)}
+														/>
+													</div>
+													<div>
+														<p className="font-semibold text-lg">
+															{to12HourTime(window.start_time)} –{' '}
+															{to12HourTime(window.end_time)}
+														</p>
+														<p className="text-sm text-muted-foreground">
+															{generateSlotsForWindow(window).length} available{' '}
+															{project?.adviser.duration}-min slots
+														</p>
+													</div>
+												</div>
+												{selectedWindow?.id === window.id && (
+													<CheckCircle2 className="h-5 w-5 text-primary" />
+												)}
+											</div>
+										</button>
+									))}
+								</div>
+							</div>
+						)}
+						{/* Step 3: Select Time Slot */}
+						{currentStep === 'slot' && selectedWindow && (
+							<div className="space-y-4">
+								<div>
+									<h3 className="font-semibold text-lg">Select Time Slot</h3>
+									<p className="text-sm text-muted-foreground">
+										Choose a {project?.adviser.duration}-minute slot within{' '}
+										{to12HourTime(selectedWindow.start_time)} –{' '}
+										{to12HourTime(selectedWindow.end_time)}
+									</p>
+								</div>
+								<div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+									{generateSlotsForWindow(selectedWindow).map((slot, index) => {
+										const booked = isSlotBooked(slot);
+										const isSelected = selectedSlot?.start === slot.start;
+
+										return (
+											<button
+												key={index}
+												onClick={() => !booked && setSelectedSlot(slot)}
+												disabled={booked}
+												className={cn(
+													'p-3 rounded-lg border text-center transition-all',
+													booked &&
+														'opacity-40 cursor-not-allowed bg-muted border-border',
+													!booked &&
+														!isSelected &&
+														'border-border hover:border-primary hover:bg-primary/5',
+													isSelected &&
+														'border-primary bg-primary text-primary-foreground',
+												)}
+											>
+												<p
+													className={cn(
+														'font-mono font-semibold text-sm',
+														isSelected && 'text-primary-foreground',
+													)}
+												>
+													{to12HourTime(slot.start)}
+												</p>
+												<p
+													className={cn(
+														'text-xs mt-0.5',
+														isSelected
+															? 'text-primary-foreground/80'
+															: 'text-muted-foreground',
+													)}
+												>
+													{booked
+														? 'Booked'
+														: `${project?.adviser.duration} min`}
+												</p>
+											</button>
+										);
+									})}
+								</div>
+								{selectedSlot && (
+									<div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+										<div className="flex items-center gap-2">
+											<CheckCircle2 className="h-4 w-4 text-primary" />
+											<p className="text-sm font-medium">
+												{to12HourTime(selectedSlot.start)} –{' '}
+												{to12HourTime(selectedSlot.end)}
+											</p>
+										</div>
+									</div>
+								)}
+							</div>
+						)}
+						{/* Step 4: Confirm Booking */}
+						{currentStep === 'confirm' && selectedDate && selectedSlot && (
+							<div className="space-y-4">
+								<div>
+									<h3 className="font-semibold text-lg">Confirm Booking</h3>
+									<p className="text-sm text-muted-foreground">
+										Review your consultation details and add a purpose
+									</p>
+								</div>
+
+								{/* Booking Summary */}
+								<div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
+									<div className="flex items-center gap-3">
+										<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+											<User className="h-6 w-6 text-primary" />
+										</div>
+										<div>
+											<p className="font-semibold">{project?.adviser.name}</p>
+											<p className="text-sm text-muted-foreground">
+												{project?.adviser.department.name}
+											</p>
+										</div>
+									</div>
+									<div className="h-px bg-border" />
+									<div className="grid grid-cols-2 gap-4">
+										<div>
+											<p className="text-xs text-muted-foreground uppercase tracking-wider">
+												Date
+											</p>
+											<p className="font-semibold">
+												{format(selectedDate, 'MMMM d, yyyy')}
+											</p>
+										</div>
+										<div>
+											<p className="text-xs text-muted-foreground uppercase tracking-wider">
+												Time
+											</p>
+											<p className="font-semibold">
+												{to12HourTime(selectedSlot.start)} –{' '}
+												{to12HourTime(selectedSlot.end)}
+											</p>
+										</div>
+										<div>
+											<p className="text-xs text-muted-foreground uppercase tracking-wider">
+												Duration
+											</p>
+											<p className="font-semibold">
+												{project?.adviser.duration} minutes
+											</p>
+										</div>
+										<div>
+											<p className="text-xs text-muted-foreground uppercase tracking-wider">
+												Day
+											</p>
+											<p className="font-semibold">
+												{format(selectedDate, 'EEEE')}
+											</p>
+										</div>
+									</div>
+								</div>
+
+								{/* Purpose Input */}
+								<div className="space-y-2">
+									<label className="text-sm font-medium">
+										Purpose of Consultation *
+									</label>
+									<Textarea
+										value={purpose}
+										onChange={(e) => setPurpose(e.target.value)}
+										placeholder="Describe what you'd like to discuss..."
+										rows={3}
+										className="resize-none"
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+					{/* Footer with Navigation */}
+					<div className="p-6 pt-4 border-t border-border flex items-center justify-between">
+						<Button
+							variant="ghost"
+							onClick={
+								currentStep === 'date' ? () => handleOpenChange(false) : goBack
+							}
+							disabled={isSubmitting}
+							className={cn(
+								'hover:bg-red-500',
+								currentStep !== 'date' && 'hover:bg-emerald-500',
+							)}
+						>
+							<ArrowLeft className="h-4 w-4 mr-2" />
+							{currentStep === 'date' ? 'Cancel' : 'Back'}
+						</Button>
+
+						{currentStep !== 'confirm' ? (
+							<Button onClick={goNext} disabled={!canProceed()}>
+								Next
+								<ArrowRight className="h-4 w-4 ml-2" />
+							</Button>
+						) : (
+							<Button
+								// onClick={handleSubmit}
+								disabled={!canProceed() || isSubmitting}
+								className="min-w-[140px]"
+							>
+								{isSubmitting ? (
+									<>
+										<Loader2 className="h-4 w-4 mr-2 animate-spin" />
+										Booking...
+									</>
+								) : (
+									<>
+										<CheckCircle2 className="h-4 w-4 mr-2" />
+										Confirm Booking
+									</>
+								)}
+							</Button>
+						)}
+					</div>
+				</DialogContent>
+			</Dialog>
+		</>
+	);
+};
+
+export default BookConsultationDialog;

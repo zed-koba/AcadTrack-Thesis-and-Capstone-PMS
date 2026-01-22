@@ -18,6 +18,7 @@ import Roles from '../Admin/pages/Roles';
 import Programs from '../Admin/pages/Programs';
 import Instructors from '../Admin/pages/Instructor';
 import StundentLayout from '../Layout/StudentLayout';
+import { default as StudentConsultation } from '../Student/pages/Consultation';
 
 export const router = createBrowserRouter([
 	{
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
 				index: true,
 				element: <StudentDashboard />,
 			},
+			{ path: 'Consultation', element: <StudentConsultation /> },
 			{ path: 'Document', element: <StudentDocument /> },
 		],
 	},

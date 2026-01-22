@@ -107,7 +107,7 @@ export const getValidEndTimes = (
 	AVAIL_TIME: string[],
 	selectedStartTime: string,
 	selectedDay: string,
-	availabilities: AdviserAvailabilityProps[]
+	availabilities: AdviserAvailabilityProps[],
 ) => {
 	const startMinutes = toMinutes(selectedStartTime);
 
@@ -141,7 +141,7 @@ export const getValidStartTimes = (
 		day: string;
 		start_time: string;
 		end_time: string;
-	}[]
+	}[],
 ) => {
 	const dayAvailabilities = availabilities.filter((a) => a.day === selectedDay);
 

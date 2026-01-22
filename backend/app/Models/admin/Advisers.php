@@ -13,7 +13,7 @@ class Advisers extends Model
 {
     //
     protected $table = "advisers";
-    protected $fillable = ['name', 'account_id', 'contact_number', 'department_id', 'status'];
+    protected $fillable = ['name', 'account_id', 'contact_number', 'department_id', 'status', 'duration'];
     public function department():BelongsTo {
         return $this->belongsTo(Departments::class, 'department_id');
     }

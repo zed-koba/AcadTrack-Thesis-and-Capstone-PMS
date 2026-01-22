@@ -18,7 +18,7 @@ class DocumentsController extends Controller
             'comments',
             'student:id,student_id,name'
         )->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with('details.student:id,student_id,program_id,name','details.student.program:id,name,code','adviser')->orderBy('created_at', 'asc')->get();
+        $projects = Proponents::with('details.student:id,student_id,program_id,name','details.student.program:id,name,code','adviser', 'adviser.department:id,name,code')->orderBy('created_at', 'asc')->get();
         return response()->json([
             'status' => 200,
             'document' => $document,

@@ -1,12 +1,17 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
-import { FileText, LayoutDashboard } from 'lucide-react';
+import { CalendarClock, FileText, LayoutDashboard } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 
 const StundentLayout = () => {
 	const navItem: NavItem[] = [
 		{ label: 'Dashboard', to: '/Student', icon: <LayoutDashboard /> },
+		{
+			label: 'Consultation',
+			to: '/Student/Consultation',
+			icon: <CalendarClock />,
+		},
 		{ label: 'Document', to: '/Student/Document', icon: <FileText /> },
 	];
 	return (

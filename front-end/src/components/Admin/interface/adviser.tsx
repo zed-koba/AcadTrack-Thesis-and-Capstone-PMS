@@ -7,11 +7,17 @@ export type AdviserProps = {
 	contact_number: string;
 	department_id: number;
 	status: string;
+	duration: number;
 	created_at: string;
 	updated_at: string;
 	account: {
 		id: number;
 		email: string;
+	};
+	department: {
+		id: number;
+		name: string;
+		code: string;
 	};
 };
 export type AdviserDetailsProps = {

@@ -1,11 +1,11 @@
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
-import DocumentDashboard from '../components/DocumentDashboard';
-import DocumentContent from '../components/DocumentContent';
+import DocumentDashboard from '../DocumentComponents/DocumentDashboard';
+import DocumentContent from '../DocumentComponents/DocumentContent';
 import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/components/Routes/http';
-import { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
-import type { ProponentsDetailsProps } from '@/components/Admin/interface/proponent';
+import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
+
 import { studentId } from '@/components/functions/functions';
 
 const Document = () => {

@@ -82,12 +82,17 @@ Route::prefix("adviser")->group(function() {
     Route::post("weekly/add", [AdviserWeeklyController::class, "storeWeekly"]);
     Route::put("{id}/weekly/update", [AdviserWeeklyController::class,"updateSchedule"]);
 
+    //Adviser Comment
     Route::get('{id}/comments', [DocumentCommentsController::class, 'getComments']);
     Route::post('comments/add', [DocumentCommentsController::class, 'storeComment']);
 });
 
 Route::prefix("student")->group(function() {
+    //Student Documents
     Route::get('documents', [DocumentsController::class, 'getDocuments']);
     Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
     Route::get('{id}/download/pdf', [DocumentsController::class,'downloadDocument']);
+
+    //Student Consultation
+    Route::get('weekly', [AdviserWeeklyController::class, "getSchedules"]);
 }); 
