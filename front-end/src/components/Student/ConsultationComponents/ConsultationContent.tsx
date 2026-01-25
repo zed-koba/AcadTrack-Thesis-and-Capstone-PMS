@@ -8,7 +8,7 @@ import {
 	RefreshCcw,
 	User,
 } from 'lucide-react';
-import type { ConsultationContent } from '../interface/consultation';
+import type { ConsultationContentProps } from '../interface/consultation';
 import {
 	getDateLabel,
 	pastSessions,
@@ -16,7 +16,7 @@ import {
 	upcomingSessions,
 } from '@/components/functions/functions';
 import {
-	AdviserWeeklyProps,
+	type AdviserWeeklyProps,
 	to12HourTime,
 } from '@/components/Adviser/interface/consultation';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,8 @@ const ConsultationContent = ({
 	weeklies,
 	project,
 	availabilities,
-}: ConsultationContent) => {
+	refresh,
+}: ConsultationContentProps) => {
 	const studentIds = (project?.details.map((d) => d.student_id) ?? []).filter(
 		(id) => id !== undefined,
 	);
@@ -145,7 +146,9 @@ const ConsultationContent = ({
 									<p className="text-muted-foreground mb-4">
 										No upcoming consultations
 									</p>
-									<Button onClick={() => setBookingDialog(true)}>Book Your First Consultation</Button>
+									<Button onClick={() => setBookingDialog(true)}>
+										Book Your First Consultation
+									</Button>
 								</CardContent>
 							</Card>
 						) : (
@@ -193,6 +196,7 @@ const ConsultationContent = ({
 					project={project}
 					studentIds={studentIds}
 					weeklies={weeklies}
+					refresh={refresh}
 				/>
 			)}
 			{rescheduleDialog && selectedSchedule && (

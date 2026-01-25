@@ -7,17 +7,18 @@ import type {
 } from '../interface/consultation';
 import { apiAdviserUrl } from '@/components/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
+import { adviserId } from '@/components/functions/functions';
 
 const AdviserConsultation = () => {
 	const [availabilities, setAvabilities] = useState<AdviserAvailabilityProps[]>(
-		[]
+		[],
 	);
 
 	const [weeklies, setWeeklies] = useState<AdviserWeeklyProps[]>([]);
 	const [loading, setLoading] = useState(true);
 	const fetchAvaibilities = async () => {
 		try {
-			const res = await fetch(`${apiAdviserUrl}/${1}/availabilities`, {
+			const res = await fetch(`${apiAdviserUrl}/${adviserId}/availabilities`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',

@@ -5,7 +5,7 @@ import type {
 } from '@/components/Adviser/interface/consultation';
 import { studentId } from '@/components/functions/functions';
 import { apiStudentUrl } from '@/components/Routes/http';
-import { useEffect, useEffectEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ConsultationDashboard from '../ConsultationComponents/ConsultationDashboard';
 import { Spinner } from '@/components/ui/spinner';
 import ConsultationContent from '../ConsultationComponents/ConsultationContent';
@@ -68,6 +68,7 @@ const Consultation = () => {
 									weeklies={weeklies}
 									project={project}
 									availabilities={availabilities}
+									refresh={fetchSchedules}
 								/>
 							</div>
 							<div className="space-y-4 lg:max-xl:row-start-1">

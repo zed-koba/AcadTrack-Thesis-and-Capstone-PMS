@@ -42,6 +42,11 @@ export type AdviserAvailabilityProps = {
 	end_time: string;
 	day: string;
 	is_available: boolean;
+	adviser: {
+		id: number;
+		name: string;
+		duration: number;
+	};
 };
 
 export type AdviserWeeklyProps = {
@@ -50,14 +55,30 @@ export type AdviserWeeklyProps = {
 	student_id: number;
 	day_of_week: number;
 	start_time: string;
-	date: string;
 	end_time: string;
+	actual_start: string;
+	actual_end: string;
+	overrunMinutes: number;
+	date: string;
 	status: string;
 	purpose: string;
 	feedback: string;
 	student: {
 		id: number;
 		name: string;
+		proponent_detail: {
+			student_id: number;
+			foreign_proponents_id: string;
+			proponent: {
+				proponents_id: string;
+				title: string;
+			};
+		};
+	};
+	adviser: {
+		id: string;
+		name: string;
+		duration: number;
 	};
 };
 export type ConsultationDialogProps = {

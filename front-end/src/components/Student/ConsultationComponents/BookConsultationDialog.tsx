@@ -19,8 +19,10 @@ import {
 } from '@/components/Adviser/interface/consultation';
 import { Calendar } from '@/components/ui/calendar';
 import { format, getDay, isSameDay } from 'date-fns';
-import { getDayNumber } from '@/components/functions/functions';
+import { getDayNumber, studentId } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
+import { apiStudentUrl } from '@/components/Routes/http';
+import { toast } from 'sonner';
 
 type Step = 'date' | 'window' | 'slot' | 'confirm';
 
@@ -31,6 +33,7 @@ const BookConsultationDialog = ({
 	availabilities,
 	weeklies,
 	studentIds,
+	refresh,
 }: BookConsultationprops) => {
 	const [currentStep, setCurrentStep] = useState<Step>('date');
 	const [selectedDate, setSelectedDate] = useState<Date>();
@@ -167,7 +170,60 @@ const BookConsultationDialog = ({
 				return false;
 		}
 	};
+	const handleSubmit = async () => {
+		setIsSubmitting(true);
+		const payLoad = {
+			adviser_id: project?.adviser_id,
+			student_id: studentId,
+			date: format(selectedDate?.toISOString() ?? '', 'yyyy-MM-dd'),
+			start_time: selectedSlot?.start,
+			end_time: selectedSlot?.end,
+			purpose: purpose.trim(),
+		};
 
+		try {
+			const res = await fetch(`${apiStudentUrl}/weekly/add`, {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json',
+					Accept: 'application/json',
+				},
+				body: JSON.stringify(payLoad),
+			});
+			const result = await res.json();
+			if (result.status === 500) {
+				toast.error(result.message);
+				console.log(result.error);
+				return;
+			}
+
+			if (result.status === 422) {
+				const errors = result.errors as Record<string, string[]>;
+				Object.values(errors).forEach((errorMessages) =>
+					errorMessages.forEach((message) => {
+						toast.error(message);
+					}),
+				);
+				return;
+			}
+
+			if (!res.ok) {
+				console.log(result.status);
+				console.log('Failed to fetch data ' + JSON.stringify(payLoad));
+				return;
+			}
+
+			if (result.status === 201) {
+				toast.success(result.message);
+				refresh?.();
+				handleOpenChange(open);
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 	return (
 		<>
 			<Dialog open={open} onOpenChange={handleOpenChange}>
@@ -206,8 +262,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-												!isCompleted &&
-												'bg-muted text-muted-foreground',
+													!isCompleted &&
+													'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -286,56 +342,59 @@ const BookConsultationDialog = ({
 									</p>
 								</div>
 								<div className="grid gap-3">
-									{availableWindows.slice().reverse().map((window) => (
-										<button
-											key={window.id}
-											onClick={() => {
-												setSelectedWindow(window);
-												setSelectedSlot(null);
-											}}
-											className={cn(
-												'p-4 rounded-lg border-2 text-left transition-all',
-												selectedWindow?.id === window.id
-													? 'border-primary bg-primary/10'
-													: 'border-border hover:border-primary/50 hover:bg-muted/50',
-											)}
-										>
-											<div className="flex items-center justify-between">
-												<div className="flex items-center gap-3">
-													<div
-														className={cn(
-															'h-10 w-10 rounded-lg flex items-center justify-center',
-															selectedWindow?.id === window.id
-																? 'bg-primary'
-																: 'bg-muted',
-														)}
-													>
-														<Clock
-															className={cn(
-																'h-5 w-5',
-																selectedWindow?.id === window.id
-																	? 'text-primary-foreground'
-																	: 'text-muted-foreground',
-															)}
-														/>
-													</div>
-													<div>
-														<p className="font-semibold text-lg">
-															{to12HourTime(window.start_time)} –{' '}
-															{to12HourTime(window.end_time)}
-														</p>
-														<p className="text-sm text-muted-foreground">
-															{generateSlotsForWindow(window).length} available{' '}
-															{project?.adviser.duration}-min slots
-														</p>
-													</div>
-												</div>
-												{selectedWindow?.id === window.id && (
-													<CheckCircle2 className="h-5 w-5 text-primary" />
+									{availableWindows
+										.slice()
+										.reverse()
+										.map((window) => (
+											<button
+												key={window.id}
+												onClick={() => {
+													setSelectedWindow(window);
+													setSelectedSlot(null);
+												}}
+												className={cn(
+													'p-4 rounded-lg border-2 text-left transition-all',
+													selectedWindow?.id === window.id
+														? 'border-primary bg-primary/10'
+														: 'border-border hover:border-primary/50 hover:bg-muted/50',
 												)}
-											</div>
-										</button>
-									))}
+											>
+												<div className="flex items-center justify-between">
+													<div className="flex items-center gap-3">
+														<div
+															className={cn(
+																'h-10 w-10 rounded-lg flex items-center justify-center',
+																selectedWindow?.id === window.id
+																	? 'bg-primary'
+																	: 'bg-muted',
+															)}
+														>
+															<Clock
+																className={cn(
+																	'h-5 w-5',
+																	selectedWindow?.id === window.id
+																		? 'text-primary-foreground'
+																		: 'text-muted-foreground',
+																)}
+															/>
+														</div>
+														<div>
+															<p className="font-semibold text-lg">
+																{to12HourTime(window.start_time)} –{' '}
+																{to12HourTime(window.end_time)}
+															</p>
+															<p className="text-sm text-muted-foreground">
+																{generateSlotsForWindow(window).length}{' '}
+																available {project?.adviser.duration}-min slots
+															</p>
+														</div>
+													</div>
+													{selectedWindow?.id === window.id && (
+														<CheckCircle2 className="h-5 w-5 text-primary" />
+													)}
+												</div>
+											</button>
+										))}
 								</div>
 							</div>
 						)}
@@ -363,12 +422,12 @@ const BookConsultationDialog = ({
 												className={cn(
 													'p-3 rounded-lg border text-center transition-all',
 													booked &&
-													'opacity-40 cursor-not-allowed bg-muted border-border',
+														'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
-													!isSelected &&
-													'border-border hover:border-primary hover:bg-primary/5',
+														!isSelected &&
+														'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
-													'border-primary bg-primary text-primary-foreground',
+														'border-primary bg-primary text-primary-foreground',
 												)}
 											>
 												<p
@@ -509,7 +568,7 @@ const BookConsultationDialog = ({
 							</Button>
 						) : (
 							<Button
-								// onClick={handleSubmit}
+								onClick={handleSubmit}
 								disabled={!canProceed() || isSubmitting}
 								className="min-w-[140px]"
 							>

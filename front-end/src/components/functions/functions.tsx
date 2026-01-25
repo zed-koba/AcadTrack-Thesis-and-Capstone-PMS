@@ -105,6 +105,7 @@ export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
 };
 
 export const studentId = 1;
+export const adviserId = 1;
 
 const dayToNumber: Record<string, number> = {
 	monday: 1,

@@ -17,13 +17,14 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->tinyInteger('day_of_week');
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
+            $table->time('actual_start');
+            $table->time('actual_end');
             $table->string('purpose');
             $table->string('feedback')->nullable();
-            $table->enum('status', ['pending', 'approved', 'completed', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'completed', 'rejected', 'expired'])->default('pending');
             $table->unique(['adviser_id', 'day_of_week', 'start_time', 'end_time'], 'unique_adviser_weekly_slot');
             $table->timestamps();
         });

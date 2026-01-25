@@ -1,15 +1,8 @@
-import {
-	BookOpen,
-	Calendar,
-	CalendarClock,
-	CheckCircle,
-	Clock,
-	User,
-} from 'lucide-react';
-import type { ConsultationDashboard } from '../interface/consultation';
+import { BookOpen, Calendar, CheckCircle, Clock } from 'lucide-react';
+import type { ConsultationDashboardProps } from '../interface/consultation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { dayToNumber, getDayNumber } from '@/components/functions/functions';
+import { getDayNumber } from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import { to12HourTime } from '@/components/Adviser/interface/consultation';
 
@@ -17,7 +10,7 @@ const ConsultationDashboard = ({
 	weeklies,
 	project,
 	availabilities,
-}: ConsultationDashboard) => {
+}: ConsultationDashboardProps) => {
 	const filterPending = weeklies.filter((w) => w.status === 'pending');
 	const filterCompleted = weeklies.filter((w) => w.status === 'completed');
 	const now = new Date();
@@ -98,7 +91,7 @@ const ConsultationDashboard = ({
 				</div>
 				<div className="grid lg:max-xl:grid-cols-3 gap-3 lg:max-xl:row-start-1 lg:max-xl:col-span-2">
 					{dashboards.map((dashboard) => (
-						<Card className="border-border py-1">
+						<Card className="border-border py-1" key={dashboard.label}>
 							<CardContent className="p-4">
 								<div className="flex items-center justify-between">
 									<div>

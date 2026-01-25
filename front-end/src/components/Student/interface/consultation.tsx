@@ -5,16 +5,17 @@ import type {
 	AvailabilityConsultationProps,
 } from '@/components/Adviser/interface/consultation';
 
-export type ConsultationDashboard = {
+export type ConsultationDashboardProps = {
 	weeklies: AdviserWeeklyProps[];
 	project: ProponentsDocumentsProps | null;
 	availabilities: AdviserAvailabilityProps[];
 };
 
-export type ConsultationContent = {
+export type ConsultationContentProps = {
 	weeklies: AdviserWeeklyProps[];
 	project: ProponentsDocumentsProps | null;
 	availabilities: AdviserAvailabilityProps[];
+	refresh?: () => void;
 };
 
 export type ConsultationCardProps = {
@@ -29,6 +30,7 @@ export type BookConsultationprops = {
 	availabilities: AdviserAvailabilityProps[];
 	weeklies: AdviserWeeklyProps[];
 	studentIds: number[];
+	refresh?: () => void;
 };
 
 export type RescheduleConsultationprops = {

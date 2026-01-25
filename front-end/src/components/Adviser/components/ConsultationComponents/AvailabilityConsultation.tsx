@@ -31,7 +31,6 @@ import { toast } from 'sonner';
 import DeleteSchedule from './DeleteSchedule';
 
 const availabilitySchema = z.object({
-	day: z.string().min(1, 'Day is required'),
 	start_time: z.string().min(1, 'Start time is required'),
 	end_time: z.string().min(1, 'End time is required'),
 });
@@ -66,7 +65,6 @@ const AvailabilityConsultation = ({
 	const durations = [15, 30, 45, 60];
 	type formValues = z.infer<typeof availabilitySchema>;
 	const defaultValues: formValues = {
-		day: '',
 		start_time: '',
 		end_time: '',
 	};
@@ -81,7 +79,7 @@ const AvailabilityConsultation = ({
 
 			try {
 				const payLoad = {
-					day: value.day,
+					day: selectedDay,
 					start_time: to24HourTime(value.start_time),
 					end_time: to24HourTime(value.end_time),
 				};
@@ -97,7 +95,7 @@ const AvailabilityConsultation = ({
 				if (result.status === 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) => toast.error(message))
+						errorMessages.forEach((message) => toast.error(message)),
 					);
 					return;
 				} else if (result.status == 500) {
@@ -119,8 +117,8 @@ const AvailabilityConsultation = ({
 					setEndTime(undefined);
 					form.reset({
 						day: selectedDay ?? 'Monday',
-						start_time: startTime ?? "",
-						end_time: endTime ?? "",
+						start_time: startTime ?? '',
+						end_time: endTime ?? '',
 					});
 				}
 			} catch (error) {
@@ -130,6 +128,7 @@ const AvailabilityConsultation = ({
 			}
 		},
 	});
+	console.log(selectedDay);
 	const validEndTimes = useMemo(() => {
 		if (!selectedDay || !startTime) return [];
 
@@ -347,7 +346,7 @@ const AvailabilityConsultation = ({
 														className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/20 border text-sm"
 													>
 														<span>
-															{to12HourTime(sched.start_time)} - {' '}
+															{to12HourTime(sched.start_time)} -{' '}
 															{to12HourTime(sched.end_time)}
 														</span>
 														<button className="text-destructive hover:text-destructive/80 transition-colors">

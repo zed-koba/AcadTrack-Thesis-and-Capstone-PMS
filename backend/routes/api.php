@@ -79,7 +79,6 @@ Route::prefix("adviser")->group(function() {
     Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class,"deleteAvailability"]);
 
     //Adviser Weekly
-    Route::post("weekly/add", [AdviserWeeklyController::class, "storeWeekly"]);
     Route::put("{id}/weekly/update", [AdviserWeeklyController::class,"updateSchedule"]);
 
     //Adviser Comment
@@ -95,4 +94,5 @@ Route::prefix("student")->group(function() {
 
     //Student Consultation
     Route::get('weekly', [AdviserWeeklyController::class, "getSchedules"]);
+    Route::post('weekly/add', [AdviserWeeklyController::class, 'storeSchedule']);
 }); 

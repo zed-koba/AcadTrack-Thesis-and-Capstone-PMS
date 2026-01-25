@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AdviserWeekly extends Model
 {
     protected $table = "adviser_weeklies";
-    protected $fillable = ['adviser_id', 'student_id', 'date', 'day_of_week', 'start_time', 'end_time', 'purpose', 'feedback', 'status'];
+    protected $fillable = ['adviser_id', 'student_id', 'date', 'day_of_week', 'start_time', 'end_time', 'purpose', 'feedback', 'status', 'actual_start', 'actual_end'];
 
     public function adviser(): BelongsTo {
         return $this->belongsTo(Advisers::class, 'adviser_id');
