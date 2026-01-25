@@ -1,5 +1,12 @@
 import { cn } from '@/lib/utils';
-import { Calendar, CalendarCheck, Check, Clock, X } from 'lucide-react';
+import {
+	Calendar,
+	CalendarCheck,
+	CalendarX,
+	Check,
+	Clock,
+	X,
+} from 'lucide-react';
 import type { ConsultationDashboardProps } from '../../interface/consultation';
 
 const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
@@ -13,6 +20,7 @@ const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
 	const findCompleted = weeklies.filter(
 		(pen) => pen.status === 'completed',
 	).length;
+	const findExpired = weeklies.filter((pen) => pen.status === 'expired').length;
 	const dashboard = [
 		{
 			color: 'bg-slate-500/20',
@@ -44,11 +52,17 @@ const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
 			value: findCompleted,
 			label: 'Completed',
 		},
+		{
+			color: 'bg-slate-500/20',
+			icon: <CalendarX className="w-5 h-5 text-slate-200" />,
+			value: findExpired,
+			label: 'Expired',
+		},
 	];
 	return (
 		<>
 			<div className="flex flex-col gap-5 mt-5 w-full text-white">
-				<section className="grid lg:grid-cols-5 sm:grid-cols-2 gap-2 mb-6">
+				<section className="grid lg:grid-cols-6 sm:grid-cols-2 gap-2 mb-6">
 					{dashboard.map((board) => (
 						<div
 							key={board.label}

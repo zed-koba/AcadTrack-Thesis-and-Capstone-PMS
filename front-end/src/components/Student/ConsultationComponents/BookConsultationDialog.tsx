@@ -18,7 +18,7 @@ import {
 	type AdviserAvailabilityProps,
 } from '@/components/Adviser/interface/consultation';
 import { Calendar } from '@/components/ui/calendar';
-import { format, getDay, isSameDay } from 'date-fns';
+import { format, getDay, isAfter, isSameDay, parse } from 'date-fns';
 import { getDayNumber, studentId } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
 import { apiStudentUrl } from '@/components/Routes/http';
@@ -224,6 +224,8 @@ const BookConsultationDialog = ({
 			setIsSubmitting(false);
 		}
 	};
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={handleOpenChange}>
@@ -303,13 +305,15 @@ const BookConsultationDialog = ({
 											setSelectedWindow(null);
 											setSelectedSlot(null);
 										}}
-										disabled={(date) =>
-											date < new Date() || !dateHasAvailability(date)
-										}
+										disabled={(date) => {
+											const checkDate = new Date(date);
+											checkDate.setHours(0, 0, 0, 0);
+											return checkDate < today || !dateHasAvailability(date);
+										}}
 										className="rounded-md border border-border pointer-events-auto"
 										modifiers={{
 											available: (date) =>
-												dateHasAvailability(date) && date >= new Date(),
+												dateHasAvailability(date) && date >= today,
 										}}
 										modifiersStyles={{
 											available: {
@@ -343,8 +347,12 @@ const BookConsultationDialog = ({
 								</div>
 								<div className="grid gap-3">
 									{availableWindows
-										.slice()
-										.reverse()
+										.sort((a, b) => {
+											if (a.start_time !== b.start_time) {
+												return a.start_time.localeCompare(b.start_time);
+											}
+											return a.end_time.localeCompare(b.end_time);
+										})
 										.map((window) => (
 											<button
 												key={window.id}
@@ -352,6 +360,16 @@ const BookConsultationDialog = ({
 													setSelectedWindow(window);
 													setSelectedSlot(null);
 												}}
+												disabled={(() => {
+													const today = format(new Date(), 'yyyy-MM-dd');
+													const startDateTime = parse(
+														`${today} ${window.start_time}`,
+														'yyyy-MM-dd HH:mm',
+														new Date(),
+													);
+
+													return isAfter(new Date(), startDateTime);
+												})()}
 												className={cn(
 													'p-4 rounded-lg border-2 text-left transition-all',
 													selectedWindow?.id === window.id
@@ -554,7 +572,7 @@ const BookConsultationDialog = ({
 							disabled={isSubmitting}
 							className={cn(
 								'hover:bg-red-500',
-								currentStep !== 'date' && 'hover:bg-emerald-500',
+								currentStep !== 'date' && 'hover:bg-slate-500',
 							)}
 						>
 							<ArrowLeft className="h-4 w-4 mr-2" />

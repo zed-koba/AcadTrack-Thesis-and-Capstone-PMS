@@ -76,6 +76,7 @@ Route::prefix("adviser")->group(function() {
     //Adviser Availability
     Route::get("{id}/availabilities", [AdviserAvailabilityController::class, "getAvailabilities"]);
     Route::post("availabilities/add", [AdviserAvailabilityController::class, "storeAvailability"]);
+    Route::put("availabilities/update", [AdviserAvailabilityController::class, "updateAvailabilty"]);
     Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class,"deleteAvailability"]);
 
     //Adviser Weekly

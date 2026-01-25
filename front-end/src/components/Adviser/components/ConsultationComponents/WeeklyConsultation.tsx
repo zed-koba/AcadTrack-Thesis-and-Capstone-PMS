@@ -5,6 +5,10 @@ import {
 	AlertTriangle,
 	BookOpen,
 	Calendar,
+	CalendarCheck,
+	CalendarClock,
+	CalendarX,
+	Check,
 	ChevronLeft,
 	ChevronRight,
 	Clock,
@@ -35,7 +39,7 @@ import {
 } from '@/components/ui/tooltip';
 import { apiAdviserUrl } from '@/components/Routes/http';
 
-const START_HOUR = 1;
+const START_HOUR = 7;
 const END_HOUR = 19;
 
 // Generate time slots based on meeting duration
@@ -170,6 +174,25 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 			}
 		});
 	}, [weeklies, nowDate]);
+	const weekConsultations = useMemo(
+		() =>
+			weeklies.filter((c) => weekDays.some((day) => isSameDay(c.date, day))),
+		[weeklies, weekDays],
+	);
+	const weekStats = useMemo(
+		() => ({
+			total: weekConsultations.length,
+			pending: weekConsultations.filter((c) => c.status === 'pending').length,
+			overruns: weekConsultations.filter((c) => (c.overrunMinutes ?? 0) > 0)
+				.length,
+			approved: weekConsultations.filter((c) => c.status === 'approved').length,
+			ongoing: weekConsultations.filter((c) => c.status === 'ongoing').length,
+			completed: weekConsultations.filter((c) => c.status === 'completed')
+				.length,
+			expired: weekConsultations.filter((c) => c.status === 'expired').length,
+		}),
+		[weekConsultations],
+	);
 	return (
 		<>
 			<Card className="bg-card border-border">
@@ -229,7 +252,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 						<div className="flex items-center gap-2">
 							<Users className="h-4 w-4 text-muted-foreground" />
 							<span className="text-sm">
-								<span className="font-bold">{weeklies.length}</span>{' '}
+								<span className="font-bold">{weekStats.total}</span>{' '}
 								consultations
 							</span>
 						</div>
@@ -247,6 +270,48 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 								<span className="text-xs text-red-400">
 									<span className="font-bold">{overrunsSchedules}</span>{' '}
 									overruns
+								</span>
+							</div>
+						)}
+						{weekStats.pending > 0 && (
+							<div className="flex items-center gap-2 px-2 py-1 rounded bg-amber-500/20 border border-amber-500/40">
+								<AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+								<span className="text-xs text-amber-500">
+									<span className="font-bold">{weekStats.pending}</span> pending
+								</span>
+							</div>
+						)}
+						{weekStats.approved > 0 && (
+							<div className="flex items-center gap-2 px-2 py-1 rounded bg-emerald-500/20 border border-emerald-500/40">
+								<Check className="h-3.5 w-3.5 text-emerald-500" />
+								<span className="text-xs text-emerald-500">
+									<span className="font-bold">{weekStats.approved}</span>{' '}
+									approved
+								</span>
+							</div>
+						)}
+						{weekStats.ongoing > 0 && (
+							<div className="flex items-center gap-2 px-2 py-1 rounded bg-sky-500/20 border border-sky-500/40">
+								<CalendarClock className="h-3.5 w-3.5 text-sky-500" />
+								<span className="text-xs text-sky-500">
+									<span className="font-bold">{weekStats.ongoing}</span> ongoing
+								</span>
+							</div>
+						)}
+						{weekStats.completed > 0 && (
+							<div className="flex items-center gap-2 px-2 py-1 rounded bg-blue-500/20 border border-blue-500/40">
+								<CalendarCheck className="h-3.5 w-3.5 text-blue-500" />
+								<span className="text-xs text-blue-500">
+									<span className="font-bold">{weekStats.completed}</span>{' '}
+									completed
+								</span>
+							</div>
+						)}
+						{weekStats.expired > 0 && (
+							<div className="flex items-center gap-2 px-2 py-1 rounded bg-slate-500/20 border border-slate-400/40">
+								<CalendarX className="h-3.5 w-3.5 text-slate-200" />
+								<span className="text-xs text-slate-200">
+									<span className="font-bold">{weekStats.expired}</span> expired
 								</span>
 							</div>
 						)}

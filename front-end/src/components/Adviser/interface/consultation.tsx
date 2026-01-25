@@ -46,6 +46,7 @@ export type AdviserAvailabilityProps = {
 		id: number;
 		name: string;
 		duration: number;
+		consultation_limit: number;
 	};
 };
 

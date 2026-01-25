@@ -8,6 +8,7 @@ export type AdviserProps = {
 	department_id: number;
 	status: string;
 	duration: number;
+	consultation_limit: number;
 	created_at: string;
 	updated_at: string;
 	account: {

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->integer('duration')->nullable();
+            $table->integer('consultation_limit')->nullable();
             $table->timestamps();
         });
     }

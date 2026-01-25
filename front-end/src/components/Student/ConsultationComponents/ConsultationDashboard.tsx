@@ -72,6 +72,14 @@ const ConsultationDashboard = ({
 								</div>
 								<div className="flex items-center justify-between py-2 border-t border-border">
 									<span className="text-muted-foreground">
+										Consultation Limit
+									</span>
+									<span className="font-medium">
+										{project?.adviser.consultation_limit} consultations
+									</span>
+								</div>
+								<div className="flex items-center justify-between py-2 border-t border-border">
+									<span className="text-muted-foreground">
 										Session Duration
 									</span>
 									<span className="font-medium">
