@@ -18,7 +18,15 @@ import {
 	type AdviserAvailabilityProps,
 } from '@/components/Adviser/interface/consultation';
 import { Calendar } from '@/components/ui/calendar';
-import { format, getDay, isAfter, isSameDay, parse } from 'date-fns';
+import {
+	addDays,
+	format,
+	getDay,
+	isAfter,
+	isSameDay,
+	parse,
+	startOfWeek,
+} from 'date-fns';
 import { getDayNumber, studentId } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
 import { apiStudentUrl } from '@/components/Routes/http';
@@ -46,8 +54,7 @@ const BookConsultationDialog = ({
 	const [selectedWindow, setSelectedWindow] =
 		useState<AdviserAvailabilityProps | null>(null);
 	const filterWeeklies = weeklies.filter(
-		(w) =>
-			w.adviser_id == project?.adviser.id && studentIds.includes(w.student_id),
+		(w) => w.adviser_id == project?.adviser.id,
 	);
 	const generateSlotsForWindow = (
 		window: AdviserAvailabilityProps,
@@ -147,7 +154,6 @@ const BookConsultationDialog = ({
 				'yyyy-MM-dd HH:mm:ss',
 				new Date(),
 			);
-
 
 			return isAfter(slotStart, now);
 		});
@@ -258,6 +264,15 @@ const BookConsultationDialog = ({
 	};
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
+	const getDateForWeekday = (day: string): string => {
+		const today = new Date();
+
+		// week starts on Sunday — change to 1 if Monday-start week
+		const weekStart = startOfWeek(today, { weekStartsOn: 0 });
+		const targetDate = addDays(weekStart, getDayNumber(day));
+
+		return format(targetDate, 'yyyy-MM-dd');
+	};
 	return (
 		<>
 			<Dialog open={open} onOpenChange={handleOpenChange}>
@@ -296,8 +311,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-												!isCompleted &&
-												'bg-muted text-muted-foreground',
+													!isCompleted &&
+													'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -397,14 +412,14 @@ const BookConsultationDialog = ({
 													setSelectedSlot(null);
 												}}
 												disabled={(() => {
-													const today = format(new Date(), 'yyyy-MM-dd');
+													const dateForDay = getDateForWeekday(window.day);
 													const startDateTime = parse(
-														`${today} ${window.start_time}`,
+														`${dateForDay} ${window.start_time}`,
 														'yyyy-MM-dd HH:mm:ss',
 														new Date(),
 													);
 													const endDateTime = parse(
-														`${today} ${window.end_time}`,
+														`${dateForDay} ${window.end_time}`,
 														'yyyy-MM-dd HH:mm:ss',
 														new Date(),
 													);
@@ -474,6 +489,7 @@ const BookConsultationDialog = ({
 								<div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
 									{generateSlotsForWindow(selectedWindow).map((slot, index) => {
 										const booked = isSlotBooked(slot);
+
 										const isSelected = selectedSlot?.start === slot.start;
 										const today = format(new Date(), 'yyyy-MM-dd');
 										const startDateTime = parse(
@@ -490,14 +506,14 @@ const BookConsultationDialog = ({
 												className={cn(
 													'p-3 rounded-lg border text-center transition-all disabled:cursor-auto cursor-pointer',
 													booked &&
-													'opacity-40 cursor-not-allowed bg-muted border-border',
+														'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
-													!isSelected &&
-													'border-border hover:border-primary hover:bg-primary/5',
+														!isSelected &&
+														'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
-													'border-primary bg-primary text-primary-foreground',
+														'border-primary bg-primary text-primary-foreground',
 													isAfter(new Date(), startDateTime) &&
-													'border-none bg-muted text-slate-600! hover:bg-muted',
+														'border-none bg-muted text-slate-600! hover:bg-muted',
 												)}
 											>
 												<p

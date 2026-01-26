@@ -6,6 +6,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import {
+	BookOpen,
 	Calendar,
 	CalendarClock,
 	Check,
@@ -13,6 +14,8 @@ import {
 	FileText,
 	MessageSquare,
 	User,
+	Users,
+	Users2,
 	X,
 } from 'lucide-react';
 import {
@@ -31,6 +34,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { consultationIcon } from '@/components/functions/functions';
 
 const ConsultationDetails = ({
 	open,
@@ -50,18 +54,21 @@ const ConsultationDetails = ({
 			case 'approved':
 				return (
 					<Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50">
+						{consultationIcon[status]}
 						Confirmed
 					</Badge>
 				);
 			case 'pending':
 				return (
 					<Badge className="bg-amber-500/20 border text-amber-400 border-amber-500/50">
+						{consultationIcon[status]}
 						Pending
 					</Badge>
 				);
 			case 'completed':
 				return (
 					<Badge className="bg-blue-500/20 border text-blue-400 border-blue-500/50">
+						{consultationIcon[status]}
 						Completed
 					</Badge>
 				);
@@ -70,12 +77,14 @@ const ConsultationDetails = ({
 			case 'expired':
 				return (
 					<Badge className="bg-slate-500/20 border text-slate-200 border-slate-500/50">
+						{consultationIcon[status]}
 						Expired
 					</Badge>
 				);
 			case 'ongoing':
 				return (
 					<Badge className="bg-sky-500/20 text-sky-500 border-sky-500 border">
+						{consultationIcon[status]}
 						Ongoing
 					</Badge>
 				);
@@ -152,6 +161,7 @@ const ConsultationDetails = ({
 	);
 	const isPast = isAfter(new Date(), endDateTime);
 	const isOngoing = isAfter(new Date(), startDateTime) && !isPast;
+
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
@@ -188,12 +198,33 @@ const ConsultationDetails = ({
 							)}
 
 							<div className="flex items-start gap-3">
-								<User className="h-5 w-5 text-muted-foreground mt-0.5" />
+								<BookOpen className="h-5 w-5 text-muted-foreground mt-0.5" />
 								<div>
 									<p className="text-sm font-medium">Thesis/Capstone:</p>
 									<p className="text-sm text-muted-foreground">
 										{weekly.student.proponent_detail.proponent.title}
 									</p>
+								</div>
+							</div>
+							<div className="flex items-start gap-3">
+								<Users className="h-5 w-5 text-muted-foreground mt-0.5" />
+								<div>
+									<p className="text-sm font-medium">Members:</p>
+									<div className="text-sm text-muted-foreground flex gap-1.5 mt-1">
+										{weekly.student.proponent_detail.proponent.details.map(
+											(student) => (
+												<div
+													key={student.student.id}
+													className="bg-muted/50 border-muted/80 py-1 px-2 border rounded-sm flex gap-2 items-center"
+												>
+													<User className="w-3.5 h-3.5" />
+													<p className="text-xs font-normal">
+														{student.student.name}
+													</p>
+												</div>
+											),
+										)}
+									</div>
 								</div>
 							</div>
 

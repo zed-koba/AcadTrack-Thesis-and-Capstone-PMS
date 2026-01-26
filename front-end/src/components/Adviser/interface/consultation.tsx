@@ -73,6 +73,12 @@ export type AdviserWeeklyProps = {
 			proponent: {
 				proponents_id: string;
 				title: string;
+				details: {
+					student: {
+						id: number;
+						name: string;
+					};
+				}[];
 			};
 		};
 	};

@@ -3,6 +3,8 @@ import { apiStudentUrl } from '../Routes/http';
 import type { JSX } from 'react/jsx-runtime';
 import {
 	CalendarCheck,
+	CalendarClock,
+	CalendarX,
 	CircleCheckBig,
 	Clock,
 	Eye,
@@ -89,8 +91,10 @@ export const chapterStatusIcon: Record<string, JSX.Element> = {
 export const consultationIcon: Record<string, JSX.Element> = {
 	pending: <Clock className="h-3 w-3 mr-1" />,
 	rejected: <X className="h-3 w-3 mr-1" />,
-	'approved': <CircleCheckBig className="h-3 w-3 mr-1" />,
-	'completed': <CalendarCheck className="h-3 w-3 mr-1" />,
+	approved: <CircleCheckBig className="h-3 w-3 mr-1" />,
+	completed: <CalendarCheck className="h-3 w-3 mr-1" />,
+	expired: <CalendarX className="h-3 w-3 mr-1" />,
+	ongoing: <CalendarClock className="h-3 w-3 mr-1" />,
 };
 
 export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
@@ -104,7 +108,7 @@ export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
 	return doc.versions.length > 0 ? doc.versions[0].status : doc.status;
 };
 
-export const studentId = 1;
+export const studentId = 2;
 export const adviserId = 1;
 
 const dayToNumber: Record<string, number> = {
@@ -169,4 +173,23 @@ export const getDateLabel = (dateStr: string): string => {
 		month: 'short',
 		day: 'numeric',
 	});
+};
+
+export const getStatusColor = (status: string) => {
+	switch (status) {
+		case 'approved':
+			return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 hover:bg-sky-500/30';
+		case 'pending':
+			return 'bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30';
+		case 'completed':
+			return 'bg-blue-500/20 border-blue-500/50 text-blue-400 hover:bg-blue-500/30';
+		case 'rejected':
+			return 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30';
+		case 'expired':
+			return 'bg-slate-500/20 border-slate-500/50 text-slate-200 hover:bg-slate-500/30';
+		case 'ongoing':
+			return 'bg-sky-500/20 border-sky-500/50 text-sky-500 hover:bg-sky-500/30';
+		default:
+			return 'bg-muted';
+	}
 };

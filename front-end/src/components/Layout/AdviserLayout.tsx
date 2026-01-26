@@ -6,9 +6,21 @@ import { Toaster } from '@/components/ui/sonner';
 
 const AdviserLayout = () => {
 	const navItem: NavItem[] = [
-		{ label: 'Dashboard', to: '/Adviser', icon: <LayoutDashboard /> },
-		{ label: 'Consultation', to: '/Adviser/Consultation', icon: <Calendar /> },
-		{ label: 'Documents', to: '/Adviser/Documents', icon: <FileText /> },
+		{
+			label: 'Dashboard',
+			to: '/Adviser',
+			icon: <LayoutDashboard className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'Consultation',
+			to: '/Adviser/Consultation',
+			icon: <Calendar className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'Documents',
+			to: '/Adviser/Documents',
+			icon: <FileText className="w-5 h-5" strokeWidth={2.5} />,
+		},
 	];
 	return (
 		<div className="flex gap-5 content-start h-full relative">

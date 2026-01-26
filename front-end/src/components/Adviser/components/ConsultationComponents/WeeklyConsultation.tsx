@@ -11,6 +11,7 @@ import {
 	Check,
 	ChevronLeft,
 	ChevronRight,
+	CircleCheckBig,
 	Clock,
 	Users,
 } from 'lucide-react';
@@ -36,6 +37,7 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { apiAdviserUrl } from '@/components/Routes/http';
+import { getStatusColor } from '@/components/functions/functions';
 
 const START_HOUR = 7;
 const END_HOUR = 19;
@@ -96,24 +98,6 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 	};
 	const nowDate = new Date();
 
-	const getStatusColor = (status: string) => {
-		switch (status) {
-			case 'approved':
-				return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 hover:bg-sky-500/30';
-			case 'pending':
-				return 'bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30';
-			case 'completed':
-				return 'bg-blue-500/20 border-blue-500/50 text-blue-400 hover:bg-blue-500/30';
-			case 'rejected':
-				return 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30';
-			case 'expired':
-				return 'bg-slate-500/20 border-slate-500/50 text-slate-200 hover:bg-slate-500/30';
-			case 'ongoing':
-				return 'bg-sky-500/20 border-sky-500/50 text-sky-500 hover:bg-sky-500/30';
-			default:
-				return 'bg-muted';
-		}
-	};
 	const getConsultationsForDay = (day: Date) => {
 		return weeklies.filter((c) => isSameDay(parseISO(c.date), day));
 	};
@@ -188,6 +172,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 			completed: weekConsultations.filter((c) => c.status === 'completed')
 				.length,
 			expired: weekConsultations.filter((c) => c.status === 'expired').length,
+			rejected: weekConsultations.filter((c) => c.status === 'rejected').length,
 		}),
 		[weekConsultations],
 	);
@@ -281,7 +266,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 						)}
 						{weekStats.approved > 0 && (
 							<div className="flex items-center gap-2 px-2 py-1 rounded bg-emerald-500/20 border border-emerald-500/40">
-								<Check className="h-3.5 w-3.5 text-emerald-500" />
+								<CircleCheckBig className="h-3.5 w-3.5 text-emerald-500" />
 								<span className="text-xs text-emerald-500">
 									<span className="font-bold">{weekStats.approved}</span>{' '}
 									approved
@@ -310,6 +295,15 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 								<CalendarX className="h-3.5 w-3.5 text-slate-200" />
 								<span className="text-xs text-slate-200">
 									<span className="font-bold">{weekStats.expired}</span> expired
+								</span>
+							</div>
+						)}
+						{weekStats.rejected > 0 && (
+							<div className="flex items-center gap-2 px-2 py-1 rounded bg-red-500/20 border border-red-500/40">
+								<CalendarX className="h-3.5 w-3.5 text-red-500" />
+								<span className="text-xs text-red-500">
+									<span className="font-bold">{weekStats.expired}</span>{' '}
+									cancelled
 								</span>
 							</div>
 						)}

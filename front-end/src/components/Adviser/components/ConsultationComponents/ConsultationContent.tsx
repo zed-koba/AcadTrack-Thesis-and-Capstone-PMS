@@ -4,6 +4,7 @@ import { CalendarDays, Calendar, Clock } from 'lucide-react';
 import AvailabilityConsultation from './AvailabilityConsultation';
 import type { ConsultationContentProps } from '../../interface/consultation';
 import WeeklyConsultation from './WeeklyConsultation';
+import DailyConsultation from './DailyConsultation';
 
 const ConsultationContent = ({
 	availabilities,
@@ -32,7 +33,9 @@ const ConsultationContent = ({
 						<TabsContent value="weekly">
 							<WeeklyConsultation weeklies={weeklies} refresh={refresh} />
 						</TabsContent>
-						<TabsContent value="daily"></TabsContent>
+						<TabsContent value="daily">
+							<DailyConsultation weeklies={weeklies} refresh={refresh} />
+						</TabsContent>
 						<TabsContent value="availability">
 							<AvailabilityConsultation
 								availabilities={availabilities}

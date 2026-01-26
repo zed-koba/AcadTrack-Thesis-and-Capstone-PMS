@@ -4,6 +4,7 @@ import {
 	CalendarCheck,
 	CalendarX,
 	Check,
+	CircleCheckBig,
 	Clock,
 	X,
 } from 'lucide-react';
@@ -36,7 +37,7 @@ const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
 		},
 		{
 			color: 'bg-emerald-500/20',
-			icon: <Check className="w-5 h-5 text-emerald-500" />,
+			icon: <CircleCheckBig className="w-5 h-5 text-emerald-500" />,
 			value: findApproved,
 			label: 'Approved',
 		},

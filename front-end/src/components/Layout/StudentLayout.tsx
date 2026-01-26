@@ -9,14 +9,18 @@ const StundentLayout = () => {
 		{
 			label: 'Dashboard',
 			to: '/Student',
-			icon: <LayoutDashboard />,
+			icon: <LayoutDashboard className="w-5 h-5" strokeWidth={2.5} />,
 		},
 		{
 			label: 'Consultation',
 			to: '/Student/Consultation',
-			icon: <CalendarClock />,
+			icon: <CalendarClock className="w-5 h-5" strokeWidth={2.5} />,
 		},
-		{ label: 'Document', to: '/Student/Document', icon: <FileText /> },
+		{
+			label: 'Document',
+			to: '/Student/Document',
+			icon: <FileText className="w-5 h-5" strokeWidth={2.5} />,
+		},
 	];
 	return (
 		<div className="flex gap-5 content-start h-full relative">
