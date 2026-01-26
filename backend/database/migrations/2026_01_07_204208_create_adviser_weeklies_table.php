@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('purpose');
             $table->string('feedback')->nullable();
             $table->enum('status', ['pending', 'approved', 'completed', 'rejected', 'expired'])->default('pending');
-            $table->unique(['adviser_id', 'day_of_week', 'start_time', 'end_time'], 'unique_adviser_weekly_slot');
+            $table->unique(['adviser_id', 'start_time', 'date', 'end_time'], 'unique_adviser_weekly_slot');
             $table->timestamps();
         });
     }

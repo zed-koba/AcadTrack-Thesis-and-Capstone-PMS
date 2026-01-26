@@ -143,10 +143,11 @@ const BookConsultationDialog = ({
 		// Check if at least ONE slot hasn't started yet
 		return slots.some((slot) => {
 			const slotStart = parse(
-				`${dateStr} ${slot.start_time}`,
+				`${dateStr} ${slot.end_time}`,
 				'yyyy-MM-dd HH:mm:ss',
 				new Date(),
 			);
+
 
 			return isAfter(slotStart, now);
 		});
@@ -295,8 +296,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-													!isCompleted &&
-													'bg-muted text-muted-foreground',
+												!isCompleted &&
+												'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -477,7 +478,7 @@ const BookConsultationDialog = ({
 										const today = format(new Date(), 'yyyy-MM-dd');
 										const startDateTime = parse(
 											`${today} ${slot.start}`,
-											'yyyy-MM-dd HH:mm:ss',
+											'yyyy-MM-dd HH:mm',
 											new Date(),
 										);
 
@@ -485,18 +486,18 @@ const BookConsultationDialog = ({
 											<button
 												key={index}
 												onClick={() => !booked && setSelectedSlot(slot)}
-												disabled={booked || !isAfter(new Date(), startDateTime)}
+												disabled={booked || isAfter(new Date(), startDateTime)}
 												className={cn(
 													'p-3 rounded-lg border text-center transition-all disabled:cursor-auto cursor-pointer',
 													booked &&
-														'opacity-40 cursor-not-allowed bg-muted border-border',
+													'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
-														!isSelected &&
-														'border-border hover:border-primary hover:bg-primary/5',
+													!isSelected &&
+													'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
-														'border-primary bg-primary text-primary-foreground',
-													!isAfter(new Date(), startDateTime) &&
-														'border-none bg-muted text-slate-600! hover:bg-muted',
+													'border-primary bg-primary text-primary-foreground',
+													isAfter(new Date(), startDateTime) &&
+													'border-none bg-muted text-slate-600! hover:bg-muted',
 												)}
 											>
 												<p
