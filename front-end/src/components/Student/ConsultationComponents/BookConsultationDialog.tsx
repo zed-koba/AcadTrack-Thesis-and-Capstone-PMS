@@ -120,6 +120,37 @@ const BookConsultationDialog = ({
 		const dayOfWeek = getDay(checkDate);
 		return availabilities.some((slot) => getDayNumber(slot.day) === dayOfWeek);
 	};
+	const getSlotsForDay = (checkDate: Date) => {
+		const dayOfWeek = getDay(checkDate);
+		return availabilities.filter(
+			(slot) => getDayNumber(slot.day) === dayOfWeek,
+		);
+	};
+	const dateHasFutureAvailability = (checkDate: Date): boolean => {
+		const slots = getSlotsForDay(checkDate);
+
+		// No slots at all → no availability
+		if (slots.length === 0) return false;
+
+		// If not today, any slot means it's available
+		if (!isSameDay(checkDate, new Date())) {
+			return true;
+		}
+
+		const now = new Date();
+		const dateStr = format(checkDate, 'yyyy-MM-dd');
+
+		// Check if at least ONE slot hasn't started yet
+		return slots.some((slot) => {
+			const slotStart = parse(
+				`${dateStr} ${slot.start_time}`,
+				'yyyy-MM-dd HH:mm:ss',
+				new Date(),
+			);
+
+			return isAfter(slotStart, now);
+		});
+	};
 
 	// Get availability windows for selected date
 	const availableWindows = useMemo(() => {
@@ -308,7 +339,11 @@ const BookConsultationDialog = ({
 										disabled={(date) => {
 											const checkDate = new Date(date);
 											checkDate.setHours(0, 0, 0, 0);
-											return checkDate < today || !dateHasAvailability(date);
+											return (
+												checkDate < today ||
+												!dateHasAvailability(date) ||
+												!dateHasFutureAvailability(date)
+											);
 										}}
 										className="rounded-md border border-border pointer-events-auto"
 										modifiers={{
@@ -364,14 +399,22 @@ const BookConsultationDialog = ({
 													const today = format(new Date(), 'yyyy-MM-dd');
 													const startDateTime = parse(
 														`${today} ${window.start_time}`,
-														'yyyy-MM-dd HH:mm',
+														'yyyy-MM-dd HH:mm:ss',
+														new Date(),
+													);
+													const endDateTime = parse(
+														`${today} ${window.end_time}`,
+														'yyyy-MM-dd HH:mm:ss',
 														new Date(),
 													);
 
-													return isAfter(new Date(), startDateTime);
+													return (
+														isAfter(new Date(), startDateTime) &&
+														isAfter(new Date(), endDateTime)
+													);
 												})()}
 												className={cn(
-													'p-4 rounded-lg border-2 text-left transition-all',
+													"p-4 rounded-lg border-2 text-left transition-all cursor-pointer disabled:cursor-auto disabled:border-none disabled:bg-muted disabled:text-slate-600! hover:disabled:border-none relative hover:disabled:bg-muted disabled:after:content-[' '] disabled:after:bg-card disabled:after:absolute disabled:after:w-full disabled:after:h-0.5 disabled:after:top-1/2 disabled:after:left-0",
 													selectedWindow?.id === window.id
 														? 'border-primary bg-primary/10'
 														: 'border-border hover:border-primary/50 hover:bg-muted/50',
@@ -431,14 +474,20 @@ const BookConsultationDialog = ({
 									{generateSlotsForWindow(selectedWindow).map((slot, index) => {
 										const booked = isSlotBooked(slot);
 										const isSelected = selectedSlot?.start === slot.start;
+										const today = format(new Date(), 'yyyy-MM-dd');
+										const startDateTime = parse(
+											`${today} ${slot.start}`,
+											'yyyy-MM-dd HH:mm:ss',
+											new Date(),
+										);
 
 										return (
 											<button
 												key={index}
 												onClick={() => !booked && setSelectedSlot(slot)}
-												disabled={booked}
+												disabled={booked || !isAfter(new Date(), startDateTime)}
 												className={cn(
-													'p-3 rounded-lg border text-center transition-all',
+													'p-3 rounded-lg border text-center transition-all disabled:cursor-auto cursor-pointer',
 													booked &&
 														'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
@@ -446,6 +495,8 @@ const BookConsultationDialog = ({
 														'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
 														'border-primary bg-primary text-primary-foreground',
+													!isAfter(new Date(), startDateTime) &&
+														'border-none bg-muted text-slate-600! hover:bg-muted',
 												)}
 											>
 												<p

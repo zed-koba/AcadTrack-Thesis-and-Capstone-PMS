@@ -62,7 +62,7 @@ const Consultation = () => {
 							<Spinner className="size-8" />
 						</div>
 					) : (
-						<div className="grid lg:max-xl:grid-rows-2 xl:grid-cols-3 gap-6 w-full h-full">
+						<div className="grid lg:max-xl:grid-rows-[auto_1fr] xl:grid-cols-3 gap-6 w-full h-full">
 							<div className="xl:col-span-2 space-y-6 lg:max-xl:row-start-2">
 								<ConsultationContent
 									weeklies={weeklies}

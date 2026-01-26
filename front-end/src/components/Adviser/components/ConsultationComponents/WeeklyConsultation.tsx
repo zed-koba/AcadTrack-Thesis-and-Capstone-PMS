@@ -12,8 +12,6 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Clock,
-	Coffee,
-	User,
 	Users,
 } from 'lucide-react';
 import {

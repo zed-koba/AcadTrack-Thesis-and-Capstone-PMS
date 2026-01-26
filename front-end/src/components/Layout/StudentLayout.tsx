@@ -6,7 +6,11 @@ import { Toaster } from '@/components/ui/sonner';
 
 const StundentLayout = () => {
 	const navItem: NavItem[] = [
-		{ label: 'Dashboard', to: '/Student', icon: <LayoutDashboard /> },
+		{
+			label: 'Dashboard',
+			to: '/Student',
+			icon: <LayoutDashboard />,
+		},
 		{
 			label: 'Consultation',
 			to: '/Student/Consultation',
