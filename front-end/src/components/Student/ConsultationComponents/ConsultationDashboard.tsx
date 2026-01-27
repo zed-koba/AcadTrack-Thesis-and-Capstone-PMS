@@ -1,8 +1,18 @@
-import { BookOpen, Calendar, CheckCircle, Clock } from 'lucide-react';
+import {
+	BookOpen,
+	Calendar,
+	CalendarX,
+	CheckCircle,
+	Clock,
+} from 'lucide-react';
 import type { ConsultationDashboardProps } from '../interface/consultation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { getDayNumber } from '@/components/functions/functions';
+import {
+	getDayNumber,
+	studentId,
+	studentIds,
+} from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import { to12HourTime } from '@/components/Adviser/interface/consultation';
 
@@ -11,10 +21,17 @@ const ConsultationDashboard = ({
 	project,
 	availabilities,
 }: ConsultationDashboardProps) => {
-	const filterPending = weeklies.filter((w) => w.status === 'pending');
-	const filterCompleted = weeklies.filter((w) => w.status === 'completed');
+	const filterPending = weeklies.filter(
+		(w) => w.status === 'pending' && studentIds(project).includes(w.student_id),
+	);
+	const filterCompleted = weeklies.filter(
+		(w) =>
+			w.status === 'completed' && studentIds(project).includes(w.student_id),
+	);
+	const filterExpired = weeklies.filter(
+		(w) => w.status === 'expired' && studentIds(project).includes(w.student_id),
+	);
 	const now = new Date();
-
 	const upcomingSessions = weeklies.filter((s) => {
 		if (s.status !== 'approved') return false;
 
@@ -41,6 +58,12 @@ const ConsultationDashboard = ({
 			value: filterCompleted.length,
 			iconBg: 'bg-blue-500/10',
 			icon: <CheckCircle className="h-6 w-6 text-blue-500" />,
+		},
+		{
+			label: 'Expired Session',
+			value: filterExpired.length,
+			iconBg: 'bg-slate-500/10',
+			icon: <CalendarX className="h-6 w-6 text-slate-200" />,
 		},
 	];
 	return (
@@ -97,7 +120,7 @@ const ConsultationDashboard = ({
 						</CardContent>
 					</Card>
 				</div>
-				<div className="grid lg:max-xl:grid-cols-3 gap-3 lg:max-xl:row-start-1 lg:max-xl:col-span-2">
+				<div className="grid lg:max-xl:grid-cols-4 gap-3 lg:max-xl:row-start-1 lg:max-xl:col-span-2">
 					{dashboards.map((dashboard) => (
 						<Card className="border-border py-1" key={dashboard.label}>
 							<CardContent className="p-4">

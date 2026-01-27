@@ -12,7 +12,10 @@ import {
 	RefreshCcw,
 	X,
 } from 'lucide-react';
-import type { ChapterDocumentsProps } from '../Adviser/interface/adviserdocument';
+import type {
+	ChapterDocumentsProps,
+	ProponentsDocumentsProps,
+} from '../Adviser/interface/adviserdocument';
 import type { AdviserWeeklyProps } from '../Adviser/interface/consultation';
 
 export function formatDate(dateString: string) {
@@ -192,4 +195,10 @@ export const getStatusColor = (status: string) => {
 		default:
 			return 'bg-muted';
 	}
+};
+
+export const studentIds = (project?: ProponentsDocumentsProps | null) => {
+	return (project?.details.map((d) => d.student_id) ?? []).filter(
+		(id) => id !== undefined,
+	);
 };
