@@ -161,7 +161,7 @@ const ConsultationDashboard = ({
 								<div key={day} className="flex items-center gap-3 text-sm">
 									<span
 										className={cn(
-											'w-10 font-medium',
+											'w-10 font-medium mt-3',
 											daySlots.length > 0
 												? 'text-white'
 												: 'text-muted-foreground',
@@ -169,10 +169,15 @@ const ConsultationDashboard = ({
 									>
 										{day}
 									</span>
-									<div className="flex-1">
+									<div className="flex-1  mt-2">
 										{daySlots.length > 0 ? (
 											<div className="flex flex-wrap gap-1">
-												{daySlots.map((slot, i) => (
+												{daySlots.sort((a, b) => {
+													if (a.start_time !== b.start_time) {
+														return a.start_time.localeCompare(b.start_time);
+													}
+													return a.end_time.localeCompare(b.end_time);
+												}).map((slot, i) => (
 													<Badge
 														key={i}
 														variant="outline"

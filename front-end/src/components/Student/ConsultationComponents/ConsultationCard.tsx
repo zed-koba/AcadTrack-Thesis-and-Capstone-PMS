@@ -43,10 +43,14 @@ const ConsultationCard = ({ weekly, project }: ConsultationCardProps) => {
 						</div>
 
 						{/* Content */}
-						<div className="flex-1 min-w-0">
-							<div className="flex items-start justify-between gap-2">
-								<div className="min-w-0">
-									<div className="flex items-center gap-2 mb-1">
+						<div className="flex-1 min-w-0 w-full">
+							<div className="flex items-start justify-between gap-2 w-full">
+								<div className="min-w-0 w-full">
+									<div className="flex justify-between items-center gap-2 mb-1 w-full">
+
+										<span className="text-xs text-muted-foreground">
+											{getDateLabel(weekly.date)}
+										</span>
 										<Badge
 											variant="outline"
 											className={cn(
@@ -57,9 +61,6 @@ const ConsultationCard = ({ weekly, project }: ConsultationCardProps) => {
 											{consultationIcon[weekly.status]}
 											{weekly.status}
 										</Badge>
-										<span className="text-xs text-muted-foreground">
-											{getDateLabel(weekly.date)}
-										</span>
 									</div>
 									<h4
 										className={cn(

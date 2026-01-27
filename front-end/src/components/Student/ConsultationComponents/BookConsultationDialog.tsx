@@ -56,6 +56,18 @@ const BookConsultationDialog = ({
 	const filterWeeklies = weeklies.filter(
 		(w) => w.adviser_id == project?.adviser.id,
 	);
+
+	const checkExistigSchedule = (checkDate: Date): boolean => {
+		if (!isSameDay(new Date(), checkDate)) return false;
+		const checkExistingDate = filterWeeklies.filter((s) =>
+
+			s.status !== "rejected" && s.status !== "expired" && s.status !== "cancelled" && studentIds.includes(s.student_id)
+
+		)
+
+		return checkExistingDate.length > 0;
+	};
+
 	const generateSlotsForWindow = (
 		window: AdviserAvailabilityProps,
 	): { start: string; end: string }[] => {
@@ -154,10 +166,10 @@ const BookConsultationDialog = ({
 				'yyyy-MM-dd HH:mm:ss',
 				new Date(),
 			);
-
 			return isAfter(slotStart, now);
 		});
 	};
+
 
 	// Get availability windows for selected date
 	const availableWindows = useMemo(() => {
@@ -311,8 +323,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-													!isCompleted &&
-													'bg-muted text-muted-foreground',
+												!isCompleted &&
+												'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -358,7 +370,8 @@ const BookConsultationDialog = ({
 											return (
 												checkDate < today ||
 												!dateHasAvailability(date) ||
-												!dateHasFutureAvailability(date)
+												!dateHasFutureAvailability(date) ||
+												checkExistigSchedule(date)
 											);
 										}}
 										className="rounded-md border border-border pointer-events-auto"
@@ -491,13 +504,13 @@ const BookConsultationDialog = ({
 										const booked = isSlotBooked(slot);
 
 										const isSelected = selectedSlot?.start === slot.start;
-										const today = format(new Date(), 'yyyy-MM-dd');
+
 										const startDateTime = parse(
-											`${today} ${slot.start}`,
+											`${getDateForWeekday(selectedWindow.day)} ${slot.start}`,
 											'yyyy-MM-dd HH:mm',
 											new Date(),
 										);
-
+										console.log(startDateTime);
 										return (
 											<button
 												key={index}
@@ -506,14 +519,14 @@ const BookConsultationDialog = ({
 												className={cn(
 													'p-3 rounded-lg border text-center transition-all disabled:cursor-auto cursor-pointer',
 													booked &&
-														'opacity-40 cursor-not-allowed bg-muted border-border',
+													'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
-														!isSelected &&
-														'border-border hover:border-primary hover:bg-primary/5',
+													!isSelected &&
+													'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
-														'border-primary bg-primary text-primary-foreground',
+													'border-primary bg-primary text-primary-foreground',
 													isAfter(new Date(), startDateTime) &&
-														'border-none bg-muted text-slate-600! hover:bg-muted',
+													'border-none bg-muted text-slate-600! hover:bg-muted',
 												)}
 											>
 												<p

@@ -153,6 +153,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 			) {
 				expiredPostedRef.current.add(String(w.id));
 				updateStatus(w.id, 'expired', '');
+
 			}
 		});
 	}, [weeklies, nowDate]);
@@ -371,8 +372,8 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 														{format(day, 'd')}
 													</div>
 													<div className="flex items-center justify-center gap-1 mt-0.5">
-														<span className="text-[10px] text-muted-foreground">
-															{dayConsultations.length} sessions
+														<span className="text-[12px] text-muted-foreground">
+															<span className={cn("text-emerald-500", isSameDay(day, new Date()) && 'text-primary', dayConsultations.length === 0 && 'text-red-400')}>{dayConsultations.length} </span>sessions
 														</span>
 														{/* {dayBreaks.length > 0 && (
 															<Coffee className="h-3 w-3 text-cyan-400" />
@@ -402,7 +403,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 													className={cn(
 														'px-2 py-1 text-[10px] text-muted-foreground align-top border-r border-border sticky left-0 bg-card z-10',
 														isHourStart &&
-															'font-medium text-foreground text-xs',
+														'font-medium text-foreground text-xs',
 													)}
 												>
 													{formatSlotTime(slot.hour, slot.minute)}

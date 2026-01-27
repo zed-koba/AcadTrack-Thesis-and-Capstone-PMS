@@ -81,6 +81,10 @@ export const statusColor: Record<string, string> = {
 	'under review': 'bg-success/20 border-success/40 text-success',
 	'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
 	'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
+	'ongoing': 'bg-sky-500/20 border-sky-500/40 text-sky-500',
+	'rejected': 'bg-red-500/20 border-red-500/40 text-red-500',
+	'cancelled': 'bg-red-500/20 border-red-500/40 text-red-500',
+	'expired': 'bg-slate-500/20 border-slate-500/40 text-slate-200',
 	'general': 'bg-primary/20 border-primary/40 text-primary',
 	'revised': 'bg-teal-500/20 border-teal-500/20 text-teal-500',
 };
@@ -94,6 +98,7 @@ export const chapterStatusIcon: Record<string, JSX.Element> = {
 export const consultationIcon: Record<string, JSX.Element> = {
 	pending: <Clock className="h-3 w-3 mr-1" />,
 	rejected: <X className="h-3 w-3 mr-1" />,
+	cancelled: <X className="h-3 w-3 mr-1" />,
 	approved: <CircleCheckBig className="h-3 w-3 mr-1" />,
 	completed: <CalendarCheck className="h-3 w-3 mr-1" />,
 	expired: <CalendarX className="h-3 w-3 mr-1" />,
@@ -136,7 +141,7 @@ export const upcomingSessions = (weeklies: AdviserWeeklyProps[]) => {
 	const getUpcoming = weeklies.filter((s) => {
 		const endDateTime = new Date(`${s.date}T${s.end_time}`);
 
-		return endDateTime > now;
+		return endDateTime > now && s.status !== "rejected" && s.status !== "completed" && s.status !== "cancelled";
 	});
 
 	return getUpcoming;
@@ -146,7 +151,7 @@ export const pastSessions = (weeklies: AdviserWeeklyProps[]) => {
 	const getUpcoming = weeklies.filter((s) => {
 		const endDateTime = new Date(`${s.date}T${s.end_time}`);
 
-		return endDateTime < now;
+		return endDateTime < now || s.status === "rejected" || s.status === "cancelled" || s.status === "completed";
 	});
 
 	return getUpcoming;
@@ -187,6 +192,8 @@ export const getStatusColor = (status: string) => {
 		case 'completed':
 			return 'bg-blue-500/20 border-blue-500/50 text-blue-400 hover:bg-blue-500/30';
 		case 'rejected':
+			return 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30';
+		case 'cancelled':
 			return 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30';
 		case 'expired':
 			return 'bg-slate-500/20 border-slate-500/50 text-slate-200 hover:bg-slate-500/30';

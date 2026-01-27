@@ -8,7 +8,7 @@ const Sidebar = ({ navItem }: NavItemProps) => {
 	return (
 		<>
 			<aside
-				className="relative flex flex-col h-auto bg-background transition-all duration-300 ease-in-out border-r border-muted w-56 min-h-screen"
+				className="relative flex flex-col h-auto shrink-0 bg-background transition-all duration-300 ease-in-out border-r border-muted w-56 min-h-screen"
 				aria-label="Sidebar"
 			>
 				<div className="flex items-center h-16 border-b border-muted transition-all duration-300 px-4">

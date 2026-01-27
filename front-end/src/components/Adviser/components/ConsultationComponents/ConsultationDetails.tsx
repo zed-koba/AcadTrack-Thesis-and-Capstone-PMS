@@ -73,7 +73,9 @@ const ConsultationDetails = ({
 					</Badge>
 				);
 			case 'rejected':
-				return <Badge variant="destructive">Cancelled</Badge>;
+				return <Badge variant="destructive" className="bg-red-500/20 border border-red-500/50 text-red-500">{consultationIcon[status]} Rejected</Badge>;
+			case 'cancelled':
+				return <Badge variant="destructive" className="bg-red-500/20 border border-red-500/50 text-red-500">{consultationIcon[status]} Cancelled</Badge>;
 			case 'expired':
 				return (
 					<Badge className="bg-slate-500/20 border text-slate-200 border-slate-500/50">
@@ -177,7 +179,7 @@ const ConsultationDetails = ({
 							{(weekly.actual_start !== null || weekly.actual_end !== null) && (
 								<div className="flex gap-2">
 									{weekly.start_time !== weekly.actual_start &&
-									weekly.actual_start !== null ? (
+										weekly.actual_start !== null ? (
 										<div className="rounded-full border border-amber-500/40 text-amber-500 bg-amber-500/20 py-0.5 px-3 font-medium text-sm">
 											+{differenceInMinutes(actualStartDateTime, startDateTime)}
 											mins delayed
@@ -186,7 +188,7 @@ const ConsultationDetails = ({
 										''
 									)}
 									{weekly.end_time !== weekly.actual_end &&
-									weekly.actual_end !== null ? (
+										weekly.actual_end !== null ? (
 										<div className="rounded-full border border-red-500/40 text-red-500 bg-red-500/20 py-0.5 px-3 font-medium text-sm">
 											+{differenceInMinutes(actualEndDateTime, endDateTime)}
 											mins overrun
@@ -328,7 +330,7 @@ const ConsultationDetails = ({
 						{weekly.status === 'rejected' && (
 							<div className="flex gap-2 pt-4 border-t border-border">
 								<Button
-									onClick={() => {}}
+									onClick={() => { }}
 									variant="outline"
 									className="flex-1 bg-amber-600 hover:bg-amber-600/80"
 								>
@@ -388,39 +390,18 @@ const ConsultationDetails = ({
 						)}
 						{weekly.status === 'ongoing' && (
 							<div className="grid grid-cols-1 pt-4 border-t border-border">
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<span className="inline-flex">
-											<Button
-												onClick={() => {
-													updateStatus('ongoing', '', nowDateTime);
-													setOpen(false);
-												}}
-												className="flex-1 bg-red-500/20 hover:b-red-500/40 text-red-500"
-												variant="outline"
-												disabled={!isPast}
-											>
-												<X />
-												End Consultation
-											</Button>
-										</span>
-									</TooltipTrigger>
-									<TooltipContent>
-										{!isPast && (
-											<p className="font-normal text-sm text-muted-foreground">
-												Available{' '}
-												{format(nowDate, 'yyyy-MM-dd') === weekly?.date
-													? `at ${to12HourTime(weekly?.end_time)}`
-													: `on ${format(weekly?.date, 'eee')} at ${to12HourTime(weekly?.end_time)}`}
-											</p>
-										)}
-										{isPast && (
-											<p className="font-normal text-sm text-muted-foreground">
-												End Consultation
-											</p>
-										)}
-									</TooltipContent>
-								</Tooltip>
+								<Button
+									onClick={() => {
+										updateStatus('completed', '', nowDateTime);
+										setOpen(false);
+									}}
+									className="flex-1 bg-red-500/20 hover:b-red-500/40 text-red-500 hover:bg-red-500/30"
+									variant="outline"
+
+								>
+									<X />
+									End Consultation
+								</Button>
 							</div>
 						)}
 						{weekly.status === 'completed' && weekly.feedback === null && (

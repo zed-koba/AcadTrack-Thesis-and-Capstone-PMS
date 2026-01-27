@@ -31,7 +31,7 @@ import {
 	getStatusColor,
 } from '@/components/functions/functions';
 import ConsultationDetails from './ConsultationDetails';
-const START_HOUR = 0;
+const START_HOUR = 7;
 const END_HOUR = 19;
 const generateTimeSlots = (meetingDuration: number) => {
 	const slots: { hour: number; minute: number; time: string }[] = [];

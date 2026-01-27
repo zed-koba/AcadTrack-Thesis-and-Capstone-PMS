@@ -51,15 +51,26 @@ const ConsultationContent = ({
 	const filterPastSessions = pastSessions(weeklies).filter((past) =>
 		studentIds?.includes(past.student_id),
 	);
+	const statusBg: Record<string, string> = {
+		pending: "bg-amber-500/10 border-amber-500/50",
+		approved: "bg-emerald-500/5 border-emerald-500/50",
+		ongoing: "bg-sky-500/5 border-sky-500/50",
+	}
+	const statusText: Record<string, string> = {
+		pending: "text-amber-500",
+		approved: "text-emerald-500",
+		ongoing: "text-sky-500",
+	}
+
 	return (
 		<>
 			<div className="lg:col-span-2 mt-5">
 				{/* Featured Next Consultation */}
 				{filterSchedule.length > 0 && (
-					<Card className="border-primary/50 bg-primary/5">
+					<Card className={cn("text-white", statusBg[filterSchedule[0].status])}>
 						<CardHeader>
 							<div className="flex items-center justify-between">
-								<CardTitle className="text-sm font-medium text-primary">
+								<CardTitle className={cn("text-sm font-medium", statusText[filterSchedule[0].status])}>
 									Next Consultation
 								</CardTitle>
 								<Badge
