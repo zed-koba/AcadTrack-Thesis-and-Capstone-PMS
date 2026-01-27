@@ -45,7 +45,7 @@ const ConsultationDetails = ({
 	const [feedback, setFeedback] = useState<string | null>(
 		weekly?.feedback ?? '',
 	);
-	const nowDateTime = format(new Date(), 'hh:mm');
+	const nowDateTime = format(new Date(), 'HH:mm');
 	const nowDate = new Date();
 	if (!weekly) return null;
 
@@ -387,19 +387,40 @@ const ConsultationDetails = ({
 							</div>
 						)}
 						{weekly.status === 'ongoing' && (
-							<div className="grid grid-cols-2 pt-4 border-t border-border">
-								<Button
-									onClick={() => {
-										updateStatus('completed', '', nowDateTime);
-										setOpen(false);
-									}}
-									className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-500 col-start-1 col-span-2"
-									variant="outline"
-									disabled={!isPast}
-								>
-									<Check />
-									End Consultation
-								</Button>
+							<div className="grid grid-cols-1 pt-4 border-t border-border">
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="inline-flex">
+											<Button
+												onClick={() => {
+													updateStatus('ongoing', '', nowDateTime);
+													setOpen(false);
+												}}
+												className="flex-1 bg-red-500/20 hover:b-red-500/40 text-red-500"
+												variant="outline"
+												disabled={!isPast}
+											>
+												<X />
+												End Consultation
+											</Button>
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>
+										{!isPast && (
+											<p className="font-normal text-sm text-muted-foreground">
+												Available{' '}
+												{format(nowDate, 'yyyy-MM-dd') === weekly?.date
+													? `at ${to12HourTime(weekly?.end_time)}`
+													: `on ${format(weekly?.date, 'eee')} at ${to12HourTime(weekly?.end_time)}`}
+											</p>
+										)}
+										{isPast && (
+											<p className="font-normal text-sm text-muted-foreground">
+												End Consultation
+											</p>
+										)}
+									</TooltipContent>
+								</Tooltip>
 							</div>
 						)}
 						{weekly.status === 'completed' && weekly.feedback === null && (
