@@ -29,6 +29,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { apiAdviserUrl } from '@/components/Routes/http';
 import { toast } from 'sonner';
 import DeleteSchedule from './DeleteSchedule';
+import { generateTimeSlots } from '@/components/functions/functions';
 
 const availabilitySchema = z.object({
 	day: z.string().optional().nullable(),
@@ -69,6 +70,10 @@ const AvailabilityConsultation = ({
 		'6:00 PM',
 		'7:00 PM',
 	];
+	const timeSlots: string[] = useMemo(
+		() => generateTimeSlots(15).map((slot) => to12HourTime(slot.time)),
+		[],
+	);
 
 	// const DURATION_OPTIONS = [
 	// 	{ value: 15, label: '15 minutes' },
@@ -181,13 +186,13 @@ const AvailabilityConsultation = ({
 	const validEndTimes = useMemo(() => {
 		if (!selectedDay || !startTime) return [];
 
-		return getValidEndTimes(AVAIL_TIME, startTime, selectedDay, availabilities);
+		return getValidEndTimes(timeSlots, startTime, selectedDay, availabilities);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [startTime, selectedDay, availabilities]);
 
 	const validStartTimes = useMemo(() => {
 		if (!selectedDay) return [];
-		return getValidStartTimes(AVAIL_TIME, selectedDay, availabilities);
+		return getValidStartTimes(timeSlots, selectedDay, availabilities);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedDay, availabilities]);
 	return (

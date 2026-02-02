@@ -1,7 +1,7 @@
 import { Tabs, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { TabsList } from '@radix-ui/react-tabs';
 import { CalendarDays, Calendar, Clock } from 'lucide-react';
-import AvailabilityConsultation from './AvailabilityConsultation';
+import AvailabilityConsultation from './AvailabilityConsultationv2';
 import type { ConsultationContentProps } from '../../interface/consultation';
 import WeeklyConsultation from './WeeklyConsultation';
 import DailyConsultation from './DailyConsultation';

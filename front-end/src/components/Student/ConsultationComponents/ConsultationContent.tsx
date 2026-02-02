@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConsultationCard from './ConsultationCard';
 import { useState } from 'react';
-import BookConsultationDialog from './BookConsultationDialog';
+import BookConsultationDialog from './BookConsultationDialogv2';
 import RescheduleConsultation from './RescheduleConsultation';
 import CancelAlertDialog from './CancelAlertDialog';
 
@@ -52,25 +52,32 @@ const ConsultationContent = ({
 		studentIds?.includes(past.student_id),
 	);
 	const statusBg: Record<string, string> = {
-		pending: "bg-amber-500/10 border-amber-500/50",
-		approved: "bg-emerald-500/5 border-emerald-500/50",
-		ongoing: "bg-sky-500/5 border-sky-500/50",
-	}
+		pending: 'bg-amber-500/10 border-amber-500/50',
+		approved: 'bg-emerald-500/5 border-emerald-500/50',
+		ongoing: 'bg-sky-500/5 border-sky-500/50',
+	};
 	const statusText: Record<string, string> = {
-		pending: "text-amber-500",
-		approved: "text-emerald-500",
-		ongoing: "text-sky-500",
-	}
+		pending: 'text-amber-500',
+		approved: 'text-emerald-500',
+		ongoing: 'text-sky-500',
+	};
 
 	return (
 		<>
 			<div className="lg:col-span-2 mt-5">
 				{/* Featured Next Consultation */}
 				{filterSchedule.length > 0 && (
-					<Card className={cn("text-white", statusBg[filterSchedule[0].status])}>
+					<Card
+						className={cn('text-white', statusBg[filterSchedule[0].status])}
+					>
 						<CardHeader>
 							<div className="flex items-center justify-between">
-								<CardTitle className={cn("text-sm font-medium", statusText[filterSchedule[0].status])}>
+								<CardTitle
+									className={cn(
+										'text-sm font-medium',
+										statusText[filterSchedule[0].status],
+									)}
+								>
 									Next Consultation
 								</CardTitle>
 								<Badge

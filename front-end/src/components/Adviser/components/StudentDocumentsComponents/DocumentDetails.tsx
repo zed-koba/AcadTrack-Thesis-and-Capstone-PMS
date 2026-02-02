@@ -83,13 +83,13 @@ const DocumentDetails = ({
 		const childVersions = documents
 			.filter(d => d.parent_document_id === document?.id)
 			.sort((a, b) => b.version - a.version);
-		console.log(documents);
+		
 		const allVersions = document
 			? [document, ...childVersions]
 			: childVersions;
 
 		return allVersions.sort((a, b) => b.version - a.version);
-	}, [documents, selectedDocumentId, document]);
+	}, [documents, document]);
 
 	type formValues = z.infer<typeof commentSchema>;
 	const defaultValues: formValues = {

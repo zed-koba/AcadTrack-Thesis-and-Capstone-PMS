@@ -26,7 +26,7 @@ const Sidebar = ({ navItem }: NavItemProps) => {
 				<nav className="flex-1 py-4 px-2 overflow-y-auto">
 					<ul className="space-y-0.5">
 						{navItem.map((item) => (
-							<li>
+							<li key={item.to}>
 								<NavLink
 									key={item.to}
 									to={item.to}

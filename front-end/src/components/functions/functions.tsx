@@ -141,7 +141,12 @@ export const upcomingSessions = (weeklies: AdviserWeeklyProps[]) => {
 	const getUpcoming = weeklies.filter((s) => {
 		const endDateTime = new Date(`${s.date}T${s.end_time}`);
 
-		return endDateTime > now && s.status !== "rejected" && s.status !== "completed" && s.status !== "cancelled";
+		return (
+			endDateTime > now &&
+			s.status !== 'rejected' &&
+			s.status !== 'completed' &&
+			s.status !== 'cancelled'
+		);
 	});
 
 	return getUpcoming;
@@ -151,7 +156,12 @@ export const pastSessions = (weeklies: AdviserWeeklyProps[]) => {
 	const getUpcoming = weeklies.filter((s) => {
 		const endDateTime = new Date(`${s.date}T${s.end_time}`);
 
-		return endDateTime < now || s.status === "rejected" || s.status === "cancelled" || s.status === "completed";
+		return (
+			endDateTime < now ||
+			s.status === 'rejected' ||
+			s.status === 'cancelled' ||
+			s.status === 'completed'
+		);
 	});
 
 	return getUpcoming;
@@ -208,4 +218,18 @@ export const studentIds = (project?: ProponentsDocumentsProps | null) => {
 	return (project?.details.map((d) => d.student_id) ?? []).filter(
 		(id) => id !== undefined,
 	);
+};
+export const START_HOUR = 7;
+export const END_HOUR = 19;
+
+// Generate time slots based on meeting duration
+export const generateTimeSlots = (meetingDuration: number) => {
+	const slots: { hour: number; minute: number; time: string }[] = [];
+	for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+		for (let minute = 0; minute < 60; minute += meetingDuration) {
+			const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+			slots.push({ hour, minute, time });
+		}
+	}
+	return slots;
 };

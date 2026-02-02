@@ -68,9 +68,11 @@ class AdviserWeeklyController extends Controller
         $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return response()->json([
+                'status' => 422,
                 'message' => 'Failed to store schedule',
+                'request' => $request->all(),
                 'error' => $validator->errors(),
-            ]);
+            ], 422);
         }
 
         try {

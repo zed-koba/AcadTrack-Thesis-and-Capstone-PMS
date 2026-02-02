@@ -37,22 +37,10 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { apiAdviserUrl } from '@/components/Routes/http';
-import { getStatusColor } from '@/components/functions/functions';
-
-const START_HOUR = 7;
-const END_HOUR = 19;
-
-// Generate time slots based on meeting duration
-const generateTimeSlots = (meetingDuration: number) => {
-	const slots: { hour: number; minute: number; time: string }[] = [];
-	for (let hour = START_HOUR; hour < END_HOUR; hour++) {
-		for (let minute = 0; minute < 60; minute += meetingDuration) {
-			const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-			slots.push({ hour, minute, time });
-		}
-	}
-	return slots;
-};
+import {
+	generateTimeSlots,
+	getStatusColor,
+} from '@/components/functions/functions';
 
 const formatTime = (time: string) => {
 	const [hours, minutes] = time.split(':').map(Number);
@@ -153,7 +141,6 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 			) {
 				expiredPostedRef.current.add(String(w.id));
 				updateStatus(w.id, 'expired', '');
-
 			}
 		});
 	}, [weeklies, nowDate]);
@@ -373,7 +360,17 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 													</div>
 													<div className="flex items-center justify-center gap-1 mt-0.5">
 														<span className="text-[12px] text-muted-foreground">
-															<span className={cn("text-emerald-500", isSameDay(day, new Date()) && 'text-primary', dayConsultations.length === 0 && 'text-red-400')}>{dayConsultations.length} </span>sessions
+															<span
+																className={cn(
+																	'text-emerald-500',
+																	isSameDay(day, new Date()) && 'text-primary',
+																	dayConsultations.length === 0 &&
+																		'text-red-400',
+																)}
+															>
+																{dayConsultations.length}{' '}
+															</span>
+															sessions
 														</span>
 														{/* {dayBreaks.length > 0 && (
 															<Coffee className="h-3 w-3 text-cyan-400" />
@@ -403,7 +400,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 													className={cn(
 														'px-2 py-1 text-[10px] text-muted-foreground align-top border-r border-border sticky left-0 bg-card z-10',
 														isHourStart &&
-														'font-medium text-foreground text-xs',
+															'font-medium text-foreground text-xs',
 													)}
 												>
 													{formatSlotTime(slot.hour, slot.minute)}
