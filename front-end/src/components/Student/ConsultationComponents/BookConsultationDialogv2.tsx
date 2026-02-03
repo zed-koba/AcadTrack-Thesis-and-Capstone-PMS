@@ -398,17 +398,15 @@ const BookConsultationDialog = ({
 											};
 
 											const booked = isSlotBooked(slots);
-
+											const expired =
+												isAfter(new Date(), startDateTime) &&
+												isAfter(new Date(), endDateTime);
 											return (
 												<button
 													key={window.id}
 													onClick={() => !booked && setSelectedWindow(window)}
 													disabled={(() => {
-														return (
-															(isAfter(new Date(), startDateTime) &&
-																isAfter(new Date(), endDateTime)) ||
-															booked
-														);
+														return expired || booked;
 													})()}
 													className={cn(
 														"p-4 rounded-lg border-2 text-left transition-all cursor-pointer disabled:cursor-auto disabled:border-none disabled:bg-muted disabled:text-slate-600! hover:disabled:border-none relative hover:disabled:bg-muted disabled:after:content-[' '] disabled:after:bg-card disabled:after:absolute disabled:after:w-full disabled:after:h-0.5 disabled:after:top-1/2 disabled:after:left-0",
@@ -444,7 +442,9 @@ const BookConsultationDialog = ({
 																<p className="text-sm text-muted-foreground">
 																	{booked
 																		? 'Booked'
-																		: 'Available to book/appoint'}
+																		: expired
+																			? 'Expired'
+																			: 'Available to book/appoint'}
 																</p>
 															</div>
 														</div>

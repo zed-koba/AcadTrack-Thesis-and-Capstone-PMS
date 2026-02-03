@@ -84,6 +84,8 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 	const navigateWeek = (direction: 'prev' | 'next') => {
 		setCurrentDate((prev) => addDays(prev, direction === 'next' ? 7 : -7));
 	};
+	const adviserDuration =
+		weeklies.length > 0 ? weeklies[0].adviser.duration : 15;
 	const nowDate = new Date();
 
 	const getConsultationsForDay = (day: Date) => {
@@ -92,8 +94,8 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 
 	const overrunsSchedules = weeklies.filter((w) => w.overrunMinutes > 0).length;
 	const timeSlots = useMemo(
-		() => generateTimeSlots(weeklies[0].adviser.duration),
-		[weeklies],
+		() => generateTimeSlots(adviserDuration),
+		[adviserDuration],
 	);
 
 	const updateStatus = async (id: number, status: string, feedback: string) => {
@@ -174,7 +176,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 								Weekly Schedule
 							</CardTitle>
 							<span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
-								{weeklies[0].adviser.duration} min slots
+								{adviserDuration} min slots
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
@@ -411,7 +413,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 													const slotConsultations = getConsultationsForSlot(
 														dayConsultations,
 														slot.time,
-														weeklies[0].adviser.duration,
+														adviserDuration,
 													);
 													// const slotBreaks = getBreaksForSlot(
 													// 	dayBreaks,
