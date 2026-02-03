@@ -8,12 +8,12 @@ import type {
 import { apiAdviserUrl } from '@/components/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { adviserId } from '@/components/functions/functions';
+import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
 
 const AdviserConsultation = () => {
 	const [availabilities, setAvabilities] = useState<AdviserAvailabilityProps[]>(
 		[],
 	);
-
 	const [weeklies, setWeeklies] = useState<AdviserWeeklyProps[]>([]);
 	const [loading, setLoading] = useState(true);
 	const fetchAvaibilities = async () => {

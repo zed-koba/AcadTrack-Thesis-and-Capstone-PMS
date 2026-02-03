@@ -30,6 +30,7 @@ import { getDayNumber, studentId } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
 import { apiStudentUrl } from '@/components/Routes/http';
 import { toast } from 'sonner';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Step = 'date' | 'window' | 'slot' | 'confirm';
 
@@ -57,9 +58,7 @@ const BookConsultationDialog = ({
 		//if (!isSameDay(new Date(), checkDate)) return false;
 		const checkExistingDate = filterWeeklies.filter(
 			(s) =>
-				s.status !== 'rejected' &&
 				s.status !== 'expired' &&
-				s.status !== 'cancelled' &&
 				s.date === format(checkDate, 'yyyy-MM-dd') &&
 				studentIds.includes(s.student_id),
 		);
@@ -72,7 +71,7 @@ const BookConsultationDialog = ({
 		if (!selectedDate) return false;
 
 		return filterWeeklies.some((booking) => {
-			if (booking.status === 'cancelled') return false;
+			if (booking.status === 'cancelled' || booking.status === 'rejected') return false;
 			if (!isSameDay(new Date(booking.date), selectedDate)) return false;
 
 			// Check for overlap
@@ -291,8 +290,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-													!isCompleted &&
-													'bg-muted text-muted-foreground',
+												!isCompleted &&
+												'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -314,152 +313,152 @@ const BookConsultationDialog = ({
 					</div>
 
 					{/* Step Content */}
-					<div className="p-6 min-h-80">
-						{/* Step 1: Select Date */}
-						{currentStep === 'date' && (
-							<div className="space-y-4">
-								<div>
-									<h3 className="font-semibold text-lg">Select a Date</h3>
-									<p className="text-sm text-muted-foreground">
-										Choose from available days marked on the calendar
-									</p>
-								</div>
-								<div className="flex justify-center">
-									<Calendar
-										mode="single"
-										selected={selectedDate}
-										onSelect={(date) => {
-											setSelectedDate(date);
-											setSelectedWindow(null);
-										}}
-										disabled={(date) => {
-											const checkDate = new Date(date);
-											checkDate.setHours(0, 0, 0, 0);
-
-											return (
-												checkDate < today ||
-												!dateHasAvailability(date) ||
-												!dateHasFutureAvailability(date) ||
-												checkExistigSchedule(date)
-											);
-										}}
-										className="rounded-md border border-border pointer-events-auto"
-										modifiers={{
-											available: (date) =>
-												dateHasAvailability(date) && date >= today,
-										}}
-										modifiersStyles={{
-											available: {
-												backgroundColor: 'hsl(var(--primary) / 0.1)',
-												borderRadius: '4px',
-											},
-										}}
-									/>
-								</div>
-								{selectedDate && (
-									<div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-center">
-										<p className="text-sm font-medium">
-											Selected:{' '}
-											<span className="text-primary">
-												{format(selectedDate, 'EEEE, MMMM d, yyyy')}
-											</span>
+					<ScrollArea className="max-h-[500px]">
+						<div className="p-6 min-h-80">
+							{/* Step 1: Select Date */}
+							{currentStep === 'date' && (
+								<div className="space-y-4">
+									<div>
+										<h3 className="font-semibold text-lg">Select a Date</h3>
+										<p className="text-sm text-muted-foreground">
+											Choose from available days marked on the calendar
 										</p>
 									</div>
-								)}
-							</div>
-						)}
-						{/* Step 2: Select Availability Window */}
-						{currentStep === 'window' && (
-							<div className="space-y-4">
-								<div>
-									<h3 className="font-semibold text-lg">Select Time Window</h3>
-									<p className="text-sm text-muted-foreground">
-										Choose from {project?.adviser.name}'s available time windows
-										on {selectedDate && format(selectedDate, 'MMM d')}
-									</p>
-								</div>
-								<div className="grid gap-3">
-									{availableWindows
-										.sort((a, b) => {
-											if (a.start_time !== b.start_time) {
-												return a.start_time.localeCompare(b.start_time);
-											}
-											return a.end_time.localeCompare(b.end_time);
-										})
-										.map((window) => {
-											const startDateTime = getTime(
-												dateForDay,
-												window.start_time,
-											);
-											const endDateTime = getTime(dateForDay, window.end_time);
-											const slots: { start: string; end: string } = {
-												start: window.start_time.slice(0, 5),
-												end: window.end_time.slice(0, 5),
-											};
+									<div className="flex justify-center">
+										<Calendar
+											mode="single"
+											selected={selectedDate}
+											onSelect={(date) => {
+												setSelectedDate(date);
+												setSelectedWindow(null);
+											}}
+											disabled={(date) => {
+												const checkDate = new Date(date);
+												checkDate.setHours(0, 0, 0, 0);
 
-											const booked = isSlotBooked(slots);
-											const expired =
-												isAfter(new Date(), startDateTime) &&
-												isAfter(new Date(), endDateTime);
-											return (
-												<button
-													key={window.id}
-													onClick={() => !booked && setSelectedWindow(window)}
-													disabled={(() => {
-														return expired || booked;
-													})()}
-													className={cn(
-														"p-4 rounded-lg border-2 text-left transition-all cursor-pointer disabled:cursor-auto disabled:border-none disabled:bg-muted disabled:text-slate-600! hover:disabled:border-none relative hover:disabled:bg-muted disabled:after:content-[' '] disabled:after:bg-card disabled:after:absolute disabled:after:w-full disabled:after:h-0.5 disabled:after:top-1/2 disabled:after:left-0",
-														selectedWindow?.id === window.id
-															? 'border-primary bg-primary/10'
-															: 'border-border hover:border-primary/50 hover:bg-muted/50',
-													)}
-												>
-													<div className="flex items-center justify-between">
-														<div className="flex items-center gap-3">
-															<div
-																className={cn(
-																	'h-10 w-10 rounded-lg flex items-center justify-center',
-																	selectedWindow?.id === window.id
-																		? 'bg-primary'
-																		: 'bg-muted',
-																)}
-															>
-																<Clock
-																	className={cn(
-																		'h-5 w-5',
-																		selectedWindow?.id === window.id
-																			? 'text-primary-foreground'
-																			: 'text-muted-foreground',
-																	)}
-																/>
-															</div>
-															<div>
-																<p className="font-semibold text-lg">
-																	{to12HourTime(window.start_time)} –{' '}
-																	{to12HourTime(window.end_time)}
-																</p>
-																<p className="text-sm text-muted-foreground">
-																	{booked
-																		? 'Booked'
-																		: expired
-																			? 'Expired'
-																			: 'Available to book/appoint'}
-																</p>
-															</div>
-														</div>
-														{selectedWindow?.id === window.id && (
-															<CheckCircle2 className="h-5 w-5 text-primary" />
-														)}
-													</div>
-												</button>
-											);
-										})}
+												return (
+													checkDate < today ||
+													!dateHasAvailability(date) ||
+													!dateHasFutureAvailability(date) ||
+													checkExistigSchedule(date)
+												);
+											}}
+											className="rounded-md border border-border pointer-events-auto"
+											modifiers={{
+												available: (date) =>
+													dateHasAvailability(date) && date >= today,
+											}}
+											modifiersStyles={{
+												available: {
+													backgroundColor: 'hsl(var(--primary) / 0.1)',
+													borderRadius: '4px',
+												},
+											}}
+										/>
+									</div>
+									{selectedDate && (
+										<div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-center">
+											<p className="text-sm font-medium">
+												Selected:{' '}
+												<span className="text-primary">
+													{format(selectedDate, 'EEEE, MMMM d, yyyy')}
+												</span>
+											</p>
+										</div>
+									)}
 								</div>
-							</div>
-						)}
-						{/* Step 3: Select Time Slot */}
-						{/* {currentStep === 'slot' && selectedWindow && (
+							)}
+							{/* Step 2: Select Availability Window */}
+							{currentStep === 'window' && (
+								<div className="space-y-4">
+									<div>
+										<h3 className="font-semibold text-lg">Select Time Window</h3>
+										<p className="text-sm text-muted-foreground">
+											Choose from {project?.adviser.name}'s available time windows
+											on {selectedDate && format(selectedDate, 'MMM d')}
+										</p>
+									</div>
+									<div className="grid gap-3">
+										{availableWindows
+											.sort((a, b) => {
+												if (a.start_time !== b.start_time) {
+													return a.start_time.localeCompare(b.start_time);
+												}
+												return a.end_time.localeCompare(b.end_time);
+											})
+											.map((window) => {
+												const startDateTime = getTime(
+													dateForDay,
+													window.start_time,
+												);
+												const endDateTime = getTime(dateForDay, window.end_time);
+												const slots: { start: string; end: string } = {
+													start: window.start_time.slice(0, 5),
+													end: window.end_time.slice(0, 5),
+												};
+
+												const booked = isSlotBooked(slots);
+												const expired =
+													isAfter(new Date(), startDateTime);
+												return (
+													<button
+														key={window.id}
+														onClick={() => !booked && setSelectedWindow(window)}
+														disabled={(() => {
+															return expired || booked;
+														})()}
+														className={cn(
+															"p-4 rounded-lg border-2 text-left transition-all cursor-pointer disabled:cursor-auto disabled:border-none disabled:bg-muted disabled:text-slate-600! hover:disabled:border-none relative hover:disabled:bg-muted disabled:after:content-[' '] disabled:after:bg-card disabled:after:absolute disabled:after:w-full disabled:after:h-0.5 disabled:after:top-1/2 disabled:after:left-0",
+															selectedWindow?.id === window.id
+																? 'border-primary bg-primary/10'
+																: 'border-border hover:border-primary/50 hover:bg-muted/50',
+														)}
+													>
+														<div className="flex items-center justify-between">
+															<div className="flex items-center gap-3">
+																<div
+																	className={cn(
+																		'h-10 w-10 rounded-lg flex items-center justify-center',
+																		selectedWindow?.id === window.id
+																			? 'bg-primary'
+																			: 'bg-muted',
+																	)}
+																>
+																	<Clock
+																		className={cn(
+																			'h-5 w-5',
+																			selectedWindow?.id === window.id
+																				? 'text-primary-foreground'
+																				: 'text-muted-foreground',
+																		)}
+																	/>
+																</div>
+																<div>
+																	<p className="font-semibold text-lg">
+																		{to12HourTime(window.start_time)} –{' '}
+																		{to12HourTime(window.end_time)}
+																	</p>
+																	<p className="text-sm text-muted-foreground">
+																		{expired
+																			? 'Expired'
+																			: booked
+																				? 'Booked'
+																				: 'Available to book/appoint'}
+																	</p>
+																</div>
+															</div>
+															{selectedWindow?.id === window.id && (
+																<CheckCircle2 className="h-5 w-5 text-primary" />
+															)}
+														</div>
+													</button>
+												);
+											})}
+									</div>
+								</div>
+							)}
+							{/* Step 3: Select Time Slot */}
+							{/* {currentStep === 'slot' && selectedWindow && (
 							<div className="space-y-4">
 								<div>
 									<h3 className="font-semibold text-lg">Select Time Slot</h3>
@@ -536,87 +535,88 @@ const BookConsultationDialog = ({
 								)}
 							</div>
 						)} */}
-						{/* Step 4: Confirm Booking */}
-						{currentStep === 'confirm' && selectedDate && selectedWindow && (
-							<div className="space-y-4">
-								<div>
-									<h3 className="font-semibold text-lg">Confirm Booking</h3>
-									<p className="text-sm text-muted-foreground">
-										Review your consultation details and add a purpose
-									</p>
-								</div>
+							{/* Step 4: Confirm Booking */}
+							{currentStep === 'confirm' && selectedDate && selectedWindow && (
+								<div className="space-y-4">
+									<div>
+										<h3 className="font-semibold text-lg">Confirm Booking</h3>
+										<p className="text-sm text-muted-foreground">
+											Review your consultation details and add a purpose
+										</p>
+									</div>
 
-								{/* Booking Summary */}
-								<div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
-									<div className="flex items-center gap-3">
-										<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-											<User className="h-6 w-6 text-primary" />
+									{/* Booking Summary */}
+									<div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
+										<div className="flex items-center gap-3">
+											<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+												<User className="h-6 w-6 text-primary" />
+											</div>
+											<div>
+												<p className="font-semibold">{project?.adviser.name}</p>
+												<p className="text-sm text-muted-foreground">
+													{project?.adviser.department.name}
+												</p>
+											</div>
 										</div>
-										<div>
-											<p className="font-semibold">{project?.adviser.name}</p>
-											<p className="text-sm text-muted-foreground">
-												{project?.adviser.department.name}
-											</p>
+										<div className="h-px bg-border" />
+										<div className="grid grid-cols-2 gap-4">
+											<div>
+												<p className="text-xs text-muted-foreground uppercase tracking-wider">
+													Date
+												</p>
+												<p className="font-semibold">
+													{format(selectedDate, 'MMMM d, yyyy')}
+												</p>
+											</div>
+											<div>
+												<p className="text-xs text-muted-foreground uppercase tracking-wider">
+													Time
+												</p>
+												<p className="font-semibold">
+													{to12HourTime(selectedWindow.start_time)} –{' '}
+													{to12HourTime(selectedWindow.end_time)}
+												</p>
+											</div>
+											<div>
+												<p className="text-xs text-muted-foreground uppercase tracking-wider">
+													Duration
+												</p>
+												<p className="font-semibold">
+													{differenceInMinutes(
+														getTime(dateForDay, selectedWindow.end_time),
+														getTime(dateForDay, selectedWindow.start_time),
+													)}{' '}
+													minutes
+												</p>
+											</div>
+											<div>
+												<p className="text-xs text-muted-foreground uppercase tracking-wider">
+													Day
+												</p>
+												<p className="font-semibold">
+													{format(selectedDate, 'EEEE')}
+												</p>
+											</div>
 										</div>
 									</div>
-									<div className="h-px bg-border" />
-									<div className="grid grid-cols-2 gap-4">
-										<div>
-											<p className="text-xs text-muted-foreground uppercase tracking-wider">
-												Date
-											</p>
-											<p className="font-semibold">
-												{format(selectedDate, 'MMMM d, yyyy')}
-											</p>
-										</div>
-										<div>
-											<p className="text-xs text-muted-foreground uppercase tracking-wider">
-												Time
-											</p>
-											<p className="font-semibold">
-												{to12HourTime(selectedWindow.start_time)} –{' '}
-												{to12HourTime(selectedWindow.end_time)}
-											</p>
-										</div>
-										<div>
-											<p className="text-xs text-muted-foreground uppercase tracking-wider">
-												Duration
-											</p>
-											<p className="font-semibold">
-												{differenceInMinutes(
-													getTime(dateForDay, selectedWindow.end_time),
-													getTime(dateForDay, selectedWindow.start_time),
-												)}{' '}
-												minutes
-											</p>
-										</div>
-										<div>
-											<p className="text-xs text-muted-foreground uppercase tracking-wider">
-												Day
-											</p>
-											<p className="font-semibold">
-												{format(selectedDate, 'EEEE')}
-											</p>
-										</div>
+
+									{/* Purpose Input */}
+									<div className="space-y-2">
+										<label className="text-sm font-medium">
+											Purpose of Consultation *
+										</label>
+										<Textarea
+											value={purpose}
+											onChange={(e) => setPurpose(e.target.value)}
+											placeholder="Describe what you'd like to discuss..."
+											rows={3}
+											className="resize-none"
+										/>
 									</div>
 								</div>
-
-								{/* Purpose Input */}
-								<div className="space-y-2">
-									<label className="text-sm font-medium">
-										Purpose of Consultation *
-									</label>
-									<Textarea
-										value={purpose}
-										onChange={(e) => setPurpose(e.target.value)}
-										placeholder="Describe what you'd like to discuss..."
-										rows={3}
-										className="resize-none"
-									/>
-								</div>
-							</div>
-						)}
-					</div>
+							)}
+						</div>
+					</ScrollArea>
 					{/* Footer with Navigation */}
 					<div className="p-6 pt-4 border-t border-border flex items-center justify-between">
 						<Button

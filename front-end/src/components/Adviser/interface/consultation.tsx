@@ -1,3 +1,5 @@
+import type { ProponentsDocumentsProps } from "./adviserdocument";
+
 export const DAYS = [
 	'Monday',
 	'Tuesday',
@@ -89,6 +91,10 @@ export type AdviserWeeklyProps = {
 	};
 };
 export type ConsultationDialogProps = {
+	weeklies: AdviserWeeklyProps[];
+	availabilities: AdviserAvailabilityProps[];
+	project: ProponentsDocumentsProps | null;
+	studentsIds: number[];
 	weekly: AdviserWeeklyProps | null;
 	open: boolean;
 	setOpen: (open: boolean) => void;
@@ -103,6 +109,7 @@ export type AvailabilityConsultationProps = {
 };
 export type WeeklyConsultationProps = {
 	weeklies: AdviserWeeklyProps[];
+	availabilities: AdviserAvailabilityProps[];
 	refresh?: () => void;
 };
 export type ConsultationContentProps = {

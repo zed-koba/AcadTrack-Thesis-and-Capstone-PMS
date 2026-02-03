@@ -43,6 +43,8 @@ const generateTimeSlots = (meetingDuration: number) => {
 	}
 	return slots;
 };
+const adviserDuration =
+	15;
 const formatTime = (time: string) => {
 	const [hours, minutes] = time.split(':').map(Number);
 	const period = hours >= 12 ? 'PM' : 'AM';
@@ -56,7 +58,7 @@ const formatSlotTime = (hour: number, minute: number) => {
 	return `${displayHours}:${minute.toString().padStart(2, '0')} ${period}`;
 };
 
-const DailyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
+const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsultationProps) => {
 	const [selectedDate, setSelectedDate] = useState(new Date());
 	const [calendarOpen, setCalendarOpen] = useState(false);
 	const [selectedSchedule, setSelectedSchedule] =
@@ -94,7 +96,7 @@ const DailyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 	);
 
 	const timeSlots = useMemo(
-		() => generateTimeSlots(weeklies[0].adviser.duration),
+		() => generateTimeSlots(adviserDuration),
 		[weeklies],
 	);
 	// Calculate stats
@@ -123,7 +125,7 @@ const DailyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 								Daily Schedule
 							</CardTitle>
 							<span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
-								{weeklies[0].adviser.duration} min slots
+								{adviserDuration} min slots
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
@@ -294,7 +296,7 @@ const DailyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 									const slotConsultations = getConsultationsForSlot(
 										dayConsultations,
 										slot.time,
-										weeklies[0].adviser.duration,
+										adviserDuration,
 									);
 
 									const isEmpty = slotConsultations.length === 0;

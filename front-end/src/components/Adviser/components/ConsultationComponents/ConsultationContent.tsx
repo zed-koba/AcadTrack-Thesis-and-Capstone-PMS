@@ -31,10 +31,10 @@ const ConsultationContent = ({
 							</TabsTrigger>
 						</TabsList>
 						<TabsContent value="weekly">
-							<WeeklyConsultation weeklies={weeklies} refresh={refresh} />
+							<WeeklyConsultation weeklies={weeklies} availabilities={availabilities} refresh={refresh} />
 						</TabsContent>
 						<TabsContent value="daily">
-							<DailyConsultation weeklies={weeklies} refresh={refresh} />
+							<DailyConsultation weeklies={weeklies} availabilities={availabilities} refresh={refresh} />
 						</TabsContent>
 						<TabsContent value="availability">
 							<AvailabilityConsultation

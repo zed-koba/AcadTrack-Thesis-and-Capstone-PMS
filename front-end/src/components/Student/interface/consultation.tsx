@@ -41,6 +41,7 @@ export type RescheduleConsultationprops = {
 	weeklies: AdviserWeeklyProps[];
 	selectedSchedule: AdviserWeeklyProps;
 	studentIds: number[];
+	refresh?: () => void;
 };
 
 export type CancelAlertProps = {

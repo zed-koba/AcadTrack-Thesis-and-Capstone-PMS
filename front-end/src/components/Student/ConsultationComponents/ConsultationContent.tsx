@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConsultationCard from './ConsultationCard';
 import { useState } from 'react';
 import BookConsultationDialog from './BookConsultationDialogv2';
-import RescheduleConsultation from './RescheduleConsultation';
+import RescheduleConsultation from './RescheduleConsultationv2';
 import CancelAlertDialog from './CancelAlertDialog';
 
 const ConsultationContent = ({
@@ -226,6 +226,7 @@ const ConsultationContent = ({
 					studentIds={studentIds}
 					weeklies={weeklies}
 					selectedSchedule={selectedSchedule}
+					refresh={refresh}
 				/>
 			)}
 

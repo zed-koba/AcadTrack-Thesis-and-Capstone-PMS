@@ -40,7 +40,9 @@ import { apiAdviserUrl } from '@/components/Routes/http';
 import {
 	generateTimeSlots,
 	getStatusColor,
+	studentIds,
 } from '@/components/functions/functions';
+import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
 
 const formatTime = (time: string) => {
 	const [hours, minutes] = time.split(':').map(Number);
@@ -74,8 +76,9 @@ const getConsultationsForSlot = (
 	});
 };
 
-const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
+const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsultationProps) => {
 	const [open, setOpen] = useState(false);
+
 	const [selectedSchedule, setSelectedSchedule] =
 		useState<AdviserWeeklyProps | null>(null);
 	const [currentDate, setCurrentDate] = useState(new Date());
@@ -85,7 +88,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 		setCurrentDate((prev) => addDays(prev, direction === 'next' ? 7 : -7));
 	};
 	const adviserDuration =
-		weeklies.length > 0 ? weeklies[0].adviser.duration : 15;
+		15;
 	const nowDate = new Date();
 
 	const getConsultationsForDay = (day: Date) => {
@@ -367,7 +370,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 																	'text-emerald-500',
 																	isSameDay(day, new Date()) && 'text-primary',
 																	dayConsultations.length === 0 &&
-																		'text-red-400',
+																	'text-red-400',
 																)}
 															>
 																{dayConsultations.length}{' '}
@@ -402,7 +405,7 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 													className={cn(
 														'px-2 py-1 text-[10px] text-muted-foreground align-top border-r border-border sticky left-0 bg-card z-10',
 														isHourStart &&
-															'font-medium text-foreground text-xs',
+														'font-medium text-foreground text-xs',
 													)}
 												>
 													{formatSlotTime(slot.hour, slot.minute)}
@@ -651,11 +654,27 @@ const WeeklyConsultation = ({ weeklies, refresh }: WeeklyConsultationProps) => {
 			{selectedSchedule && (
 				<ConsultationDetails
 					weekly={selectedSchedule}
+					weeklies={weeklies}
+					availabilities={availabilities}
+					project={null}
+					studentsIds={[2, 3]}
 					open={open}
 					setOpen={setOpen}
 					refresh={refresh}
 				/>
 			)}
+			{/* {rescheduleDialog && selectedSchedule && (
+				<RescheduleConsultation
+					open={rescheduleDialog}
+					setOpen={setRescheduleDialog}
+					availabilities={availabilities}
+					project={null}
+					studentIds={[2, 3]}
+					weeklies={weeklies}
+					selectedSchedule={selectedSchedule}
+					refresh={refresh}
+				/>
+			)} */}
 		</>
 	);
 };

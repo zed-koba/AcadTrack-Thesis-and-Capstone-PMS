@@ -21,6 +21,7 @@ import {
 import {
 	formatTime,
 	to12HourTime,
+	type AdviserWeeklyProps,
 	type ConsultationDialogProps,
 } from '../../interface/consultation';
 import { Badge } from '@/components/ui/badge';
@@ -35,9 +36,14 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { consultationIcon } from '@/components/functions/functions';
+import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
 
 const ConsultationDetails = ({
 	open,
+	weeklies,
+	availabilities,
+	studentsIds,
+	project,
 	weekly,
 	setOpen,
 	refresh,
@@ -47,6 +53,7 @@ const ConsultationDetails = ({
 	);
 	const nowDateTime = format(new Date(), 'HH:mm');
 	const nowDate = new Date();
+	const [rescheduleDialog, setRescheduleDialog] = useState(false);
 	if (!weekly) return null;
 
 	const getStatusBadge = (status: string) => {
@@ -330,7 +337,9 @@ const ConsultationDetails = ({
 						{weekly.status === 'rejected' && (
 							<div className="flex gap-2 pt-4 border-t border-border">
 								<Button
-									onClick={() => { }}
+									onClick={() => {
+										setRescheduleDialog(true);
+									}}
 									variant="outline"
 									className="flex-1 bg-amber-600 hover:bg-amber-600/80"
 								>
@@ -378,7 +387,7 @@ const ConsultationDetails = ({
 								<Button
 									variant="destructive"
 									onClick={() => {
-										updateStatus('rejected', '', '');
+										updateStatus('cancelled', '', '');
 										setOpen(false);
 									}}
 									className="flex-1 bg-red-500/20 hover:bg-red-500/40 text-red-500"
@@ -420,6 +429,18 @@ const ConsultationDetails = ({
 							</div>
 						)}
 					</div>
+					{rescheduleDialog && weekly && (
+						<RescheduleConsultation
+							open={rescheduleDialog}
+							setOpen={setRescheduleDialog}
+							availabilities={availabilities}
+							project={project}
+							studentIds={studentsIds}
+							weeklies={weeklies}
+							selectedSchedule={weekly}
+							refresh={refresh}
+						/>
+					)}
 				</DialogContent>
 			</Dialog>
 		</>
