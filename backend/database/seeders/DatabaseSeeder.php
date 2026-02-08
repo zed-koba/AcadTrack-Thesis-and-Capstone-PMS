@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
+    //use WithoutModelEvents;
 
     /**
      * Seed the application's database.
@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'section' => 'ADMIN',
             'remember_token' => null,
         ]);*/
-        $this->call(AccountsSeeder::class);
-        
+        $this->call(StudentsSeeder::class);
+        //$this->call(ProponentSeeder::class);
     }
 }

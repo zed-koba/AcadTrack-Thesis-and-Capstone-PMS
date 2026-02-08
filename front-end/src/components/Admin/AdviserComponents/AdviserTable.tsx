@@ -1,0 +1,339 @@
+import { Button } from '@/components/ui/button';
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from '@/components/ui/input-group';
+import {
+	Table,
+	TableHead,
+	TableHeader,
+	TableCell,
+	TableBody,
+	TableRow,
+} from '@/components/ui/table';
+import {
+	MoreHorizontal,
+	PencilRuler,
+	ReceiptText,
+	Search,
+	Trash,
+} from 'lucide-react';
+import { useState } from 'react';
+import { formatDate } from '@/components/functions/functions';
+import { Badge } from '@/components/ui/badge';
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+import type {
+	AdviserProps,
+	AdvisersTableProps,
+	DepartmentAdviserProps,
+} from '../interface/adviser';
+import AdviserAdd from './AdviserAdd';
+import AdviserEdit from './AdviserEdit';
+import AdviserDetails from './AdviserDetails';
+import AdviserDelete from './AdviserDelete';
+
+type SortField = keyof AdviserProps;
+type SortDirection = 'asc' | 'desc';
+
+const ITEMS_PER_PAGE = 10;
+const AdviserTable = ({
+	advisers,
+	departments,
+	loading,
+	refresh,
+}: AdvisersTableProps) => {
+	const [searchTerm, setSearchTerm] = useState<string>('');
+	const [sortField, setSortField] = useState<SortField>('created_at');
+	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
+	const [currentPage, setCurrentPage] = useState(1);
+	const [selectedAdviser, setSelectedAdviser] = useState<AdviserProps | null>(
+		null
+	);
+	const [open, setOpen] = useState(false);
+	const [clickedButton, setClickedButton] = useState<string>('');
+	const [adviserDepartment, setAdviserDepartment] =
+		useState<DepartmentAdviserProps | null>(null);
+
+	const filteredAdvisers = advisers.filter((adv) => {
+		const searchLower = searchTerm.toLowerCase();
+		return (
+			adv.name.toLowerCase().includes(searchLower) ||
+			adv.account.email.toLowerCase().includes(searchLower) ||
+			adv.contact_number.toLowerCase().includes(searchLower) ||
+			formatDate(adv.created_at).toLowerCase().includes(searchLower) ||
+			formatDate(adv.updated_at).toLowerCase().includes(searchLower)
+		);
+	});
+
+	const sortedPrograms = [...filteredAdvisers].sort((a, b) => {
+		const aValue = a[sortField];
+		const bValue = b[sortField];
+
+		if (aValue === undefined || bValue === undefined) return 0;
+		const comparison = aValue.toString().localeCompare(bValue.toString());
+		return sortDirection === 'asc' ? comparison : -comparison;
+	});
+
+	const totalPage = Math.ceil(sortedPrograms.length / ITEMS_PER_PAGE);
+	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+	const paginationProps = sortedPrograms.slice(
+		startIndex,
+		startIndex + ITEMS_PER_PAGE
+	);
+	const getStatusBadge = (status: string) => {
+		return status === 'active' ? (
+			<Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+				Active
+			</Badge>
+		) : (
+			<Badge variant="secondary" className="bg-muted text-muted-foreground">
+				Inactive
+			</Badge>
+		);
+	};
+	const getCodeBadge = (id: number) => {
+		const findCode = departments.find((c) => c.id === id);
+
+		return findCode ?? { id: 0, name: 'Unknown', code: '' };
+	};
+	return (
+		<>
+			<div className="rounded-lg border bg-card p-6 mt-5 shadow-sm">
+				<div className="flex items-center justify-between">
+					<div className="space-y-6 text-white">
+						<InputGroup>
+							<InputGroupInput
+								placeholder="Search...."
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+							<InputGroupAddon>
+								<Search />
+							</InputGroupAddon>
+							<InputGroupAddon align="inline-end">
+								{searchTerm.length > 1 ? filteredAdvisers.length : 0} results
+							</InputGroupAddon>
+						</InputGroup>
+					</div>
+					<div className="space-y-6 text-white">
+						<AdviserAdd departments={departments} onSuccess={refresh} />
+					</div>
+				</div>
+				<div className="rounded-lg border bg-card mt-3 shadow-sm">
+					<div className="w-auto overflow-x-auto">
+						<Table className="w-full">
+							<TableHeader>
+								<TableRow className="text-muted-foreground">
+									<TableHead className="text-muted-foreground text-left pl-4">
+										Adviser Name
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left max-w-[200px]">
+										Email
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left">
+										Department
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left">
+										Groups Handled
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left">
+										Capacity
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left">
+										Status
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left w-[150px]">
+										Created At
+									</TableHead>
+									<TableHead className="text-muted-foreground text-left w-[150px]">
+										Updated At
+									</TableHead>
+									<TableHead className="text-center text-muted-foreground w-[70px]">
+										Actions
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{loading ? (
+									<TableRow>
+										<TableCell
+											colSpan={9}
+											className="-ml-3 h-8 text-white text-center"
+										>
+											Loading...
+										</TableCell>
+									</TableRow>
+								) : paginationProps.length === 0 ? (
+									<TableRow>
+										<TableCell
+											colSpan={9}
+											className="-ml-3 h-8 text-white text-center"
+										>
+											No advisers found
+										</TableCell>
+									</TableRow>
+								) : (
+									paginationProps.map((adv) => (
+										<TableRow key={adv.id} className="text-muted-foreground">
+											<TableCell className="text-left pl-3 text-white font-medium">
+												{adv.name}
+											</TableCell>
+											<TableCell className="text-left max-w-[200px] text-white truncate">
+												{adv.account.email}
+											</TableCell>
+											<TableCell className="text-left">
+												<Badge variant="outline">
+													{getCodeBadge(adv.department_id).name}
+												</Badge>
+											</TableCell>
+											<TableCell className="text-left text-white">0</TableCell>
+											<TableCell className="text-left text-white">
+												0/5
+											</TableCell>
+											<TableCell className="text-left">
+												{getStatusBadge(adv.status)}
+											</TableCell>
+											<TableCell className="text-left">
+												{formatDate(adv.created_at)}
+											</TableCell>
+											<TableCell className="text-left">
+												{formatDate(adv.updated_at)}
+											</TableCell>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button variant="ghost" className="text-white">
+															<MoreHorizontal className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuItem
+															onClick={() => {
+																setOpen(true);
+																setSelectedAdviser(adv);
+																setClickedButton('edit');
+															}}
+														>
+															<PencilRuler className="h-4 w-4 mr-2" /> Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => {
+																setOpen(true);
+																setSelectedAdviser(adv);
+																setAdviserDepartment(
+																	getCodeBadge(adv.department_id)
+																);
+																setClickedButton('details');
+															}}
+														>
+															<ReceiptText className="h-4 w-4 mr-2" /> Details
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															className="text-red-500"
+															onClick={() => {
+																setOpen(true);
+																setSelectedAdviser(adv);
+																setClickedButton('delete');
+															}}
+														>
+															<Trash className="h-4 w-4 mr-2 group-hover:text-white" />{' '}
+															Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
+										</TableRow>
+									))
+								)}
+								{selectedAdviser &&
+									(clickedButton === 'edit' ? (
+										<AdviserEdit
+											adviser={selectedAdviser}
+											departments={departments}
+											open={open}
+											setOpen={setOpen}
+											onSuccess={refresh}
+										/>
+									) : clickedButton === 'details' ? (
+										<AdviserDetails
+											adviser={selectedAdviser}
+											open={open}
+											department={adviserDepartment}
+											setOpen={setOpen}
+										/>
+									) : (
+										<AdviserDelete
+											adviser_id={selectedAdviser.id}
+											open={open}
+											setOpen={setOpen}
+											onSuccess={refresh}
+										/>
+									))}
+							</TableBody>
+						</Table>
+					</div>
+				</div>
+				{totalPage > 0 && (
+					<div className="flex justify-between items-center pt-3">
+						<p className="text-muted-foreground text-base font-semibold w-full">
+							Showing {startIndex + 1} to{' '}
+							{Math.min(startIndex + ITEMS_PER_PAGE, sortedPrograms.length)} of{' '}
+							{sortedPrograms.length} departments
+						</p>
+						<Pagination className="justify-end">
+							<PaginationContent>
+								<PaginationItem>
+									<PaginationPrevious
+										onClick={() =>
+											setCurrentPage((prev) => Math.max(1, prev - 1))
+										}
+										disabled={currentPage === 1}
+										className="hover:bg-blue-600"
+									/>
+								</PaginationItem>
+								{Array.from({ length: totalPage }, (_, i) => i + 1).map(
+									(page) => (
+										<PaginationItem>
+											<PaginationLink
+												key={page}
+												onClick={() => setCurrentPage(page)}
+												isActive={currentPage === page ? true : false}
+												className="cursor-pointer"
+											>
+												{page}
+											</PaginationLink>
+										</PaginationItem>
+									)
+								)}
+								<PaginationItem>
+									<PaginationNext
+										onClick={() =>
+											setCurrentPage((prev) => Math.min(totalPage, prev + 1))
+										}
+										disabled={currentPage === totalPage}
+									/>
+								</PaginationItem>
+							</PaginationContent>
+						</Pagination>
+					</div>
+				)}
+			</div>
+		</>
+	);
+};
+
+export default AdviserTable;
