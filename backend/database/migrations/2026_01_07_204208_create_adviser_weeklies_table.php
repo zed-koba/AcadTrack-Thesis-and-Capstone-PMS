@@ -24,7 +24,7 @@ return new class extends Migration
             $table->time('actual_end');
             $table->string('purpose');
             $table->string('feedback')->nullable();
-            $table->enum('status', ['pending', 'approved', 'completed', 'rejected', 'expired'])->default('pending');
+            $table->enum('status', ['upcoming', 'completed', 'cancelled', 'ongoing' ,'expired'])->default('upcoming');
             $table->unique(['adviser_id', 'start_time', 'date', 'end_time'], 'unique_adviser_weekly_slot');
             $table->timestamps();
         });

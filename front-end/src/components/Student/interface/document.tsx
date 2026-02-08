@@ -1,9 +1,5 @@
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
-import type { ProponentsProps } from '@/components/Admin/interface/proponent';
-import type {
-	ChapterDocumentsProps,
-	ProponentsDocumentsProps,
-} from '@/components/Adviser/interface/adviserdocument';
+import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
 export type DocumentProps = {
 	id: number;
@@ -11,14 +7,12 @@ export type DocumentProps = {
 	original_name: string;
 	stored_name: string;
 	title_name: string;
-	description: string;
 	status: string;
 	path: string;
 	mime_type: string;
 	size: number;
 	parent_document_id: number | null;
 	version: number;
-	chapter: number;
 	created_at: string;
 	updated_at: string;
 	versions: DocumentProps[];
@@ -40,8 +34,6 @@ export type CommentProps = {
 	updated_at: string;
 };
 export type DocumentUploadProps = {
-	totalChapters: number;
-	checkLastChapterStatus: boolean;
 	refresh?: () => void;
 };
 export type DocumentRevisionProps = {
@@ -66,16 +58,8 @@ export type DocumentDashboardProps = {
 	project: ProponentsDocumentsProps | null;
 };
 
-export type ChapterItemProps = {
+export type DocumentItemProps = {
 	currentDocument: DocumentProps;
-	projectAdviser: AdviserProps | null;
-	refresh?: () => void;
-};
-
-export type ChaptersProps = {
-	chapter: ChapterDocumentsProps;
-	isExpanded: boolean;
-	onToggle: () => void;
 	projectAdviser: AdviserProps | null;
 	refresh?: () => void;
 };

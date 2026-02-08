@@ -36,11 +36,9 @@ export type BookConsultationprops = {
 export type RescheduleConsultationprops = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	project: ProponentsDocumentsProps | null;
 	availabilities: AdviserAvailabilityProps[];
 	weeklies: AdviserWeeklyProps[];
 	selectedSchedule: AdviserWeeklyProps;
-	studentIds: number[];
 	refresh?: () => void;
 };
 
@@ -49,4 +47,5 @@ export type CancelAlertProps = {
 	setOpen: (open: boolean) => void;
 	project: ProponentsDocumentsProps | null;
 	selectedSchedule: AdviserWeeklyProps;
+	refresh?: () => void;
 };

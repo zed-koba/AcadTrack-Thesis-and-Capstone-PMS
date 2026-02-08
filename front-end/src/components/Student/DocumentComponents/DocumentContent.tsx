@@ -1,5 +1,4 @@
 import { Book, Folder, Info, Search } from 'lucide-react';
-import DocumentCard from './ChaptersDocument';
 import DocumentUploadDialog from './DocumentUploadDialog';
 import type { DocumentContentProps } from '../interface/document';
 import { cn } from '@/lib/utils';
@@ -7,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import ChaptersDocument from './ChaptersDocument';
-import { getProjectStatus, studentId } from '@/components/functions/functions';
+import ChapterItem from './ChapterItem';
 
 const DocumentContent = ({
 	documents,
@@ -19,11 +17,9 @@ const DocumentContent = ({
 	const filterDocuments = useMemo(() => {
 		return documents.filter((doc) => studentIds?.includes(doc.student_id));
 	}, [documents, studentIds]);
-	const [expandedChapters, setExpandedChapters] = useState<Set<number>>(
-		new Set(),
-	);
+
 	const [searchQuery, setSearchQuery] = useState('');
-	const chaptersGrouped = useMemo(() => {
+	const documentsGrouped = useMemo(() => {
 		const parents = filterDocuments.filter(
 			(d) => d.parent_document_id === null,
 		);
@@ -33,57 +29,38 @@ const DocumentContent = ({
 				.sort((a, b) => b.version - a.version);
 			return { ...parent, versions };
 		});
-		const byChapter: Record<number, typeof groupedDocuments> = {};
-		groupedDocuments.forEach((doc) => {
-			if (!byChapter[doc.chapter]) byChapter[doc.chapter] = [];
-			byChapter[doc.chapter].push(doc);
+		return groupedDocuments;
+	}, [filterDocuments]);
+	const filteredDocumentsGrouped = useMemo(() => {
+		return documentsGrouped.filter((doc) => {
+			const versionFiles = doc.versions
+				.map((v) => v.original_name.toLowerCase())
+				.join(' ');
+			const matchesSearch =
+				doc.original_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				versionFiles.includes(searchQuery.toLowerCase());
+
+			return matchesSearch;
 		});
+	}, [documentsGrouped, searchQuery]);
 
-		return Object.entries(byChapter).map(([chapter, docs]) => ({
-			chapter: Number(chapter),
-			documents: docs,
-		}));
-	}, [documents, filterDocuments]);
-	const filteredChaptersGrouped = useMemo(() => {
-		return chaptersGrouped
-			.map((c) => {
-				const filteredDocs = c.documents.filter((doc) => {
-					const versionFiles = doc.versions
-						.map((v) => v.original_name.toLowerCase())
-						.join(' ');
-					const matchesSearch =
-						doc.original_name
-							.toLowerCase()
-							.includes(searchQuery.toLowerCase()) ||
-						versionFiles.includes(searchQuery.toLowerCase());
+	const needRevisionDocs = filteredDocumentsGrouped.filter((d) =>
+		d.versions.length > 0
+			? d.versions[0].status === 'need revision'
+			: d.status === 'need revision',
+	);
 
-					return matchesSearch;
-				});
-				return {
-					...c,
-					documents: filteredDocs,
-				};
-			})
-			.filter((c) => c.documents.length > 0);
-	}, [chaptersGrouped, searchQuery]);
-	const toggleChapter = (chapterId: number) => {
-		const newExpanded = new Set(expandedChapters);
-		if (newExpanded.has(chapterId)) {
-			newExpanded.delete(chapterId);
-		} else {
-			newExpanded.add(chapterId);
-		}
-		setExpandedChapters(newExpanded);
-	};
 	return (
 		<>
-			{getProjectStatus(filteredChaptersGrouped) === 'need revision' && (
+			{needRevisionDocs.length > 0 && (
 				<div className="flex items-center gap-3 p-4 mb-6 rounded-lg bg-red-500/10 border border-red-500/20">
 					<Info className="h-5 w-5 text-red-500 shrink-0" />
 					<p className="text-sm text-white">
-						<strong className="text-red-600">1 document </strong> need revision.
-						Click the "Submit Revision" button on the document to upload a
-						revised version.
+						<strong className="text-red-600">
+							{needRevisionDocs.length} document{' '}
+						</strong>{' '}
+						need revision. Click the "Submit Revision" button on the document to
+						upload a revised version.
 					</p>
 				</div>
 			)}
@@ -100,24 +77,16 @@ const DocumentContent = ({
 									</div>
 									<div>
 										<CardTitle className="text-lg">
-											Documents Chapters
+											Thesis/Capstone Documents
 										</CardTitle>
 										<p className="text-sm text-muted-foreground mt-0.5">
-											{filteredChaptersGrouped.length} chapters •{' '}
-											{filterDocuments.length} total submitted documents
+											{filteredDocumentsGrouped.length} total submitted
+											documents
 										</p>
 									</div>
 								</div>
 								<div className="flex items-center gap-2">
-									<DocumentUploadDialog
-										totalChapters={filteredChaptersGrouped.length}
-										checkLastChapterStatus={
-											getProjectStatus(filteredChaptersGrouped) === 'approved'
-												? true
-												: false
-										}
-										refresh={refresh}
-									/>
+									<DocumentUploadDialog refresh={refresh} />
 								</div>
 							</div>
 							<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-4">
@@ -134,19 +103,27 @@ const DocumentContent = ({
 						</CardHeader>
 						<CardContent className="pt-4">
 							<ScrollArea className="h-[650px]">
-								{filteredChaptersGrouped.length === 0 ? (
+								{filteredDocumentsGrouped.length === 0 ? (
 									<div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
 										<Folder className="h-12 w-12 mb-4 opacity-50" />
 										<p className="font-medium">No documents found</p>
 									</div>
 								) : (
 									<div className="space-y-4">
-										{filteredChaptersGrouped.map((chapter) => (
+										{/* {filteredChaptersGrouped.map((chapter) => (
 											<ChaptersDocument
 												key={chapter.chapter}
 												chapter={chapter}
 												isExpanded={expandedChapters.has(chapter.chapter)}
 												onToggle={() => toggleChapter(chapter.chapter)}
+												projectAdviser={project?.adviser ?? null}
+												refresh={refresh}
+											/>
+										))} */}
+										{filteredDocumentsGrouped.map((doc) => (
+											<ChapterItem
+												key={doc.id}
+												currentDocument={doc}
 												projectAdviser={project?.adviser ?? null}
 												refresh={refresh}
 											/>
@@ -168,29 +145,6 @@ const DocumentContent = ({
 				)} */}
 			</section>
 		</>
-		// <>
-		// 	<section className="space-y-4 w-full">
-		// 		<div className="space-y-6 text-white">
-		// 			<div className="flex justify-between wrap-normal flex-wrap">
-		// 				<div className="grid grid-cols-2 max-w-160 grow shrink-0">
-		// 					<InputGroup>
-		// 						<InputGroupInput placeholder="Search...." />
-		// 						<InputGroupAddon>
-		// 							<Search className="h-5 w-5" />
-		// 						</InputGroupAddon>
-		// 						<InputGroupAddon align="inline-end">
-		// 							0 results...
-		// 						</InputGroupAddon>
-		// 					</InputGroup>
-		// 				</div>
-		// 				<DocumentUploadDialog refresh={refresh} />
-		// 			</div>
-		// 			<div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2">
-		// 				<DocumentCard documents={documents} />
-		// 			</div>
-		// 		</div>
-		// 	</section>
-		// </>
 	);
 };
 

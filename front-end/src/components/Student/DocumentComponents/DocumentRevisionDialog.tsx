@@ -55,14 +55,16 @@ const DocumentRevisionDialog = ({
 			formData.append('currentId', String(document.id));
 			formData.append(
 				'title_name',
-				'Chapter ' + document.chapter + '_v' + (document?.version + 1),
+				document.title_name + '_v' + (document?.version + 1),
 			);
-			formData.append('description', document?.description ?? '');
 			formData.append(
 				'parent_document_id',
-				String(document.parent_document_id === null ? document.id : document.parent_document_id),
+				String(
+					document.parent_document_id === null
+						? document.id
+						: document.parent_document_id,
+				),
 			);
-			formData.append('chapter', String(document?.chapter));
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {
 					method: 'POST',
@@ -145,12 +147,18 @@ const DocumentRevisionDialog = ({
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogTrigger asChild>
-					<Button variant="primary" className="bg-red-500 hover:bg-red-500/80">
+					<Button variant="outline" className="bg-red-500 hover:bg-red-500/80">
 						<FileUp className="h-4 w-4 mr-2" />
 						Submit Revision
 					</Button>
 				</DialogTrigger>
-				<DialogContent className="text-white">
+				<DialogContent
+					className="text-white"
+					onInteractOutside={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
+				>
 					<DialogHeader>
 						<DialogTitle>Submit Revision</DialogTitle>
 						<DialogDescription>Upload a revised version for</DialogDescription>
@@ -198,10 +206,11 @@ const DocumentRevisionDialog = ({
 										</div>
 									) : (
 										<div
-											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
-												? 'border-primary bg-primary/5'
-												: 'border-muted-foreground/25'
-												}`}
+											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+												dragActive
+													? 'border-primary bg-primary/5'
+													: 'border-muted-foreground/25'
+											}`}
 											onDragEnter={handleDrag}
 											onDragLeave={handleDrag}
 											onDragOver={handleDrag}

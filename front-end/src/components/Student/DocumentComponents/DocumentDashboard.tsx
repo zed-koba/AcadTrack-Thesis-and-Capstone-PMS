@@ -9,7 +9,6 @@ import {
 	RotateCcw,
 } from 'lucide-react';
 import type { DocumentDashboardProps } from '../interface/document';
-import { studentId } from '@/components/functions/functions';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -100,7 +99,7 @@ const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
 				<Card className="mb-6">
 					<CardContent className="px-4 py-1">
 						<div className="flex items-start gap-4">
-							<div className="p-3 rounded-xl bg-primary/10">
+							<div className="p-3 rounded-md bg-primary/10">
 								<BookOpen className="h-6 w-6 text-primary" />
 							</div>
 							<div className="flex-1">

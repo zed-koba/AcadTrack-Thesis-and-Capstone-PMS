@@ -3,20 +3,17 @@ import {
 	Calendar,
 	CalendarCheck,
 	CalendarX,
-	Check,
 	CircleCheckBig,
-	Clock,
 	X,
 } from 'lucide-react';
 import type { ConsultationDashboardProps } from '../../interface/consultation';
 
 const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
-	const findPending = weeklies.filter((pen) => pen.status === 'pending').length;
 	const findApproved = weeklies.filter(
-		(pen) => pen.status === 'approved',
+		(pen) => pen.status === 'upcoming',
 	).length;
 	const findCancelled = weeklies.filter(
-		(pen) => pen.status === 'rejected',
+		(pen) => pen.status === 'cancelled',
 	).length;
 	const findCompleted = weeklies.filter(
 		(pen) => pen.status === 'completed',
@@ -29,17 +26,12 @@ const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
 			value: weeklies.length,
 			label: 'Total Consultation',
 		},
-		{
-			color: 'bg-amber-500/20',
-			icon: <Clock className="w-5 h-5 text-amber-500" />,
-			value: findPending,
-			label: 'Pending',
-		},
+
 		{
 			color: 'bg-emerald-500/20',
 			icon: <CircleCheckBig className="w-5 h-5 text-emerald-500" />,
 			value: findApproved,
-			label: 'Approved',
+			label: 'Upcoming',
 		},
 		{
 			color: 'bg-red-500/20',
@@ -63,7 +55,7 @@ const ConsultationDashboard = ({ weeklies }: ConsultationDashboardProps) => {
 	return (
 		<>
 			<div className="flex flex-col gap-5 mt-5 w-full text-white">
-				<section className="grid lg:grid-cols-6 sm:grid-cols-2 gap-2 mb-6">
+				<section className="grid lg:grid-cols-5 sm:grid-cols-2 gap-2 mb-6">
 					{dashboard.map((board) => (
 						<div
 							key={board.label}

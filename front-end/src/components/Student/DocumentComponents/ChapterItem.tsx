@@ -4,7 +4,6 @@ import {
 	Clock,
 	Download,
 	Eye,
-	File,
 	FileText,
 	MessageCircle,
 	MoreVertical,
@@ -29,16 +28,18 @@ import {
 import { Button } from '@/components/ui/button';
 
 import DocumentViewDialog from './DocumentViewDialog';
-import type { ChapterItemProps, DocumentProps } from '../interface/document';
+import type { DocumentItemProps, DocumentProps } from '../interface/document';
+import DocumentRevisionDialog from './DocumentRevisionDialog';
 
 const ChapterItem = ({
 	currentDocument,
 	projectAdviser,
 	refresh,
-}: ChapterItemProps) => {
+}: DocumentItemProps) => {
 	const [showVersions, setShowVersions] = useState(true);
 	const [selectedDocument, setSelectedDocument] =
 		useState<DocumentProps | null>(null);
+	const [revisionOpen, setRevisionOpen] = useState(false);
 	const [open, setOpen] = useState(false);
 	const checkVersion =
 		currentDocument.versions.length > 0
@@ -52,25 +53,34 @@ const ChapterItem = ({
 		}
 	};
 	const checkIfVersionLatest = selectedDocument === checkVersion;
+
 	return (
 		<div className="space-y-1">
 			<div
 				className={cn(
-					'flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer',
+					'flex items-center gap-3 p-3 rounded-md bg-muted/50 transition-colors cursor-pointer border border-muted-foreground/40',
+
+					checkVersion.version &&
+						checkVersion.status === 'need revision' &&
+						'border border-red-500/50',
 					checkVersion.version &&
 						checkVersion.id === selectedDocument?.id &&
 						'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 				)}
-				onClick={() => {
+				onClick={(e) => {
+					if ((e.target as HTMLElement).closest('button')) return;
+					if (revisionOpen) return;
 					setSelectedDocument(checkVersion);
 					setOpen(true);
 				}}
 			>
-				<FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+				<div className="p-3 rounded-md bg-primary/10 text-primary">
+					<FileText className="h-5 w-5 shrink-0" />
+				</div>
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-2">
 						<span className="text-sm font-medium truncate">
-							{checkVersion.title_name}
+							{currentDocument.title_name}
 						</span>
 						<Badge variant="outline" className="text-[10px] px-1.5 py-0">
 							v{checkVersion.version}
@@ -106,7 +116,15 @@ const ChapterItem = ({
 					)}
 					{checkVersion.status}
 				</Badge>
-
+				{checkVersion.status === 'need revision' && (
+					<DocumentRevisionDialog
+						document={checkVersion}
+						open={revisionOpen}
+						setOpen={setRevisionOpen}
+						refresh={refresh}
+						setSubmitRevision={setRevisionOpen}
+					/>
+				)}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">

@@ -4,11 +4,9 @@ import { cn } from '@/lib/utils';
 import {
 	AlertTriangle,
 	BookOpen,
-	Calendar,
 	CalendarCheck,
 	CalendarClock,
 	CalendarX,
-	Check,
 	ChevronLeft,
 	ChevronRight,
 	CircleCheckBig,
@@ -39,10 +37,8 @@ import {
 import { apiAdviserUrl } from '@/components/Routes/http';
 import {
 	generateTimeSlots,
-	getStatusColor,
-	studentIds,
+	statusColor,
 } from '@/components/functions/functions';
-import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
 
 const formatTime = (time: string) => {
 	const [hours, minutes] = time.split(':').map(Number);
@@ -76,7 +72,11 @@ const getConsultationsForSlot = (
 	});
 };
 
-const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsultationProps) => {
+const WeeklyConsultation = ({
+	weeklies,
+	availabilities,
+	refresh,
+}: WeeklyConsultationProps) => {
 	const [open, setOpen] = useState(false);
 
 	const [selectedSchedule, setSelectedSchedule] =
@@ -87,9 +87,7 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 	const navigateWeek = (direction: 'prev' | 'next') => {
 		setCurrentDate((prev) => addDays(prev, direction === 'next' ? 7 : -7));
 	};
-	const adviserDuration =
-		15;
-	const nowDate = new Date();
+	const adviserDuration = 15;
 
 	const getConsultationsForDay = (day: Date) => {
 		return weeklies.filter((c) => isSameDay(parseISO(c.date), day));
@@ -132,6 +130,7 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 
 	const expiredPostedRef = useRef<Set<string>>(new Set());
 	useEffect(() => {
+		const nowDate = new Date();
 		weeklies.forEach((w) => {
 			const endDateTime = parse(
 				`${w.date} ${w.end_time}`,
@@ -148,7 +147,7 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 				updateStatus(w.id, 'expired', '');
 			}
 		});
-	}, [weeklies, nowDate]);
+	}, [weeklies]);
 	const weekConsultations = useMemo(
 		() =>
 			weeklies.filter((c) => weekDays.some((day) => isSameDay(c.date, day))),
@@ -178,23 +177,8 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 							<CardTitle className="text-xl font-semibold">
 								Weekly Schedule
 							</CardTitle>
-							<span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
-								{adviserDuration} min slots
-							</span>
 						</div>
 						<div className="flex items-center gap-2">
-							{/* Take a Break Button */}
-							{/* {onTakeBreak && (
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={onTakeBreak}
-									className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
-								>
-									<Coffee className="h-4 w-4 mr-2" />
-									Take a Break
-								</Button>
-							)} */}
 							<Button
 								variant="outline"
 								size="icon"
@@ -300,31 +284,12 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 								</span>
 							</div>
 						)}
-						{/* {weekStats.affected > 0 && (
-							<div className="flex items-center gap-2 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-								<AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
-								<span className="text-xs text-amber-400">
-									<span className="font-bold">{weekStats.affected}</span>{' '}
-									delayed by overrun
-								</span>
-							</div>
-						)}
-						{weekStats.affectedByBreak > 0 && (
-							<div className="flex items-center gap-2 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">
-								<Pause className="h-3.5 w-3.5 text-cyan-400" />
-								<span className="text-xs text-cyan-400">
-									<span className="font-bold">{weekStats.affectedByBreak}</span>{' '}
-									delayed by break
-								</span>
-							</div>
-						)} */}
 					</div>
 				</CardHeader>
 
 				<CardContent className="p-0">
 					<div className="overflow-x-auto">
 						<div className="min-w-[1000px]">
-							{/* Table-based layout */}
 							<table className="w-full border-collapse">
 								<thead>
 									<tr className="bg-muted/30">
@@ -336,13 +301,6 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 										</th>
 										{weekDays.map((day) => {
 											const dayConsultations = getConsultationsForDay(day);
-											//const dayBreaks = getBreaksForDay(day);
-											const hasIssues = dayConsultations.some(
-												(c) =>
-													// c.isAffectedByOverrun ||
-													// c.isAffectedByBreak ||
-													(c.overrunMinutes ?? 0) > 0,
-											);
 
 											return (
 												<th
@@ -370,19 +328,13 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 																	'text-emerald-500',
 																	isSameDay(day, new Date()) && 'text-primary',
 																	dayConsultations.length === 0 &&
-																	'text-red-400',
+																		'text-red-400',
 																)}
 															>
 																{dayConsultations.length}{' '}
 															</span>
 															sessions
 														</span>
-														{/* {dayBreaks.length > 0 && (
-															<Coffee className="h-3 w-3 text-cyan-400" />
-														)} */}
-														{hasIssues && (
-															<AlertTriangle className="h-3 w-3 text-amber-400" />
-														)}
 													</div>
 												</th>
 											);
@@ -403,28 +355,23 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 											>
 												<td
 													className={cn(
-														'px-2 py-1 text-[10px] text-muted-foreground align-top border-r border-border sticky left-0 bg-card z-10',
+														'px-2 py-1 text-[12px] text-muted-foreground align-center border-r border-border sticky left-0 bg-card z-10',
 														isHourStart &&
-														'font-medium text-foreground text-xs',
+															'font-medium text-foreground text-xs',
 													)}
 												>
 													{formatSlotTime(slot.hour, slot.minute)}
 												</td>
 												{weekDays.map((day) => {
 													const dayConsultations = getConsultationsForDay(day);
-													//const dayBreaks = getBreaksForDay(day);
+
 													const slotConsultations = getConsultationsForSlot(
 														dayConsultations,
 														slot.time,
 														adviserDuration,
 													);
-													// const slotBreaks = getBreaksForSlot(
-													// 	dayBreaks,
-													// 	slot.time,
-													// 	meetingDuration,
-													// );
+
 													const isEmpty = slotConsultations.length === 0;
-													//slotBreaks.length === 0;
 
 													return (
 														<td
@@ -440,65 +387,10 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 															) : (
 																<div className="flex flex-col gap-0.5">
 																	<TooltipProvider>
-																		{/* {slotBreaks.map((breakSlot) => (
-																			<Tooltip key={breakSlot.id}>
-																				<TooltipTrigger asChild>
-																					<div
-																						className={cn(
-																							'w-full p-1.5 rounded-sm border-l-2 border-dashed text-left text-[10px]',
-																							'bg-cyan-500/20 border-cyan-500 text-cyan-300',
-																						)}
-																					>
-																						<div className="flex items-center gap-1">
-																							<Coffee className="h-2.5 w-2.5 shrink-0" />
-																							<span className="font-medium truncate">
-																								Break
-																							</span>
-																							<span className="px-1 py-0.5 rounded text-[8px] font-bold bg-cyan-500/30">
-																								{breakSlot.duration}m
-																							</span>
-																						</div>
-																					</div>
-																				</TooltipTrigger>
-																				<TooltipContent
-																					side="right"
-																					className="max-w-[200px] bg-popover border-border"
-																				>
-																					<div className="space-y-1">
-																						<div className="font-semibold text-sm flex items-center gap-1">
-																							<Coffee className="h-4 w-4 text-cyan-400" />
-																							Break
-																						</div>
-																						{breakSlot.reason && (
-																							<div className="text-xs text-muted-foreground">
-																								{breakSlot.reason}
-																							</div>
-																						)}
-																						<div className="text-xs">
-																							{formatTime(
-																								breakSlot.scheduledStart,
-																							)}{' '}
-																							-{' '}
-																							{formatTime(
-																								breakSlot.scheduledEnd,
-																							)}
-																						</div>
-																						<div className="text-xs text-cyan-400 font-medium">
-																							{breakSlot.duration} minute break
-																						</div>
-																					</div>
-																				</TooltipContent>
-																			</Tooltip>
-																		))} */}
-
 																		{/* Render consultations */}
 																		{slotConsultations.map((consultation) => {
 																			const hasOverrun =
 																				(consultation.overrunMinutes ?? 0) > 0;
-																			// const isAffected =
-																			// 	consultation.isAffectedByOverrun;
-																			// const isAffectedByBreak =
-																			// 	consultation.isAffectedByBreak;
 
 																			return (
 																				<Tooltip key={consultation.id}>
@@ -511,79 +403,30 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 																								setOpen(true);
 																							}}
 																							className={cn(
-																								'w-full p-1.5 rounded-sm border-l-2 text-left text-[10px] transition-all relative cursor-pointer',
-																								'hover:brightness-110 hover:z-20',
-																								getStatusColor(
-																									consultation.status,
-																								),
+																								'w-full p-2.5 rounded-sm border-l-3 text-left text-[12px] transition-all relative cursor-pointer',
+																								'hover:brightness-150 hover:z-20',
+																								statusColor[
+																									consultation.status
+																								],
 																							)}
 																						>
 																							<div className="flex items-start justify-between gap-1">
 																								<div className="flex-1 min-w-0">
 																									<div className="font-medium truncate flex items-center gap-1">
-																										<BookOpen className="h-2.5 w-2.5 shrink-0" />
+																										<BookOpen className="h-4 w-4 shrink-0" />
 																										{
 																											consultation.student
 																												.proponent_detail
 																												.proponent.title
 																										}
 																									</div>
-																									<div className="opacity-80 text-[9px]">
+																									<div className="opacity-80 text-[12px]">
 																										{formatTime(
 																											consultation.start_time,
 																										).replace(' ', '')}
 																									</div>
 																								</div>
-
-																								{/* Compact indicators */}
-																								<div className="flex flex-col gap-0.5 shrink-0">
-																									{hasOverrun && (
-																										<span className="px-1 py-0.5 rounded text-[8px] font-bold bg-red-500/40 text-red-200">
-																											+
-																											{
-																												consultation.overrunMinutes
-																											}
-																											m
-																										</span>
-																									)}
-																									{/* {isAffected && (
-																										<span className="px-1 py-0.5 rounded text-[8px] font-bold bg-amber-500/40 text-amber-200">
-																											⚠
-																										</span>
-																									)}
-																									{isAffectedByBreak && (
-																										<span className="px-1 py-0.5 rounded text-[8px] font-bold bg-cyan-500/40 text-cyan-200">
-																											☕
-																										</span>
-																									)} */}
-																								</div>
 																							</div>
-
-																							{/* Resolve button */}
-																							{/* {(isAffected ||
-																								isAffectedByBreak) &&
-																								onResolveConflict && (
-																									<button
-																										onClick={(e) => {
-																											e.stopPropagation();
-																											onResolveConflict(
-																												consultation,
-																												findCausingConsultation(
-																													consultation,
-																												),
-																											);
-																										}}
-																										className={cn(
-																											'absolute -right-0.5 -top-0.5 p-0.5 rounded-full transition-colors shadow-md',
-																											isAffectedByBreak
-																												? 'bg-cyan-500 text-cyan-950 hover:bg-cyan-400'
-																												: 'bg-amber-500 text-amber-950 hover:bg-amber-400',
-																										)}
-																										title="Resolve conflict"
-																									>
-																										<Wrench className="h-2.5 w-2.5" />
-																									</button>
-																								)} */}
 																						</button>
 																					</TooltipTrigger>
 																					<TooltipContent
@@ -656,25 +499,11 @@ const WeeklyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsult
 					weekly={selectedSchedule}
 					weeklies={weeklies}
 					availabilities={availabilities}
-					project={null}
-					studentsIds={[2, 3]}
 					open={open}
 					setOpen={setOpen}
 					refresh={refresh}
 				/>
 			)}
-			{/* {rescheduleDialog && selectedSchedule && (
-				<RescheduleConsultation
-					open={rescheduleDialog}
-					setOpen={setRescheduleDialog}
-					availabilities={availabilities}
-					project={null}
-					studentIds={[2, 3]}
-					weeklies={weeklies}
-					selectedSchedule={selectedSchedule}
-					refresh={refresh}
-				/>
-			)} */}
 		</>
 	);
 };

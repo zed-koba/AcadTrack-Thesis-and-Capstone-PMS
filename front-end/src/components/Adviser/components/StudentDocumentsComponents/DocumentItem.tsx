@@ -4,7 +4,6 @@ import {
 	Clock,
 	Download,
 	Eye,
-	File,
 	FileText,
 	MessageCircle,
 	MoreVertical,
@@ -18,7 +17,6 @@ import {
 	downloadDocument,
 	formatDate,
 	formatDateWithTime,
-	formatFileSize,
 	statusColor,
 } from '@/components/functions/functions';
 import {
@@ -47,7 +45,11 @@ const DocumentItem = ({
 		<div className="space-y-1">
 			<div
 				className={cn(
-					'flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer',
+					'flex items-center gap-3 p-3 rounded-md bg-muted/50 transition-colors cursor-pointer border border-muted-foreground/40',
+
+					checkVersion.version &&
+						checkVersion.status === 'need revision' &&
+						'border border-red-500/50',
 					checkVersion.version &&
 						checkVersion.id === selectedDocument?.id &&
 						'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',

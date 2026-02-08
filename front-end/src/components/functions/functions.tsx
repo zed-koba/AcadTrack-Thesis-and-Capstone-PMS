@@ -12,11 +12,9 @@ import {
 	RefreshCcw,
 	X,
 } from 'lucide-react';
-import type {
-	ChapterDocumentsProps,
-	ProponentsDocumentsProps,
-} from '../Adviser/interface/adviserdocument';
+import type { ProponentsDocumentsProps } from '../Adviser/interface/adviserdocument';
 import type { AdviserWeeklyProps } from '../Adviser/interface/consultation';
+import { parse } from 'date-fns';
 
 export function formatDate(dateString: string) {
 	const date = new Date(dateString);
@@ -81,6 +79,8 @@ export const statusColor: Record<string, string> = {
 	'under review': 'bg-success/20 border-success/40 text-success',
 	'need revision': 'bg-red-500/20 border-red-500/40 text-red-500',
 	'approved': 'bg-green-500/20 border-green-500/40 text-green-500',
+	'completed': 'bg-blue-500/20 border-blue-500/40 text-blue-500',
+	'upcoming': 'bg-green-500/20 border-green-500/40 text-green-500',
 	'ongoing': 'bg-sky-500/20 border-sky-500/40 text-sky-500',
 	'rejected': 'bg-red-500/20 border-red-500/40 text-red-500',
 	'cancelled': 'bg-red-500/20 border-red-500/40 text-red-500',
@@ -99,21 +99,10 @@ export const consultationIcon: Record<string, JSX.Element> = {
 	pending: <Clock className="h-3 w-3 mr-1" />,
 	rejected: <X className="h-3 w-3 mr-1" />,
 	cancelled: <X className="h-3 w-3 mr-1" />,
-	approved: <CircleCheckBig className="h-3 w-3 mr-1" />,
+	upcoming: <CircleCheckBig className="h-3 w-3 mr-1" />,
 	completed: <CalendarCheck className="h-3 w-3 mr-1" />,
 	expired: <CalendarX className="h-3 w-3 mr-1" />,
 	ongoing: <CalendarClock className="h-3 w-3 mr-1" />,
-};
-
-export const getProjectStatus = (chaptersGrouped: ChapterDocumentsProps[]) => {
-	if (chaptersGrouped.length === 0) return 'No Document';
-
-	const lastChapter = chaptersGrouped.at(-1);
-	if (!lastChapter || lastChapter.documents.length === 0) return null;
-
-	const doc = lastChapter.documents[0];
-
-	return doc.versions.length > 0 ? doc.versions[0].status : doc.status;
 };
 
 export const studentId = 2;
@@ -193,27 +182,6 @@ export const getDateLabel = (dateStr: string): string => {
 	});
 };
 
-export const getStatusColor = (status: string) => {
-	switch (status) {
-		case 'approved':
-			return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 hover:bg-sky-500/30';
-		case 'pending':
-			return 'bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30';
-		case 'completed':
-			return 'bg-blue-500/20 border-blue-500/50 text-blue-400 hover:bg-blue-500/30';
-		case 'rejected':
-			return 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30';
-		case 'cancelled':
-			return 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30';
-		case 'expired':
-			return 'bg-slate-500/20 border-slate-500/50 text-slate-200 hover:bg-slate-500/30';
-		case 'ongoing':
-			return 'bg-sky-500/20 border-sky-500/50 text-sky-500 hover:bg-sky-500/30';
-		default:
-			return 'bg-muted';
-	}
-};
-
 export const studentIds = (project?: ProponentsDocumentsProps | null) => {
 	return (project?.details.map((d) => d.student_id) ?? []).filter(
 		(id) => id !== undefined,
@@ -232,4 +200,8 @@ export const generateTimeSlots = (meetingDuration: number) => {
 		}
 	}
 	return slots;
+};
+
+export const getTime = (dateForDay: string, timeSlot: string) => {
+	return parse(`${dateForDay} ${timeSlot}`, 'yyyy-MM-dd HH:mm:ss', new Date());
 };

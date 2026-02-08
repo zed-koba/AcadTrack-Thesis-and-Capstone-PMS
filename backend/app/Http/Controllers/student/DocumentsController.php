@@ -32,7 +32,7 @@ class DocumentsController extends Controller
             'title_name' => 'required|string',
             'file' => 'required|file|mimes:pdf|max:10240',
             'parent_document_id' => 'nullable|string|exists:documents,id',
-            'chapter' => 'integer|required'
+            
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -61,7 +61,6 @@ class DocumentsController extends Controller
             $document = Documents::create([
                 'student_id' => $request->student_id,
                 'title_name' => $request->title_name,
-                'description' => $request->description,
                 'original_name' => $file->getClientOriginalName(),
                 'stored_name' => basename($path),
                 'path' => $path,
@@ -69,7 +68,6 @@ class DocumentsController extends Controller
                 'size' => $file->getSize(),
                 'parent_document_id' => $parentDocumentId,
                 'version' => $version,
-                'chapter' => $request->chapter,
                 'status' => $status,
             ]);
 

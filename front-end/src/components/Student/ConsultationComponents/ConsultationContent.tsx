@@ -7,10 +7,13 @@ import {
 	CheckCircle,
 	RefreshCcw,
 	User,
+	X,
 } from 'lucide-react';
 import type { ConsultationContentProps } from '../interface/consultation';
 import {
+	consultationIcon,
 	getDateLabel,
+	getTime,
 	pastSessions,
 	statusColor,
 	upcomingSessions,
@@ -26,6 +29,7 @@ import { useState } from 'react';
 import BookConsultationDialog from './BookConsultationDialogv2';
 import RescheduleConsultation from './RescheduleConsultationv2';
 import CancelAlertDialog from './CancelAlertDialog';
+import { differenceInMinutes } from 'date-fns';
 
 const ConsultationContent = ({
 	weeklies,
@@ -52,13 +56,11 @@ const ConsultationContent = ({
 		studentIds?.includes(past.student_id),
 	);
 	const statusBg: Record<string, string> = {
-		pending: 'bg-amber-500/10 border-amber-500/50',
-		approved: 'bg-emerald-500/5 border-emerald-500/50',
+		upcoming: 'bg-emerald-500/5 border-emerald-500/50',
 		ongoing: 'bg-sky-500/5 border-sky-500/50',
 	};
 	const statusText: Record<string, string> = {
-		pending: 'text-amber-500',
-		approved: 'text-emerald-500',
+		upcoming: 'text-emerald-500',
 		ongoing: 'text-sky-500',
 	};
 
@@ -87,6 +89,7 @@ const ConsultationContent = ({
 										statusColor[filterSchedule[0].status],
 									)}
 								>
+									{consultationIcon[filterSchedule[0].status]}{' '}
 									{filterSchedule[0].status}
 								</Badge>
 							</div>
@@ -99,7 +102,17 @@ const ConsultationContent = ({
 									</p>
 									<p className="text-sm text-muted-foreground mt-1">
 										{getDateLabel(filterSchedule[0].date)} •{' '}
-										{project?.adviser.duration} min
+										{differenceInMinutes(
+											getTime(
+												filterSchedule[0].date,
+												filterSchedule[0].end_time,
+											),
+											getTime(
+												filterSchedule[0].date,
+												filterSchedule[0].start_time,
+											),
+										)}{' '}
+										min
 									</p>
 								</div>
 								<div className="flex-1">
@@ -112,25 +125,15 @@ const ConsultationContent = ({
 									</p>
 									<div className="flex gap-2 mt-3">
 										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => {
-												setSelectedSchedule(filterSchedule[0]);
-												setRescheduleDialog(true);
-											}}
-										>
-											<RefreshCcw className="h-4 w-4 mr-2" />
-											Reschedule
-										</Button>
-										<Button
 											variant="ghost"
 											size="sm"
-											className="text-destructive hover:text-white hover:bg-red-500"
+											className="text-red-500 hover:text-white bg-red-500/20 border-red-500/40 border hover:bg-red-500 w-35"
 											onClick={() => {
 												setSelectedSchedule(filterSchedule[0]);
 												setCancelDialog(true);
 											}}
 										>
+											<X />
 											Cancel
 										</Button>
 									</div>
@@ -222,8 +225,6 @@ const ConsultationContent = ({
 					open={rescheduleDialog}
 					setOpen={setRescheduleDialog}
 					availabilities={availabilities}
-					project={project}
-					studentIds={studentIds}
 					weeklies={weeklies}
 					selectedSchedule={selectedSchedule}
 					refresh={refresh}
@@ -236,6 +237,7 @@ const ConsultationContent = ({
 					setOpen={setCancelDialog}
 					project={project}
 					selectedSchedule={selectedSchedule}
+					refresh={refresh}
 				/>
 			)}
 		</>

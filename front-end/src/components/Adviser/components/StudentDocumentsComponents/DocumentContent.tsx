@@ -1,6 +1,5 @@
 import { BarChart3, Filter, Folder, LibraryBig, Search } from 'lucide-react';
-import type { DocumentProps } from '@/components/Student/interface/document';
-import { useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,10 +11,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import DocumentProjectCard from './DocumentProjectCard';
-import type {
-	AdviserDocumentContentProps,
-	ChapterDocumentsProps,
-} from '../../interface/adviserdocument';
+import type { AdviserDocumentContentProps } from '../../interface/adviserdocument';
 import DocumentsComments from './DocumentComments';
 import { cn } from '@/lib/utils';
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
@@ -31,9 +27,7 @@ const DocumentContent = ({
 	const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
 		new Set(),
 	);
-	const [expandedChapters, setExpandedChapters] = useState<Set<number>>(
-		new Set(),
-	);
+
 	const [projectAdviser, setProjectAdviser] = useState<AdviserProps | null>(
 		null,
 	);
@@ -79,22 +73,6 @@ const DocumentContent = ({
 		setExpandedProjects(newExpanded);
 	};
 
-	const toggleChapter = (chapterId: number) => {
-		const newExpanded = new Set(expandedChapters);
-		if (newExpanded.has(chapterId)) {
-			newExpanded.delete(chapterId);
-		} else {
-			newExpanded.add(chapterId);
-		}
-		setExpandedChapters(newExpanded);
-	};
-	const onStatusChange = (projectId: number, newStatus: string) => {
-		filterProjects.forEach((project) => {
-			if (project.id === projectId) {
-				project.status = newStatus;
-			}
-		});
-	};
 	return (
 		<>
 			<section className="w-full grid h-auto lg:grid-rows-[auto-1fr] xl:grid-rows-none xl:grid-cols-[1000px_1fr] gap-3">
@@ -116,8 +94,8 @@ const DocumentContent = ({
 											Capstone/Thesis Projects
 										</CardTitle>
 										<p className="text-sm text-muted-foreground mt-0.5">
-											{projects.length} projects • {documents.length} total
-											submitted documents
+											{projects.length} thesis/capstone • {documents.length}{' '}
+											total submitted documents
 										</p>
 									</div>
 								</div>
@@ -177,15 +155,12 @@ const DocumentContent = ({
 												documents={documents}
 												project={project}
 												isExpanded={expandedProjects.has(project.proponents_id)}
-												expandedChapters={expandedChapters}
 												onToggle={() => toggleProject(project.proponents_id)}
-												onToggleChapter={toggleChapter}
 												onSelectDocument={setSelectedDocument}
 												selectedDocument={selectedDocument}
 												refresh={refresh}
 												projectAdviser={project.adviser}
 												setProjectAdviser={setProjectAdviser}
-												onStatusChange={onStatusChange}
 											/>
 										))}
 									</div>

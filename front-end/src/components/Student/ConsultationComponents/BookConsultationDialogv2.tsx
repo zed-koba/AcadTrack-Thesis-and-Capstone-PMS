@@ -26,7 +26,11 @@ import {
 	isSameDay,
 	parse,
 } from 'date-fns';
-import { getDayNumber, studentId } from '@/components/functions/functions';
+import {
+	getDayNumber,
+	getTime,
+	studentId,
+} from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
 import { apiStudentUrl } from '@/components/Routes/http';
 import { toast } from 'sonner';
@@ -71,7 +75,8 @@ const BookConsultationDialog = ({
 		if (!selectedDate) return false;
 
 		return filterWeeklies.some((booking) => {
-			if (booking.status === 'cancelled' || booking.status === 'rejected') return false;
+			if (booking.status === 'cancelled' || booking.status === 'rejected')
+				return false;
 			if (!isSameDay(new Date(booking.date), selectedDate)) return false;
 
 			// Check for overlap
@@ -240,14 +245,6 @@ const BookConsultationDialog = ({
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	const getTime = (dateForDay: string, timeSlot: string) => {
-		return parse(
-			`${dateForDay} ${timeSlot}`,
-			'yyyy-MM-dd HH:mm:ss',
-			new Date(),
-		);
-	};
-
 	const dateForDay = format(selectedDate ?? new Date(), 'yyyy-MM-dd');
 	return (
 		<>
@@ -290,8 +287,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-												!isCompleted &&
-												'bg-muted text-muted-foreground',
+													!isCompleted &&
+													'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -372,10 +369,12 @@ const BookConsultationDialog = ({
 							{currentStep === 'window' && (
 								<div className="space-y-4">
 									<div>
-										<h3 className="font-semibold text-lg">Select Time Window</h3>
+										<h3 className="font-semibold text-lg">
+											Select Time Window
+										</h3>
 										<p className="text-sm text-muted-foreground">
-											Choose from {project?.adviser.name}'s available time windows
-											on {selectedDate && format(selectedDate, 'MMM d')}
+											Choose from {project?.adviser.name}'s available time
+											windows on {selectedDate && format(selectedDate, 'MMM d')}
 										</p>
 									</div>
 									<div className="grid gap-3">
@@ -391,15 +390,14 @@ const BookConsultationDialog = ({
 													dateForDay,
 													window.start_time,
 												);
-												const endDateTime = getTime(dateForDay, window.end_time);
+
 												const slots: { start: string; end: string } = {
 													start: window.start_time.slice(0, 5),
 													end: window.end_time.slice(0, 5),
 												};
 
 												const booked = isSlotBooked(slots);
-												const expired =
-													isAfter(new Date(), startDateTime);
+												const expired = isAfter(new Date(), startDateTime);
 												return (
 													<button
 														key={window.id}
@@ -457,85 +455,8 @@ const BookConsultationDialog = ({
 									</div>
 								</div>
 							)}
-							{/* Step 3: Select Time Slot */}
-							{/* {currentStep === 'slot' && selectedWindow && (
-							<div className="space-y-4">
-								<div>
-									<h3 className="font-semibold text-lg">Select Time Slot</h3>
-									<p className="text-sm text-muted-foreground">
-										Choose a {project?.adviser.duration}-minute slot within{' '}
-										{to12HourTime(selectedWindow.start_time)} –{' '}
-										{to12HourTime(selectedWindow.end_time)}
-									</p>
-								</div>
-								<div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-									{generateSlotsForWindow(selectedWindow).map((slot, index) => {
-										const booked = isSlotBooked(slot);
 
-										const isSelected = selectedSlot?.start === slot.start;
-
-										const startDateTime = parse(
-											`${getDateForWeekday(selectedWindow.day)} ${slot.start}`,
-											'yyyy-MM-dd HH:mm',
-											new Date(),
-										);
-										
-										return (
-											<button
-												key={index}
-												onClick={() => !booked && setSelectedSlot(slot)}
-												disabled={booked || isAfter(new Date(), startDateTime)}
-												className={cn(
-													'p-3 rounded-lg border text-center transition-all disabled:cursor-auto cursor-pointer',
-													booked &&
-														'opacity-40 cursor-not-allowed bg-muted border-border',
-													!booked &&
-														!isSelected &&
-														'border-border hover:border-primary hover:bg-primary/5',
-													isSelected &&
-														'border-primary bg-primary text-primary-foreground',
-													isAfter(new Date(), startDateTime) &&
-														'border-none bg-muted text-slate-600! hover:bg-muted',
-												)}
-											>
-												<p
-													className={cn(
-														'font-mono font-semibold text-sm',
-														isSelected && 'text-primary-foreground',
-													)}
-												>
-													{to12HourTime(slot.start)}
-												</p>
-												<p
-													className={cn(
-														'text-xs mt-0.5',
-														isSelected
-															? 'text-primary-foreground/80'
-															: 'text-muted-foreground',
-													)}
-												>
-													{booked
-														? 'Booked'
-														: `${project?.adviser.duration} min`}
-												</p>
-											</button>
-										);
-									})}
-								</div>
-								{selectedSlot && (
-									<div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-										<div className="flex items-center gap-2">
-											<CheckCircle2 className="h-4 w-4 text-primary" />
-											<p className="text-sm font-medium">
-												{to12HourTime(selectedSlot.start)} –{' '}
-												{to12HourTime(selectedSlot.end)}
-											</p>
-										</div>
-									</div>
-								)}
-							</div>
-						)} */}
-							{/* Step 4: Confirm Booking */}
+							{/* Step 3: Confirm Booking */}
 							{currentStep === 'confirm' && selectedDate && selectedWindow && (
 								<div className="space-y-4">
 									<div>

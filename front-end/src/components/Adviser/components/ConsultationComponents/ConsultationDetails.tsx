@@ -15,17 +15,14 @@ import {
 	MessageSquare,
 	User,
 	Users,
-	Users2,
 	X,
 } from 'lucide-react';
 import {
 	formatTime,
-	to12HourTime,
-	type AdviserWeeklyProps,
 	type ConsultationDialogProps,
 } from '../../interface/consultation';
 import { Badge } from '@/components/ui/badge';
-import { differenceInMinutes, format, isAfter, isEqual, parse } from 'date-fns';
+import { differenceInMinutes, format, isAfter, parse } from 'date-fns';
 import { apiAdviserUrl } from '@/components/Routes/http';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -35,15 +32,17 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { consultationIcon } from '@/components/functions/functions';
+import {
+	consultationIcon,
+	statusColor,
+} from '@/components/functions/functions';
 import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
+import { cn } from '@/lib/utils';
 
 const ConsultationDetails = ({
 	open,
 	weeklies,
 	availabilities,
-	studentsIds,
-	project,
 	weekly,
 	setOpen,
 	refresh,
@@ -52,55 +51,9 @@ const ConsultationDetails = ({
 		weekly?.feedback ?? '',
 	);
 	const nowDateTime = format(new Date(), 'HH:mm');
-	const nowDate = new Date();
 	const [rescheduleDialog, setRescheduleDialog] = useState(false);
 	if (!weekly) return null;
 
-	const getStatusBadge = (status: string) => {
-		switch (status) {
-			case 'approved':
-				return (
-					<Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50">
-						{consultationIcon[status]}
-						Confirmed
-					</Badge>
-				);
-			case 'pending':
-				return (
-					<Badge className="bg-amber-500/20 border text-amber-400 border-amber-500/50">
-						{consultationIcon[status]}
-						Pending
-					</Badge>
-				);
-			case 'completed':
-				return (
-					<Badge className="bg-blue-500/20 border text-blue-400 border-blue-500/50">
-						{consultationIcon[status]}
-						Completed
-					</Badge>
-				);
-			case 'rejected':
-				return <Badge variant="destructive" className="bg-red-500/20 border border-red-500/50 text-red-500">{consultationIcon[status]} Rejected</Badge>;
-			case 'cancelled':
-				return <Badge variant="destructive" className="bg-red-500/20 border border-red-500/50 text-red-500">{consultationIcon[status]} Cancelled</Badge>;
-			case 'expired':
-				return (
-					<Badge className="bg-slate-500/20 border text-slate-200 border-slate-500/50">
-						{consultationIcon[status]}
-						Expired
-					</Badge>
-				);
-			case 'ongoing':
-				return (
-					<Badge className="bg-sky-500/20 text-sky-500 border-sky-500 border">
-						{consultationIcon[status]}
-						Ongoing
-					</Badge>
-				);
-			default:
-				return <Badge>{status}</Badge>;
-		}
-	};
 	const updateStatus = async (
 		status: string,
 		actual_start: string,
@@ -111,7 +64,7 @@ const ConsultationDetails = ({
 				status: status,
 				feedback: weekly?.status === 'completed' ? feedback : weekly?.feedback,
 				actual_start:
-					weekly?.status === 'approved' ? actual_start : weekly?.actual_start,
+					weekly?.status === 'upcoming' ? actual_start : weekly?.actual_start,
 				actual_end:
 					weekly?.status === 'ongoing' ? actual_end : weekly.actual_end,
 			};
@@ -132,7 +85,7 @@ const ConsultationDetails = ({
 				);
 				return;
 			} else if (result.status === 500) {
-				console.log(result.errors);
+				console.log(result.error);
 				return;
 			}
 
@@ -146,12 +99,13 @@ const ConsultationDetails = ({
 		}
 	};
 	const trimSeconds = (time: string) => time.slice(0, 5);
-	const startDateTime = parse(
+	const startDateTime = parse(`${weekly.date}`, 'yyyy-MM-dd', new Date());
+
+	const startDateTimeMin = parse(
 		`${weekly.date} ${trimSeconds(weekly.start_time)}`,
 		'yyyy-MM-dd HH:mm',
 		new Date(),
 	);
-
 	const actualStartDateTime = parse(
 		`${weekly.date} ${weekly.actual_start !== null ? trimSeconds(weekly.actual_start) : ''}`,
 		'yyyy-MM-dd HH:mm',
@@ -168,8 +122,7 @@ const ConsultationDetails = ({
 		'yyyy-MM-dd HH:mm',
 		new Date(),
 	);
-	const isPast = isAfter(new Date(), endDateTime);
-	const isOngoing = isAfter(new Date(), startDateTime) && !isPast;
+	const isOngoing = isAfter(new Date(), startDateTime);
 
 	return (
 		<>
@@ -178,7 +131,13 @@ const ConsultationDetails = ({
 					<DialogHeader>
 						<DialogTitle className="flex items-center justify-between capitalize">
 							<span>Consultation Details</span>
-							{getStatusBadge(weekly.status)}
+							<Badge
+								variant="outline"
+								className={cn('', statusColor[weekly.status])}
+							>
+								{consultationIcon[weekly.status]}
+								{weekly.status}
+							</Badge>
 						</DialogTitle>
 					</DialogHeader>
 					<div className="space-y-6 py-4">
@@ -186,19 +145,21 @@ const ConsultationDetails = ({
 							{(weekly.actual_start !== null || weekly.actual_end !== null) && (
 								<div className="flex gap-2">
 									{weekly.start_time !== weekly.actual_start &&
-										weekly.actual_start !== null ? (
+									weekly.actual_start !== null ? (
 										<div className="rounded-full border border-amber-500/40 text-amber-500 bg-amber-500/20 py-0.5 px-3 font-medium text-sm">
-											+{differenceInMinutes(actualStartDateTime, startDateTime)}
-											mins delayed
+											{startDateTimeMin > actualStartDateTime
+												? `-${differenceInMinutes(startDateTimeMin, actualStartDateTime)}mins early`
+												: `+${differenceInMinutes(actualStartDateTime, startDateTimeMin)}mins delayed`}
 										</div>
 									) : (
 										''
 									)}
 									{weekly.end_time !== weekly.actual_end &&
-										weekly.actual_end !== null ? (
+									weekly.actual_end !== null ? (
 										<div className="rounded-full border border-red-500/40 text-red-500 bg-red-500/20 py-0.5 px-3 font-medium text-sm">
-											+{differenceInMinutes(actualEndDateTime, endDateTime)}
-											mins overrun
+											{endDateTime > actualEndDateTime
+												? `-${differenceInMinutes(endDateTime, actualEndDateTime)}mins early ended`
+												: `+${differenceInMinutes(actualEndDateTime, endDateTime)}mins overrun`}
 										</div>
 									) : (
 										''
@@ -224,10 +185,10 @@ const ConsultationDetails = ({
 											(student) => (
 												<div
 													key={student.student.id}
-													className="bg-muted/50 border-muted/80 py-1 px-2 border rounded-sm flex gap-2 items-center"
+													className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
 												>
-													<User className="w-3.5 h-3.5" />
-													<p className="text-xs font-normal">
+													<User className="w-4 h-4" />
+													<p className="text-xs font-medium">
 														{student.student.name}
 													</p>
 												</div>
@@ -308,47 +269,21 @@ const ConsultationDetails = ({
 							)}
 						</div>
 
-						{weekly.status === 'pending' && (
-							<div className="flex gap-2 pt-4 border-t border-border">
-								<Button
-									onClick={() => {
-										updateStatus('approved', '', '');
-										setOpen(false);
-									}}
-									variant="ghost"
-									className="flex-1 text-blue-500 bg-blue-500/20 hover:bg-blue-500/40"
-								>
-									<Check />
-									Approve
-								</Button>
-								<Button
-									variant="ghost"
-									onClick={() => {
-										updateStatus('rejected', '', '');
-										setOpen(false);
-									}}
-									className="flex-1 text-red-500 bg-red-500/20 hover:bg-red-500/40"
-								>
-									<X />
-									Reject
-								</Button>
-							</div>
-						)}
-						{weekly.status === 'rejected' && (
+						{weekly.status === 'cancelled' && (
 							<div className="flex gap-2 pt-4 border-t border-border">
 								<Button
 									onClick={() => {
 										setRescheduleDialog(true);
 									}}
 									variant="outline"
-									className="flex-1 bg-amber-600 hover:bg-amber-600/80"
+									className="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-500"
 								>
-									Re-schedule
+									Reschedule
 								</Button>
 							</div>
 						)}
 
-						{weekly.status === 'approved' && (
+						{weekly.status === 'upcoming' && (
 							<div className="flex gap-2 pt-4 border-t border-border">
 								<Tooltip>
 									<TooltipTrigger asChild>
@@ -358,7 +293,7 @@ const ConsultationDetails = ({
 													updateStatus('ongoing', nowDateTime, '');
 													setOpen(false);
 												}}
-												className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-500"
+												className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 hover:text-emerald-500 text-emerald-500"
 												variant="outline"
 												disabled={!isOngoing}
 											>
@@ -370,10 +305,7 @@ const ConsultationDetails = ({
 									<TooltipContent>
 										{!isOngoing && (
 											<p className="font-normal text-sm text-muted-foreground">
-												Available{' '}
-												{format(nowDate, 'yyyy-MM-dd') === weekly?.date
-													? `at ${to12HourTime(weekly?.start_time)}`
-													: `on ${format(weekly?.date, 'eee')} at ${to12HourTime(weekly?.start_time)}`}
+												Available {`on ${format(weekly?.date, 'EEEE')}`}
 											</p>
 										)}
 										{isOngoing && (
@@ -406,7 +338,6 @@ const ConsultationDetails = ({
 									}}
 									className="flex-1 bg-red-500/20 hover:b-red-500/40 text-red-500 hover:bg-red-500/30"
 									variant="outline"
-
 								>
 									<X />
 									End Consultation
@@ -434,8 +365,6 @@ const ConsultationDetails = ({
 							open={rescheduleDialog}
 							setOpen={setRescheduleDialog}
 							availabilities={availabilities}
-							project={project}
-							studentIds={studentsIds}
 							weeklies={weeklies}
 							selectedSchedule={weekly}
 							refresh={refresh}

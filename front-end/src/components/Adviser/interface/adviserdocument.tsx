@@ -13,9 +13,7 @@ export type ChapterDocumentsProps = {
 	documents: DocumentProps[];
 };
 export type ViewDocumentsProps = {
-	chapter: ChapterDocumentsProps;
-	isExpanded: boolean;
-	onToggle: () => void;
+	document: DocumentProps;
 	onSelectDocument: (document: DocumentProps) => void;
 	selectedDocument: DocumentProps | null;
 	setProjectAdviser: (adviser: AdviserProps) => void;
@@ -73,11 +71,8 @@ export type ProjectCollapseProps = {
 	documents: DocumentProps[];
 	project: ProjectWithStatus;
 	isExpanded: boolean;
-	expandedChapters: Set<number>;
 	projectAdviser: AdviserProps;
-	onStatusChange: (projectId: number, newStatus: string) => void;
 	onToggle: () => void;
-	onToggleChapter: (chapterId: number) => void;
 	onSelectDocument: (document: DocumentProps) => void;
 	selectedDocument: DocumentProps | null;
 	setProjectAdviser: (adviser: AdviserProps) => void;

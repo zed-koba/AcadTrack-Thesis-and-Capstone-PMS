@@ -11,33 +11,21 @@ import z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { FileText, Upload, X } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { apiStudentUrl } from '@/components/Routes/http';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
+
 import { studentId } from '@/components/functions/functions';
 
 const uploadSchema = z.object({
-	chapter: z.number().min(1, 'Select a chapter'),
 	document_title: z.string().min(2, 'Title required'),
 	description: z.string().nullable().optional(),
 });
 
-const DocumentUploadDialog = ({
-	totalChapters,
-	checkLastChapterStatus,
-	refresh,
-}: DocumentUploadProps) => {
+const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
@@ -46,7 +34,6 @@ const DocumentUploadDialog = ({
 	const defaultValues: formValues = {
 		document_title: '',
 		description: '',
-		chapter: 0,
 	};
 
 	const form = useForm({
@@ -66,9 +53,8 @@ const DocumentUploadDialog = ({
 			const formData = new FormData();
 			formData.append('file', selectedFile);
 			formData.append('student_id', String(studentId));
-			formData.append('chapter', String(value.chapter));
 			formData.append('title_name', value.document_title);
-			formData.append('description', value.description ?? '');
+
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {
 					method: 'POST',
@@ -174,49 +160,6 @@ const DocumentUploadDialog = ({
 						>
 							<div className="flex flex-col gap-5">
 								<form.Field
-									name="chapter"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor={field.name}>
-													Select Chapter: *
-												</FieldLabel>
-												<Select
-													name={field.name}
-													onValueChange={(v) => field.handleChange(Number(v))}
-												>
-													<SelectTrigger
-														className="w-auto"
-														aria-invalid={isInvalid}
-														id={field.name}
-													>
-														<SelectValue placeholder="Select a Chapter" />
-													</SelectTrigger>
-													<SelectContent>
-														{Array.from({ length: totalChapters }, (_, i) => (
-															<SelectItem value={String(i + 1)}>
-																Chapter {i + 1}
-															</SelectItem>
-														))}
-														{(checkLastChapterStatus ||
-															totalChapters === 0) && (
-															<SelectItem value={String(totalChapters + 1)}>
-																Chapter {totalChapters + 1}
-															</SelectItem>
-														)}
-													</SelectContent>
-												</Select>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-								<form.Field
 									name="document_title"
 									children={(field) => {
 										const isInvalid =
@@ -236,35 +179,6 @@ const DocumentUploadDialog = ({
 													aria-invalid={isInvalid}
 													placeholder={'Ex. Rationale Draft Review'}
 													autoComplete="off"
-												/>
-												{isInvalid && (
-													<FieldError errors={field.state.meta.errors} />
-												)}
-											</Field>
-										);
-									}}
-								/>
-								<form.Field
-									name="description"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid} orientation="responsive">
-												<FieldLabel htmlFor={field.name}>
-													Description (Optional)
-												</FieldLabel>
-												<Textarea
-													id={field.name}
-													name={field.name}
-													onBlur={field.handleBlur}
-													onChange={(e) => field.handleChange(e.target.value)}
-													aria-invalid={isInvalid}
-													placeholder={
-														'Brief description about the document...'
-													}
-													autoComplete="off"
-													className="resize-none w-full h-30"
 												/>
 												{isInvalid && (
 													<FieldError errors={field.state.meta.errors} />

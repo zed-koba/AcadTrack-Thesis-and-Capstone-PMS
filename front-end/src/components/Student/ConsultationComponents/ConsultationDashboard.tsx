@@ -1,18 +1,16 @@
 import {
 	BookOpen,
 	Calendar,
+	CalendarCheck,
 	CalendarX,
 	CheckCircle,
-	Clock,
+	CircleCheckBig,
+	X,
 } from 'lucide-react';
 import type { ConsultationDashboardProps } from '../interface/consultation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import {
-	getDayNumber,
-	studentId,
-	studentIds,
-} from '@/components/functions/functions';
+import { getDayNumber, studentIds } from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import { to12HourTime } from '@/components/Adviser/interface/consultation';
 
@@ -21,8 +19,10 @@ const ConsultationDashboard = ({
 	project,
 	availabilities,
 }: ConsultationDashboardProps) => {
-	const filterPending = weeklies.filter(
-		(w) => w.status === 'pending' && studentIds(project).includes(w.student_id),
+	const filterCancelled = weeklies.filter(
+		(w) =>
+			(w.status === 'cancelled' || w.status === 'rejected') &&
+			studentIds(project).includes(w.student_id),
 	);
 	const filterCompleted = weeklies.filter(
 		(w) =>
@@ -42,22 +42,22 @@ const ConsultationDashboard = ({
 
 	const dashboards = [
 		{
-			label: 'Pending Approval',
-			value: filterPending.length,
-			iconBg: 'bg-amber-500/10',
-			icon: <Clock className="h-6 w-6 text-amber-500" />,
-		},
-		{
 			label: 'Upcoming Sessions',
 			value: upcomingSessions.length,
 			iconBg: 'bg-emerald-500/10',
-			icon: <Calendar className="h-6 w-6 text-emerald-500" />,
+			icon: <CircleCheckBig className="h-6 w-6 text-emerald-500" />,
 		},
 		{
 			label: 'Completed Session',
 			value: filterCompleted.length,
 			iconBg: 'bg-blue-500/10',
-			icon: <CheckCircle className="h-6 w-6 text-blue-500" />,
+			icon: <CalendarCheck className="h-6 w-6 text-blue-500" />,
+		},
+		{
+			label: 'Cancelled Session',
+			value: filterCancelled.length,
+			iconBg: 'bg-red-500/10',
+			icon: <X className="h-6 w-6 text-red-500" />,
 		},
 		{
 			label: 'Expired Session',
@@ -73,7 +73,7 @@ const ConsultationDashboard = ({
 					<Card className="border-border">
 						<CardHeader className="pb-0">
 							<CardTitle className="text-sm font-medium text-muted-foreground">
-								Your Project
+								Your Thesis/Capstone
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
@@ -93,7 +93,6 @@ const ConsultationDashboard = ({
 									<span className="text-muted-foreground">Adviser</span>
 									<span className="font-medium">{project?.adviser.name}</span>
 								</div>
-
 
 								<div className="flex items-center justify-between py-2 border-t border-border">
 									<span className="text-muted-foreground">Available Days</span>
@@ -158,21 +157,23 @@ const ConsultationDashboard = ({
 									<div className="flex-1  mt-2">
 										{daySlots.length > 0 ? (
 											<div className="flex flex-wrap gap-1">
-												{daySlots.sort((a, b) => {
-													if (a.start_time !== b.start_time) {
-														return a.start_time.localeCompare(b.start_time);
-													}
-													return a.end_time.localeCompare(b.end_time);
-												}).map((slot, i) => (
-													<Badge
-														key={i}
-														variant="outline"
-														className="text-xs font-normal"
-													>
-														{to12HourTime(slot.start_time)} -{' '}
-														{to12HourTime(slot.end_time)}
-													</Badge>
-												))}
+												{daySlots
+													.sort((a, b) => {
+														if (a.start_time !== b.start_time) {
+															return a.start_time.localeCompare(b.start_time);
+														}
+														return a.end_time.localeCompare(b.end_time);
+													})
+													.map((slot, i) => (
+														<Badge
+															key={i}
+															variant="outline"
+															className="text-xs font-normal"
+														>
+															{to12HourTime(slot.start_time)} -{' '}
+															{to12HourTime(slot.end_time)}
+														</Badge>
+													))}
 											</div>
 										) : (
 											<span className="text-muted-foreground text-xs">

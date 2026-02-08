@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->string('original_name');
-            $table->string('description')->nullable();
+            $table->string('original_name');       
             $table->string('title_name');
             $table->string('stored_name');
             $table->enum('status', ['pending', 'under review', 'need revision', 'approved', 'revised'])->default('pending');
@@ -27,7 +26,6 @@ return new class extends Migration
                 ->constrained('documents')
                 ->cascadeOnDelete();
             $table->integer('version')->default(1);
-            $table->integer('chapter')->default(1);
             $table->timestamps();
         });
     }

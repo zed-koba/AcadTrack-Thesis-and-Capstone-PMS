@@ -28,7 +28,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import {
 	consultationIcon,
-	getStatusColor,
+	statusColor,
 } from '@/components/functions/functions';
 import ConsultationDetails from './ConsultationDetails';
 const START_HOUR = 7;
@@ -43,8 +43,7 @@ const generateTimeSlots = (meetingDuration: number) => {
 	}
 	return slots;
 };
-const adviserDuration =
-	15;
+const adviserDuration = 15;
 const formatTime = (time: string) => {
 	const [hours, minutes] = time.split(':').map(Number);
 	const period = hours >= 12 ? 'PM' : 'AM';
@@ -58,7 +57,11 @@ const formatSlotTime = (hour: number, minute: number) => {
 	return `${displayHours}:${minute.toString().padStart(2, '0')} ${period}`;
 };
 
-const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsultationProps) => {
+const DailyConsultation = ({
+	weeklies,
+	availabilities,
+	refresh,
+}: WeeklyConsultationProps) => {
 	const [selectedDate, setSelectedDate] = useState(new Date());
 	const [calendarOpen, setCalendarOpen] = useState(false);
 	const [selectedSchedule, setSelectedSchedule] =
@@ -95,10 +98,7 @@ const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsulta
 		[weeklies, selectedDate],
 	);
 
-	const timeSlots = useMemo(
-		() => generateTimeSlots(adviserDuration),
-		[weeklies],
-	);
+	const timeSlots = useMemo(() => generateTimeSlots(adviserDuration), []);
 	// Calculate stats
 	const stats = useMemo(
 		() => ({
@@ -124,9 +124,6 @@ const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsulta
 							<CardTitle className="text-xl font-semibold">
 								Daily Schedule
 							</CardTitle>
-							<span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
-								{adviserDuration} min slots
-							</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<Button
@@ -344,7 +341,7 @@ const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsulta
 																	className={cn(
 																		'flex items-stretch gap-2 p-2 rounded-md border-l-4 transition-all cursor-pointer',
 																		'hover:brightness-110 hover:shadow-md',
-																		getStatusColor(consultation.status),
+																		statusColor[consultation.status],
 																	)}
 																	onClick={() => {
 																		setSelectedSchedule(consultation);
@@ -365,7 +362,7 @@ const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsulta
 																			<span
 																				className={cn(
 																					'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold capitalize',
-																					getStatusColor(consultation.status),
+																					statusColor[consultation.status],
 																				)}
 																			>
 																				{consultationIcon[consultation.status]}
@@ -428,6 +425,8 @@ const DailyConsultation = ({ weeklies, availabilities, refresh }: WeeklyConsulta
 						{selectedSchedule && (
 							<ConsultationDetails
 								weekly={selectedSchedule}
+								weeklies={weeklies}
+								availabilities={availabilities}
 								open={open}
 								setOpen={setOpen}
 								refresh={refresh}

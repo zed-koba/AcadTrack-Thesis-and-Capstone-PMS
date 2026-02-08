@@ -1,4 +1,4 @@
-import type { ProponentsDocumentsProps } from "./adviserdocument";
+import type { ProponentsDocumentsProps } from './adviserdocument';
 
 export const DAYS = [
 	'Monday',
@@ -76,6 +76,7 @@ export type AdviserWeeklyProps = {
 				proponents_id: string;
 				title: string;
 				details: {
+					student_id: number;
 					student: {
 						id: number;
 						name: string;
@@ -85,7 +86,7 @@ export type AdviserWeeklyProps = {
 		};
 	};
 	adviser: {
-		id: string;
+		id: number;
 		name: string;
 		duration: number;
 	};
@@ -93,8 +94,6 @@ export type AdviserWeeklyProps = {
 export type ConsultationDialogProps = {
 	weeklies: AdviserWeeklyProps[];
 	availabilities: AdviserAvailabilityProps[];
-	project: ProponentsDocumentsProps | null;
-	studentsIds: number[];
 	weekly: AdviserWeeklyProps | null;
 	open: boolean;
 	setOpen: (open: boolean) => void;

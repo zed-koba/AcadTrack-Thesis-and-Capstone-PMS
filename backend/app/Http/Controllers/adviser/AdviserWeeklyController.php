@@ -84,7 +84,7 @@ class AdviserWeeklyController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'purpose' => $request->purpose,
-                'status' => 'pending',
+                'status' => 'upcoming',
             ]);
             DB::commit();
             return response()->json([
