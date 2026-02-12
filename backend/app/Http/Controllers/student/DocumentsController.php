@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\student;
 
+use App\Events\NotificationService;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Proponents;
 use App\Models\student\Documents;
@@ -18,7 +19,7 @@ class DocumentsController extends Controller
             'comments',
             'student:id,student_id,name'
         )->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with('details.student:id,student_id,program_id,name','details.student.program:id,name,code','adviser', 'adviser.department:id,name,code')->orderBy('created_at', 'asc')->get();
+        $projects = Proponents::with('details.student:id,student_id,program_id,name', 'details.student.program:id,name,code', 'adviser', 'adviser.department:id,name,code')->orderBy('created_at', 'asc')->get();
         return response()->json([
             'status' => 200,
             'document' => $document,
@@ -32,7 +33,7 @@ class DocumentsController extends Controller
             'title_name' => 'required|string',
             'file' => 'required|file|mimes:pdf|max:10240',
             'parent_document_id' => 'nullable|string|exists:documents,id',
-            
+
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -55,7 +56,7 @@ class DocumentsController extends Controller
                 $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
                     ->max('version');
                 $version = ($latestVersion ?? 1) + 1;
-                $currentDoc = Documents::findOrFail( $request->currentId)->update(['status' => 'revised']);
+                $currentDoc = Documents::findOrFail($request->currentId)->update(['status' => 'revised']);
             }
 
             $document = Documents::create([
@@ -71,11 +72,12 @@ class DocumentsController extends Controller
                 'status' => $status,
             ]);
 
+            event(NotificationService($document));
             DB::commit();
             return response()->json([
                 'status' => 201,
                 'message' => 'Document uploaded succesfully',
-                
+
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();

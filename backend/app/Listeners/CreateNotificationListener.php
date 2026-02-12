@@ -1,49 +1,31 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Listeners;
 
+use App\Events\NotificationService;
 use App\Models\Notifications;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class NotificationsController extends Controller
+class CreateNotificationListener
 {
-    //
-
-    public function getNotifications()
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
     {
-        $notification = Notifications::with('student:id,name', 'project:proponents_id,title', 'adviser:id,name')->orderBy('created_at', 'DESC')->get();
-
-        return response()->json([
-            'status' => 200,
-            'notifications' => $notification,
-        ], 200);
+        //
     }
 
-    public function readNotification($id)
+    /**
+     * Handle the event.
+     */
+    public function handle(NotificationService $event, Request $request)
     {
-        try {
-            if (!$id) return;
-            DB::beginTransaction();
-            $notification = Notifications::findOrFail($id)->update([
-                'read_at' => now(),
-            ]);
-            DB::commit();
-            return response()->json([
-                'status' => 200,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'An error occurred while registering the account.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function storeNotification(Request $request)
-    {
+        //
         $rules = [
             'student_id' => 'required|integer',
             'adviser_id' => 'required|integer',

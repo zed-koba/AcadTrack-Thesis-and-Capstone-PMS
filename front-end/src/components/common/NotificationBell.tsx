@@ -89,7 +89,7 @@ const NotificationBell = () => {
 								variant="ghost"
 								size="sm"
 								className="text-xs h-7"
-								//onClick={onMarkAllAsRead}
+							//onClick={onMarkAllAsRead}
 							>
 								<CheckCheck className="h-3 w-3 mr-1" />
 								Mark all read
@@ -116,9 +116,8 @@ const NotificationBell = () => {
 									return (
 										<div
 											key={notification.id}
-											className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
-												!notification.read_at ? 'bg-primary/5' : ''
-											}`}
+											className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${!notification.read_at ? 'bg-primary/5' : ''
+												}`}
 											onClick={() => readNotificationUpdate(notification.id)}
 										>
 											<div className="flex gap-3">
@@ -129,11 +128,10 @@ const NotificationBell = () => {
 												</div>
 												<div className="flex-1 min-w-0">
 													<p
-														className={`text-sm ${
-															!notification.read_at ? 'font-medium' : ''
-														}`}
+														className={`text-sm ${!notification.read_at ? 'font-medium' : ''
+															}`}
 													>
-														{`${notification.student.name} ${notification.message}`}
+														{`${notification.project.title} ${notification.message}`}
 													</p>
 
 													<p className="text-xs text-muted-foreground mt-1">

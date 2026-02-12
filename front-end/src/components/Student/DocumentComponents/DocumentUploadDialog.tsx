@@ -204,11 +204,10 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 										</div>
 									) : (
 										<div
-											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-												dragActive
+											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
 													? 'border-primary bg-primary/5'
 													: 'border-muted-foreground/25'
-											}`}
+												}`}
 											onDragEnter={handleDrag}
 											onDragLeave={handleDrag}
 											onDragOver={handleDrag}
