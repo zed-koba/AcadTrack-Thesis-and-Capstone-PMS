@@ -5,6 +5,7 @@ namespace App\Models\admin;
 use App\Models\admin\Accounts;
 use App\Models\adviser\AdviserAvailability;
 use App\Models\adviser\AdviserWeekly;
+use App\Models\Notifications;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,5 +33,8 @@ class Advisers extends Model
 
     public function weeklySchedule(): hasMany {
         return $this->hasMany(AdviserWeekly::class,'adviser_id');
+    }
+    public function notifications(): hasMany {
+        return $this->hasMany(Notifications::class,'adviser_id');
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
 use App\Http\Controllers\adviser\DocumentCommentsController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
 
@@ -96,4 +97,7 @@ Route::prefix("student")->group(function() {
     //Student Consultation
     Route::get('weekly', [AdviserWeeklyController::class, "getSchedules"]);
     Route::post('weekly/add', [AdviserWeeklyController::class, 'storeSchedule']);
-}); 
+});
+
+Route::get('notifications', [NotificationsController::class, 'getNotifications']);
+Route::put('notifications/read/{id}', [NotificationsController::class, 'readNotification']);

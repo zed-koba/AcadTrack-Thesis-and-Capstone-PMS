@@ -25,6 +25,10 @@ export function formatDate(dateString: string) {
 		year: 'numeric',
 	});
 }
+export const studentId = 2;
+export const adviserId = 1;
+export const START_HOUR = 7;
+export const END_HOUR = 19;
 
 export function formatDateWithTime(dateString: string) {
 	const date = new Date(dateString);
@@ -105,9 +109,6 @@ export const consultationIcon: Record<string, JSX.Element> = {
 	ongoing: <CalendarClock className="h-3 w-3 mr-1" />,
 };
 
-export const studentId = 2;
-export const adviserId = 1;
-
 const dayToNumber: Record<string, number> = {
 	monday: 1,
 	tuesday: 2,
@@ -187,8 +188,6 @@ export const studentIds = (project?: ProponentsDocumentsProps | null) => {
 		(id) => id !== undefined,
 	);
 };
-export const START_HOUR = 7;
-export const END_HOUR = 19;
 
 // Generate time slots based on meeting duration
 export const generateTimeSlots = (meetingDuration: number) => {
