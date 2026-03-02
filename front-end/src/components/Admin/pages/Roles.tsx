@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import RolesDashboard from '../RolesComponents/RolesDashboard';
 import type { RolesProps, DepartmentRolesProps } from '../interface/roles';

@@ -29,7 +29,7 @@ import {
 } from 'date-fns';
 import { getDayNumber, studentId } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 
 type Step = 'date' | 'window' | 'slot' | 'confirm';
@@ -59,11 +59,13 @@ const BookConsultationDialog = ({
 
 	const checkExistigSchedule = (checkDate: Date): boolean => {
 		if (!isSameDay(new Date(), checkDate)) return false;
-		const checkExistingDate = filterWeeklies.filter((s) =>
-
-			s.status !== "rejected" && s.status !== "expired" && s.status !== "cancelled" && studentIds.includes(s.student_id)
-
-		)
+		const checkExistingDate = filterWeeklies.filter(
+			(s) =>
+				s.status !== 'rejected' &&
+				s.status !== 'expired' &&
+				s.status !== 'cancelled' &&
+				studentIds.includes(s.student_id),
+		);
 
 		return checkExistingDate.length > 0;
 	};
@@ -169,7 +171,6 @@ const BookConsultationDialog = ({
 			return isAfter(slotStart, now);
 		});
 	};
-
 
 	// Get availability windows for selected date
 	const availableWindows = useMemo(() => {
@@ -323,8 +324,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-												!isCompleted &&
-												'bg-muted text-muted-foreground',
+													!isCompleted &&
+													'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />
@@ -519,14 +520,14 @@ const BookConsultationDialog = ({
 												className={cn(
 													'p-3 rounded-lg border text-center transition-all disabled:cursor-auto cursor-pointer',
 													booked &&
-													'opacity-40 cursor-not-allowed bg-muted border-border',
+														'opacity-40 cursor-not-allowed bg-muted border-border',
 													!booked &&
-													!isSelected &&
-													'border-border hover:border-primary hover:bg-primary/5',
+														!isSelected &&
+														'border-border hover:border-primary hover:bg-primary/5',
 													isSelected &&
-													'border-primary bg-primary text-primary-foreground',
+														'border-primary bg-primary text-primary-foreground',
 													isAfter(new Date(), startDateTime) &&
-													'border-none bg-muted text-slate-600! hover:bg-muted',
+														'border-none bg-muted text-slate-600! hover:bg-muted',
 												)}
 											>
 												<p

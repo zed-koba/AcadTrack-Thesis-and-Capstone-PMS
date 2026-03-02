@@ -1,4 +1,4 @@
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -95,7 +95,7 @@ const CommentAddDialog = ({
 			}
 		},
 	});
-	const statusRevised = document?.status === "revised";
+	const statusRevised = document?.status === 'revised';
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>

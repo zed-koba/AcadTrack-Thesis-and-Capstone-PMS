@@ -1,9 +1,7 @@
 import {
 	BookOpen,
-	Calendar,
 	CalendarCheck,
 	CalendarX,
-	CheckCircle,
 	CircleCheckBig,
 	X,
 } from 'lucide-react';

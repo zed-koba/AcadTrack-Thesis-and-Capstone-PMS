@@ -32,7 +32,11 @@ class NotificationCreated
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('users.' . $this->notification->notifiable_id),
+            'notification'
         ];
+    }
+    public function broadcastAs()
+    {
+        return 'new.upload';
     }
 }

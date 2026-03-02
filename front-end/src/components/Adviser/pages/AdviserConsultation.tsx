@@ -5,10 +5,9 @@ import type {
 	AdviserAvailabilityProps,
 	AdviserWeeklyProps,
 } from '../interface/consultation';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { adviserId } from '@/components/functions/functions';
-import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
 
 const AdviserConsultation = () => {
 	const [availabilities, setAvabilities] = useState<AdviserAvailabilityProps[]>(

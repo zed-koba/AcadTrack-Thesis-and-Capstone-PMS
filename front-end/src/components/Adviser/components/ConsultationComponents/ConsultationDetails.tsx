@@ -23,7 +23,7 @@ import {
 } from '../../interface/consultation';
 import { Badge } from '@/components/ui/badge';
 import { differenceInMinutes, format, isAfter, parse } from 'date-fns';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';

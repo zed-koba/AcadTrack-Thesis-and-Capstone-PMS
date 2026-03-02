@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Bell, CheckCheck, User } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import type { NotificationProps } from '../interface/type';
-import { api } from '../Routes/http';
+import { api } from '../../Routes/http';
 import { ScrollArea } from '../ui/scroll-area';
 import { Spinner } from '../ui/spinner';
 import { format } from 'date-fns';
@@ -89,7 +89,7 @@ const NotificationBell = () => {
 								variant="ghost"
 								size="sm"
 								className="text-xs h-7"
-							//onClick={onMarkAllAsRead}
+								//onClick={onMarkAllAsRead}
 							>
 								<CheckCheck className="h-3 w-3 mr-1" />
 								Mark all read
@@ -116,8 +116,9 @@ const NotificationBell = () => {
 									return (
 										<div
 											key={notification.id}
-											className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${!notification.read_at ? 'bg-primary/5' : ''
-												}`}
+											className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
+												!notification.read_at ? 'bg-primary/5' : ''
+											}`}
 											onClick={() => readNotificationUpdate(notification.id)}
 										>
 											<div className="flex gap-3">
@@ -128,8 +129,9 @@ const NotificationBell = () => {
 												</div>
 												<div className="flex-1 min-w-0">
 													<p
-														className={`text-sm ${!notification.read_at ? 'font-medium' : ''
-															}`}
+														className={`text-sm ${
+															!notification.read_at ? 'font-medium' : ''
+														}`}
 													>
 														{`${notification.project.title} ${notification.message}`}
 													</p>

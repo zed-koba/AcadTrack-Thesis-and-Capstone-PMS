@@ -49,7 +49,7 @@ import type {
 	DocumentCommentsProps,
 	ViewDetailsProps,
 } from '../../interface/adviserdocument';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import z from 'zod';
 import { useForm } from '@tanstack/react-form';
@@ -59,7 +59,7 @@ import { toast } from 'sonner';
 const commentSchema = z.object({
 	comment_type: z.enum(
 		['general', 'need revision', 'approved'],
-		'Select a comment type'
+		'Select a comment type',
 	),
 	comment: z.string().min(2, 'Atleast enter 2 characters in the comment'),
 });
@@ -81,12 +81,10 @@ const DocumentDetails = ({
 
 	const versions = useMemo(() => {
 		const childVersions = documents
-			.filter(d => d.parent_document_id === document?.id)
+			.filter((d) => d.parent_document_id === document?.id)
 			.sort((a, b) => b.version - a.version);
-		
-		const allVersions = document
-			? [document, ...childVersions]
-			: childVersions;
+
+		const allVersions = document ? [document, ...childVersions] : childVersions;
 
 		return allVersions.sort((a, b) => b.version - a.version);
 	}, [documents, document]);
@@ -272,13 +270,13 @@ const DocumentDetails = ({
 														className={cn(
 															'py-0.5 px-3 inline-flex gap-1 items-center rounded-full mt-1 border',
 															document?.status === 'pending' &&
-															statusColor.pending,
+																statusColor.pending,
 															document?.status === 'under review' &&
-															statusColor['under review'],
+																statusColor['under review'],
 															document?.status === 'need revision' &&
-															statusColor['need revision'],
+																statusColor['need revision'],
 															document?.status === 'approved' &&
-															statusColor.approved
+																statusColor.approved,
 														)}
 													>
 														<Clock className="h-3 w-3" />
@@ -352,7 +350,10 @@ const DocumentDetails = ({
 									</CardHeader>
 									<CardContent>
 										<div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-											<div className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/30" onClick={() => setActiveTab('history')}>
+											<div
+												className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/30"
+												onClick={() => setActiveTab('history')}
+											>
 												<p className="text-2xl font-bold text-primary">
 													{versions.length}
 												</p>
@@ -360,7 +361,10 @@ const DocumentDetails = ({
 													Versions Submitted
 												</p>
 											</div>
-											<div className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/30" onClick={() => setActiveTab('comments')}>
+											<div
+												className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/30"
+												onClick={() => setActiveTab('comments')}
+											>
 												<p className="text-2xl font-bold text-primary">
 													{comments.length}
 												</p>
@@ -436,7 +440,7 @@ const DocumentDetails = ({
 													{document?.student.proponent_detail === null
 														? 'Not Assigned'
 														: document?.student.proponent_detail.proponent
-															.title}
+																.title}
 												</p>
 											</div>
 											<div>
@@ -517,77 +521,74 @@ const DocumentDetails = ({
 											<div className="absolute left-4 top-8 bottom-4 w-0.5 bg-border" />
 
 											<div className="space-y-6">
-												{versions
-													.map((version, index) => (
+												{versions.map((version, index) => (
+													<div key={version.id} className="relative flex gap-4">
 														<div
-															key={version.id}
-															className="relative flex gap-4"
-														>
-															<div
-																className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${index === 0
+															className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+																index === 0
 																	? 'bg-primary text-primary-foreground'
 																	: 'bg-muted border-2 border-border'
-																	}`}
-															>
-																{index === 0 ? (
-																	<FileCheck className="h-4 w-4" />
-																) : (
-																	<Hash className="h-4 w-4 text-muted-foreground" />
-																)}
-															</div>
+															}`}
+														>
+															{index === 0 ? (
+																<FileCheck className="h-4 w-4" />
+															) : (
+																<Hash className="h-4 w-4 text-muted-foreground" />
+															)}
+														</div>
 
-															{/* Content */}
-															<div className="flex-1 pb-2">
-																<div className="flex items-start justify-between">
-																	<div>
-																		<p className="font-medium text-sm">
-																			Version
-																			{version.version}
-																			{index === 0 && (
-																				<Badge
-																					variant="outline"
-																					className="ml-2 text-xs"
-																				>
-																					Current
-																				</Badge>
-																			)}
-																		</p>
-																		<p className="text-sm text-muted-foreground mt-0.5">
-																			{version.original_name}
-																		</p>
-																	</div>
-																	<Button
-																		variant="ghost"
-																		size="sm"
-																		className="shrink-0"
-																		onClick={() =>
-																			downloadDocument(
-																				version.id,
-																				version.original_name
-																			)
-																		}
-																	>
-																		<Download className="h-4 w-4 mr-1.5" />
-																		Download
-																	</Button>
+														{/* Content */}
+														<div className="flex-1 pb-2">
+															<div className="flex items-start justify-between">
+																<div>
+																	<p className="font-medium text-sm">
+																		Version
+																		{version.version}
+																		{index === 0 && (
+																			<Badge
+																				variant="outline"
+																				className="ml-2 text-xs"
+																			>
+																				Current
+																			</Badge>
+																		)}
+																	</p>
+																	<p className="text-sm text-muted-foreground mt-0.5">
+																		{version.original_name}
+																	</p>
 																</div>
-																<div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-																	<span className="flex items-center gap-1">
-																		<Calendar className="h-3.5 w-3.5" />
-																		{/* {format(
+																<Button
+																	variant="ghost"
+																	size="sm"
+																	className="shrink-0"
+																	onClick={() =>
+																		downloadDocument(
+																			version.id,
+																			version.original_name,
+																		)
+																	}
+																>
+																	<Download className="h-4 w-4 mr-1.5" />
+																	Download
+																</Button>
+															</div>
+															<div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+																<span className="flex items-center gap-1">
+																	<Calendar className="h-3.5 w-3.5" />
+																	{/* {format(
 																			version.uploadedAt,
 																			"MMM d, yyyy 'at' h:mm a"
 																		)} */}
-																		{formatDate(version.created_at)}
-																	</span>
-																	<span className="flex items-center gap-1">
-																		<FileText className="h-3.5 w-3.5" />
-																		{formatFileSize(version.size)} MB
-																	</span>
-																</div>
+																	{formatDate(version.created_at)}
+																</span>
+																<span className="flex items-center gap-1">
+																	<FileText className="h-3.5 w-3.5" />
+																	{formatFileSize(version.size)} MB
+																</span>
 															</div>
 														</div>
-													))}
+													</div>
+												))}
 											</div>
 										</div>
 									</CardContent>
@@ -629,9 +630,9 @@ const DocumentDetails = ({
 																onValueChange={(v) =>
 																	field.handleChange(
 																		v as
-																		| 'general'
-																		| 'need revision'
-																		| 'approved'
+																			| 'general'
+																			| 'need revision'
+																			| 'approved',
 																	)
 																}
 															>
@@ -754,7 +755,7 @@ const DocumentDetails = ({
 																		? commentsColorType.approval
 																		: com.comment_type === 'need revision'
 																			? commentsColorType['revision-request']
-																			: commentsColorType.general
+																			: commentsColorType.general,
 																)}
 															>
 																{com.comment_type}
@@ -781,7 +782,7 @@ const DocumentDetails = ({
 							onClick={() =>
 								downloadDocument(
 									versions[0].id,
-									versions[0].original_name as string
+									versions[0].original_name as string,
 								)
 							}
 						>

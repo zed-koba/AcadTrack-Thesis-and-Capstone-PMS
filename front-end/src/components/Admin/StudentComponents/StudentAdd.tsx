@@ -19,7 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -135,7 +135,7 @@ const StudentAdd = ({
 				if (result.status == 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) => toast.error(message))
+						errorMessages.forEach((message) => toast.error(message)),
 					);
 					return;
 				} else if (result.status == 500) {
@@ -164,16 +164,18 @@ const StudentAdd = ({
 	const [selectedDepartmentId, setSelectedDepartmentId] = useState(0);
 
 	const filteredPrograms = programs.filter(
-		(p) => p.department_id === selectedDepartmentId
+		(p) => p.department_id === selectedDepartmentId,
 	);
 
 	const filteredRoles = roles.filter(
-		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1
+		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1,
 	);
 
-	const filteredInstructor = instructors.filter((ins) => ins.department_id === selectedDepartmentId);
+	const filteredInstructor = instructors.filter(
+		(ins) => ins.department_id === selectedDepartmentId,
+	);
 	const selectedInstructor = instructors.find(
-		(d) => d.id === selectInstructorId
+		(d) => d.id === selectInstructorId,
 	);
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -435,10 +437,14 @@ const StudentAdd = ({
 														'w-full justify-between',
 														field.state.value === 0
 															? 'text-muted-foreground'
-															: 'text-white'
+															: 'text-white',
 													)}
 												>
-													{selectedDepartmentId ? selectedInstructor ? selectedInstructor.name : 'Search and select instructor' : 'Select a department first'}
+													{selectedDepartmentId
+														? selectedInstructor
+															? selectedInstructor.name
+															: 'Search and select instructor'
+														: 'Select a department first'}
 
 													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 												</Button>
@@ -462,7 +468,7 @@ const StudentAdd = ({
 																		'',
 																		selectInstructorId === adv.id
 																			? 'bg-blue-600! text-white hover:bg-blue-600!'
-																			: 'hover:bg-card/50'
+																			: 'hover:bg-card/50',
 																	)}
 																>
 																	<Check
@@ -470,7 +476,7 @@ const StudentAdd = ({
 																			'h-4 w-4',
 																			Number(field.state.value) === adv.id
 																				? 'opacity-100 text-white'
-																				: 'opacity-0'
+																				: 'opacity-0',
 																		)}
 																	/>
 																	{adv.name}

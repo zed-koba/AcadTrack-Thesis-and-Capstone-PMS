@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import DeleteSchedule from './DeleteSchedule';
 import { generateTimeSlots } from '@/components/functions/functions';

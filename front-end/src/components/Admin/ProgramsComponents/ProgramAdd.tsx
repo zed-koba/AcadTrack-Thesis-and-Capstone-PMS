@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -88,7 +88,7 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 					Object.values(errors).forEach((errorMessages) =>
 						errorMessages.forEach((message) => {
 							toast.error(message);
-						})
+						}),
 					);
 					return;
 				} else if (result.status == 500) {
@@ -176,9 +176,7 @@ const ProgramAdd = ({ departments, onSuccess }: ProgramAddProps) => {
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>
-												Program Code
-											</FieldLabel>
+											<FieldLabel htmlFor={field.name}>Program Code</FieldLabel>
 											<Input
 												id={field.name}
 												name={field.name}

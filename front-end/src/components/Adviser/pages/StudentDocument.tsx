@@ -1,4 +1,4 @@
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import DocumentDashboard from '../components/StudentDocumentsComponents/DocumentDashboard';

@@ -1,4 +1,4 @@
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -33,13 +33,13 @@ const DeleteSchedule = ({
 						'Content-type': 'application/json',
 						Accept: 'application/json',
 					},
-				}
+				},
 			);
 			const result = await res.json();
 			if (result.status === 422) {
 				const errors = result.errors as Record<string, string[]>;
 				Object.values(errors).forEach((errorMessages) =>
-					errorMessages.forEach((message) => toast.error(message))
+					errorMessages.forEach((message) => toast.error(message)),
 				);
 				return;
 			}

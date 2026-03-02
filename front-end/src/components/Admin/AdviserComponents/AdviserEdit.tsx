@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -105,7 +105,7 @@ const AdviserEdit = ({
 					Object.values(errors).forEach((errorMessages) =>
 						errorMessages.forEach((message) => {
 							toast.error(message);
-						})
+						}),
 					);
 					console.log(result.request);
 					return;

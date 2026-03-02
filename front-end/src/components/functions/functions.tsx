@@ -1,5 +1,5 @@
 import { toast } from 'sonner';
-import { apiStudentUrl } from '../Routes/http';
+import { apiStudentUrl } from '../../Routes/http';
 import type { JSX } from 'react/jsx-runtime';
 import {
 	CalendarCheck,
@@ -27,8 +27,10 @@ export function formatDate(dateString: string) {
 }
 export const studentId = 2;
 export const adviserId = 1;
+export const instructorId = 1;
 export const START_HOUR = 7;
 export const END_HOUR = 19;
+export const user = JSON.parse(localStorage.getItem('user') || '{}');
 
 export function formatDateWithTime(dateString: string) {
 	const date = new Date(dateString);

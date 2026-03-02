@@ -34,7 +34,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import {
 	generateTimeSlots,
 	statusColor,
@@ -329,7 +329,7 @@ const WeeklyConsultation = ({
 																	'text-emerald-500',
 																	isSameDay(day, new Date()) && 'text-primary',
 																	dayConsultations.length === 0 &&
-																	'text-red-400',
+																		'text-red-400',
 																)}
 															>
 																{dayConsultations.length}{' '}
@@ -358,7 +358,7 @@ const WeeklyConsultation = ({
 													className={cn(
 														'px-2 py-1 text-[12px] text-muted-foreground align-center border-r border-border sticky left-0 bg-card z-10',
 														isHourStart &&
-														'font-medium text-foreground text-xs',
+															'font-medium text-foreground text-xs',
 													)}
 												>
 													{formatSlotTime(slot.hour, slot.minute)}
@@ -407,7 +407,7 @@ const WeeklyConsultation = ({
 																								'w-full p-2.5 rounded-sm border-l-3 text-left text-[12px] transition-all relative cursor-pointer',
 																								'hover:brightness-150 hover:z-20',
 																								statusColor[
-																								consultation.status
+																									consultation.status
 																								],
 																							)}
 																						>

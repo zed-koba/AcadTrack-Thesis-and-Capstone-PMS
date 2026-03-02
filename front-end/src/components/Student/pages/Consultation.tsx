@@ -4,7 +4,7 @@ import type {
 	AdviserWeeklyProps,
 } from '@/components/Adviser/interface/consultation';
 import { studentId } from '@/components/functions/functions';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import ConsultationDashboard from '../ConsultationComponents/ConsultationDashboard';
 import { Spinner } from '@/components/ui/spinner';

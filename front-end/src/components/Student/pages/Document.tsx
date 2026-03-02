@@ -3,15 +3,16 @@ import { useEffect, useState } from 'react';
 import DocumentDashboard from '../DocumentComponents/DocumentDashboard';
 import DocumentContent from '../DocumentComponents/DocumentContent';
 import type { DocumentProps } from '../interface/document';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
 import { studentId } from '@/components/functions/functions';
+import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 const Document = () => {
 	const [loading, setLoading] = useState(true);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
-	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [deadlines, setDeadline] = useState<Deadlines[]>([]);
 	const [project, setProject] = useState<ProponentsDocumentsProps | null>(null);
 
 	const fetchDocuments = async () => {
@@ -28,7 +29,7 @@ const Document = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
 				await setDocuments(result.document);
-				await setProjects(result.projects);
+				await setDeadline(result.deadline);
 				setProject(
 					result.projects.find((p: ProponentsDocumentsProps) =>
 						p.details.some((detail) => detail.student.id === studentId),
@@ -72,6 +73,7 @@ const Document = () => {
 					<DocumentContent
 						documents={documents}
 						project={project}
+						deadlines={deadlines}
 						refresh={fetchDocuments}
 					/>
 				</>

@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import type {

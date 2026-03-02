@@ -58,6 +58,7 @@ class DocumentCommentsController extends Controller
             } else {
                 $document->update([
                     'status' => 'approved',
+                    'approved_date' => now(),
                 ]);
             }
 

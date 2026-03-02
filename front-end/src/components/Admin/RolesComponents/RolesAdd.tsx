@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -85,7 +85,7 @@ const RolesAdd = ({ departments, onSuccess }: RolesAddProps) => {
 					Object.values(errors).forEach((errorMessages) =>
 						errorMessages.forEach((message) => {
 							toast.error(message);
-						})
+						}),
 					);
 					return;
 				} else if (result.status == 500) {

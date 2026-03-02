@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import AdvisersDashboard from '../AdviserComponents/AdviserDashboard';
@@ -13,7 +13,7 @@ import InstructorTable from '../InstructorComponents/InstructorTable';
 const Instructors = () => {
 	const [instructors, setInstructors] = useState<InstructorProps[]>([]);
 	const [departments, setDepartments] = useState<DepartmentInstructorProps[]>(
-		[]
+		[],
 	);
 	const [loading, setLoading] = useState(true);
 

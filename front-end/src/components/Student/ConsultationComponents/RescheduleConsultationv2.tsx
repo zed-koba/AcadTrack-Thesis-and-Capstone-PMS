@@ -28,7 +28,7 @@ import {
 } from 'date-fns';
 import { getDayNumber, studentId } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 
 type Step = 'date' | 'window' | 'slot' | 'confirm';

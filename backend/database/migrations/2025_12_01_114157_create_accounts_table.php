@@ -15,18 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role',['instructor', 'student', 'adviser'])->default('student');
-            $table->enum('status',['approved', 'pending', 'rejected'])->default('pending');
+            $table->enum('role', ['instructor', 'student', 'adviser'])->default('student');
             $table->timestamps();
             $table->rememberToken();
-   
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
-   
         });
     }
 

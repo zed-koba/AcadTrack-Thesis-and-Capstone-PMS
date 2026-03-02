@@ -11,6 +11,7 @@ import ChapterItem from './ChapterItem';
 const DocumentContent = ({
 	documents,
 	project,
+	deadlines,
 	refresh,
 }: DocumentContentProps) => {
 	const studentIds = project?.details.map((v) => v.student_id);
@@ -86,7 +87,10 @@ const DocumentContent = ({
 									</div>
 								</div>
 								<div className="flex items-center gap-2">
-									<DocumentUploadDialog refresh={refresh} />
+									<DocumentUploadDialog
+										refresh={refresh}
+										deadlines={deadlines}
+									/>
 								</div>
 							</div>
 							<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-4">

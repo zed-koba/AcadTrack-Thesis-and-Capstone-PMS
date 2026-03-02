@@ -16,7 +16,7 @@ import { AlertCircle, FileText, FileUp, Upload, X } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { Badge } from '@/components/ui/badge';
 import { studentId } from '@/components/functions/functions';
 

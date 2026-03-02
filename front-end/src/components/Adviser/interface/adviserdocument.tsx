@@ -1,12 +1,5 @@
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
-import type {
-	ProponentsDetailsProps,
-	ProponentsProps,
-} from '@/components/Admin/interface/proponent';
-import type {
-	CommentProps,
-	DocumentProps,
-} from '@/components/Student/interface/document';
+import type { DocumentProps } from '@/components/Student/interface/document';
 
 export type ChapterDocumentsProps = {
 	chapter: number;
@@ -49,7 +42,16 @@ export type DetailsDocumentsProps = {
 	student: {
 		name: string;
 		student_id: string;
+		instructor_id: number;
+		section: string;
 		id: number;
+		document: {
+			id: number;
+			title_name: string;
+			status: string;
+			approved_date: Date;
+			passed_date: Date;
+		};
 		program: {
 			id: number;
 			name: string;

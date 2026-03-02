@@ -32,7 +32,7 @@ import {
 	studentId,
 } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -340,7 +340,7 @@ const BookConsultationDialog = ({
 													checkExistigSchedule(date)
 												);
 											}}
-											className="rounded-md border border-border pointer-events-auto"
+											className="rounded-md border border-border pointer-events-auto focus:outline-none focus:border-none"
 											modifiers={{
 												available: (date) =>
 													dateHasAvailability(date) && date >= today,

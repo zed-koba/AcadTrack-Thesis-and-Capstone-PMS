@@ -25,10 +25,10 @@ class AccountsController extends Controller
   {
     $rules = [
       'email' => 'required|email|unique:accounts,email',
-      'program' => 'required',
-      'section' => 'required',
+      'name' => 'required|string|unique:instructors,name|unique:students,name|unique:advisers,name',
+      'password' => 'required',
     ];
-    $messages = [
+    $messages = [ 
       'student_id.unique' => 'Student ID already exists',
       'email.unique' => 'Email already exists',
     ];
@@ -46,22 +46,44 @@ class AccountsController extends Controller
       DB::beginTransaction();
       $account = new Accounts();
       $account->email = $request->email;
-      $account->password = Hash::make('password');
-      $account->student_id = $request->student_id;
+      $account->password = Hash::make($request->password);
       $account->role = 'student';
-      $account->program = $request->program;
-      $account->section = $request->section;
       $account->save();
+      $token = $account->createToken('auth_token')->plainTextToken;
+      if($request->role === 'student') {
+        $account->student()->create([
+          'name' => $request->name,
+          'student_id' => $request->student_id,
+          'program' => $request->program,
+          'section' => $request->section,
+        ]);
+      } else if($request->role === 'instructor') {
+        $account->instructor()->create([
+          'name' => $request->name,
+          'account_id' => $account->id,
+          'status' => 'active',
+        ]);
+      } else if($request->role === 'adviser') {
+        $account->adviser()->create([
+          'name' => $request->name,
+          'account_id' => $account->id,
+          'status' => 'active',
+        ]);
+      }
+
+
       DB::commit();
       return response()->json([
         'status' => 200,
         'message' => 'Successfully registered',
+        'token' => $token,
       ]);
     } catch (\Exception $e) {
       DB::rollBack();
       return response()->json([
         'status' => 500,
         'message' => 'An error occurred while registering the account.',
+        'error' => $e->getMessage(),
       ], 500);
     }
 
@@ -98,6 +120,7 @@ class AccountsController extends Controller
       return response()->json([
         'status' => 200,
         'message' => 'Successfully updated account',
+        
       ], 200);
     } catch (\Exception $e) {
       DB::rollBack();
@@ -129,4 +152,43 @@ class AccountsController extends Controller
     }
 
   }
+
+  public function loginAccount(Request $request) {
+    $rules = [
+      'email' => 'required|email',
+      'password' => 'required',
+    ];
+    $validator = Validator::make($request->all(), $rules);
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'status' => 422,
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+    $account = Accounts::where('email', $request->email)->first();
+    if (!$account || !Hash::check($request->password, $account->password)) {
+      return response()->json([
+        'status' => 401,
+        'message' => 'Invalid email or password',
+      ], 401);
+    }
+    $token = $account->createToken('auth_token')->plainTextToken;
+    return response()->json([
+      'status' => 200,
+      'message' => 'Successfully logged in',
+      'user' => $account,
+      'token' => $token,
+    ], 200);
+  }
+  public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out'
+        ]);
+    }
 }

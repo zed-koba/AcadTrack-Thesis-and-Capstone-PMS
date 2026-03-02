@@ -10,22 +10,28 @@ import React, { useState } from 'react';
 import z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { FileText, Upload, X } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 
 import { studentId } from '@/components/functions/functions';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 
 const uploadSchema = z.object({
 	document_title: z.string().min(2, 'Title required'),
 	description: z.string().nullable().optional(),
 });
 
-const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
+const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
@@ -54,7 +60,6 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 			formData.append('file', selectedFile);
 			formData.append('student_id', String(studentId));
 			formData.append('title_name', value.document_title);
-
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {
 					method: 'POST',
@@ -170,7 +175,7 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 												<FieldLabel htmlFor={field.name}>
 													Document Title *
 												</FieldLabel>
-												<Input
+												{/* <Input
 													id={field.name}
 													name={field.name}
 													value={field.state.value}
@@ -179,7 +184,28 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 													aria-invalid={isInvalid}
 													placeholder={'Ex. Rationale Draft Review'}
 													autoComplete="off"
-												/>
+												/> */}
+												<Select
+													name={field.name}
+													defaultValue={field.state.value}
+													value={field.state.value}
+													onValueChange={(v) => field.handleChange(v)}
+												>
+													<SelectTrigger
+														className="w-full"
+														aria-invalid={isInvalid}
+														id={field.name}
+													>
+														<SelectValue placeholder="Select Document" />
+													</SelectTrigger>
+													<SelectContent>
+														{deadlines.map((deadline) => (
+															<SelectItem value={deadline.document_title}>
+																{deadline.document_title}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												{isInvalid && (
 													<FieldError errors={field.state.meta.errors} />
 												)}
@@ -204,10 +230,11 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 										</div>
 									) : (
 										<div
-											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
+											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+												dragActive
 													? 'border-primary bg-primary/5'
 													: 'border-muted-foreground/25'
-												}`}
+											}`}
 											onDragEnter={handleDrag}
 											onDragLeave={handleDrag}
 											onDragOver={handleDrag}

@@ -11,6 +11,7 @@ use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
 use App\Http\Controllers\adviser\DocumentCommentsController;
+use App\Http\Controllers\instructor\DocumentsDeadlineController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
@@ -18,12 +19,13 @@ use App\Http\Controllers\StudentsController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
+Route::post('/login', [AccountsController::class, 'loginAccount']);
+Route::post('/accounts/add', [AccountsController::class, 'storeAccount']);
 
 Route::prefix("admin")->group(function () {
 
     //Accounts Routes
     Route::get('accounts', [AccountsController::class, 'getData']);
-    Route::post('accounts/add', [AccountsController::class, 'storeAccount']);
     Route::put('accounts/edit/{id}', [AccountsController::class, 'updateAccount']);
     Route::delete('accounts/delete/{id}', [AccountsController::class, 'deleteAccount']);
 
@@ -73,7 +75,7 @@ Route::prefix("admin")->group(function () {
 });
 
 
-Route::prefix("adviser")->group(function() {
+Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(function() {
     //Adviser Availability
     Route::get("{id}/availabilities", [AdviserAvailabilityController::class, "getAvailabilities"]);
     Route::post("availabilities/add", [AdviserAvailabilityController::class, "storeAvailability"]);
@@ -93,10 +95,19 @@ Route::prefix("student")->group(function() {
     Route::get('documents', [DocumentsController::class, 'getDocuments']);
     Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
     Route::get('{id}/download/pdf', [DocumentsController::class,'downloadDocument']);
+    Route::put('documents/passed/{id}', [DocumentsController::class, 'passDocument']);
 
     //Student Consultation
     Route::get('weekly', [AdviserWeeklyController::class, "getSchedules"]);
     Route::post('weekly/add', [AdviserWeeklyController::class, 'storeSchedule']);
+    Route::get('deadlines/{id}', [DocumentsDeadlineController::class, 'getDeadlines']);
+});
+
+Route::prefix("instructor")->group(function() {
+    Route::get('deadlines/{id}', [DocumentsDeadlineController::class, 'getDeadlines']);
+    Route::post('deadlines/add', [DocumentsDeadlineController::class, 'addDeadlines']);
+    Route::put('deadlines/update/{id}', [DocumentsDeadlineController::class, 'updateDeadline']);
+    Route::delete('deadlines/delete/{id}', [DocumentsDeadlineController::class, 'deleteDeadline']);
 });
 
 Route::get('notifications', [NotificationsController::class, 'getNotifications']);

@@ -18,10 +18,10 @@ class NotificationService
     /**
      * Create a new event instance.
      */
-    public function __construct(Documents $document)
+    public function __construct()
     {
         //
-        $this->document = $document;
+        
     }
 
     /**

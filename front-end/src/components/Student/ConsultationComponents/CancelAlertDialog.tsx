@@ -12,7 +12,7 @@ import { AlertTriangle } from 'lucide-react';
 import type { CancelAlertProps } from '../interface/consultation';
 import { format } from 'date-fns';
 import { to12HourTime } from '@/components/Adviser/interface/consultation';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 
 const CancelAlertDialog = ({

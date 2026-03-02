@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import {
 	RolesProponentsProps,
 	StudentsProponentsProps,

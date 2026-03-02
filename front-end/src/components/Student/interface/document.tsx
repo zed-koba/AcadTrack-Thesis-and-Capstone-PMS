@@ -1,5 +1,6 @@
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
+import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 export type DocumentProps = {
 	id: number;
@@ -35,6 +36,7 @@ export type CommentProps = {
 };
 export type DocumentUploadProps = {
 	refresh?: () => void;
+	deadlines: Deadlines[];
 };
 export type DocumentRevisionProps = {
 	document: DocumentProps;
@@ -47,6 +49,7 @@ export type DocumentRevisionProps = {
 export type DocumentContentProps = {
 	documents: DocumentProps[];
 	project: ProponentsDocumentsProps | null;
+	deadlines: Deadlines[];
 	refresh?: () => void;
 };
 

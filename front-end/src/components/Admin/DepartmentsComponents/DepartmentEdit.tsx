@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -57,7 +57,7 @@ const DepartmentEdit = ({
 				name: value.name,
 				code: value.code,
 				description:
-					value.description ?? ''.trim() === '' ? null : value.description,
+					(value.description ?? ''.trim() === '') ? null : value.description,
 				status: value.status,
 			};
 			console.log(value.status);
@@ -77,7 +77,7 @@ const DepartmentEdit = ({
 					Object.values(errors).forEach((errorMessages) =>
 						errorMessages.forEach((message) => {
 							toast.error(message);
-						})
+						}),
 					);
 					return;
 				} else if (result.status == 500) {
