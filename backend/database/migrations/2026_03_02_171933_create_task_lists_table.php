@@ -11,20 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('task_lists', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('student_id', 20)->unique();
-            
-            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->string('foreign_proponents_id');
             $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
-            $table->string('section');
-            $table->string('mobile_num')->nullable();
-            $table->integer('semester');
-            $table->string('facebook_profile')->nullable();
-            $table->integer('year_level');
-            $table->foreignId('role_id')->nullable()->constrained();
+            $table->string('task');
+            $table->date('deadline');
+            $table->boolean('is_completed')->default(false);
             $table->timestamps();
         });
     }
@@ -34,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('task_lists');
     }
 };

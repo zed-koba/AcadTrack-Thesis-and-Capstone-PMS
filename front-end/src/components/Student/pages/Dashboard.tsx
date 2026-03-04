@@ -1,10 +1,13 @@
 import { user } from '@/components/functions/functions';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { apiStudentUrl } from '@/Routes/http';
 import { differenceInDays, format } from 'date-fns';
-import { ListChecks, Timer } from 'lucide-react';
+import { ListChecks, Plus, Timer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const Dashboard = () => {
