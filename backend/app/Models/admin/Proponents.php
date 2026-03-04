@@ -4,7 +4,6 @@ namespace App\Models\admin;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\admin\ProponentsDetails;
 use App\Models\Notifications;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,9 +18,9 @@ class Proponents extends Model
         'adviser_id',
     ];
 
-    public function details(): HasMany
+    public function student(): HasMany
     {
-        return $this->hasMany(ProponentsDetails::class, 'foreign_proponents_id', 'proponents_id');
+        return $this->hasMany(Students::class, 'foreign_proponents_id', 'proponents_id');
     }
     public function notifications(): HasMany
     {

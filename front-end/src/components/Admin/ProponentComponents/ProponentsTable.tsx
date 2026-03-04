@@ -26,7 +26,6 @@ import {
 	ReceiptText,
 	Trash,
 	MoreHorizontal,
-	PowerOff,
 } from 'lucide-react';
 import ProponentsAdd from './ProponentsAdd';
 import ProponetsEdit from './ProponentsEdit';
@@ -55,6 +54,8 @@ const ProponentsTable = ({
 	proponents,
 	advisers,
 	roles,
+	instructors,
+	departments,
 	loading,
 	refresh,
 }: ProponentsTableProps) => {
@@ -97,7 +98,7 @@ const ProponentsTable = ({
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 	const paginationProps = sortedProponents.slice(
 		startIndex,
-		startIndex + ITEMS_PER_PAGE
+		startIndex + ITEMS_PER_PAGE,
 	);
 
 	const getAdviser = (id: number) => {
@@ -111,7 +112,7 @@ const ProponentsTable = ({
 			proponent.details
 				.filter((d) => d.foreign_proponents_id === proponent.proponents_id)
 				.map((d) => d.student_id)
-				.filter((id): id is number => id !== undefined)
+				.filter((id): id is number => id !== undefined),
 		);
 
 		const findStudents = students.filter((student) => findIds.has(student.id));
@@ -143,6 +144,8 @@ const ProponentsTable = ({
 						<ProponentsAdd
 							students={students}
 							proponents={proponents}
+							instructors={instructors}
+							departments={departments}
 							advisers={advisers}
 							roles={roles}
 							refresh={refresh}
@@ -241,7 +244,7 @@ const ProponentsTable = ({
 															onClick={() => {
 																setSelectedProponent(proponent);
 																setSelectedAdviser(
-																	getAdviser(proponent.adviser_id)
+																	getAdviser(proponent.adviser_id),
 																);
 																setSelectedStudents(getStudentsIds(proponent));
 																setOpen(true);
@@ -273,6 +276,8 @@ const ProponentsTable = ({
 											advisers={advisers}
 											roles={roles}
 											open={open}
+											instructors={instructors}
+											departments={departments}
 											proponents={proponents}
 											setOpen={setOpen}
 											proponent={selectedProponent}
@@ -329,7 +334,7 @@ const ProponentsTable = ({
 												{page}
 											</PaginationLink>
 										</PaginationItem>
-									)
+									),
 								)}
 								<PaginationItem>
 									<PaginationNext

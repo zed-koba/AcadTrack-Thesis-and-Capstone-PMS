@@ -8,7 +8,7 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, ChevronsUpDown, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Input } from '@/components/ui/input';
@@ -29,20 +29,6 @@ import {
 	FieldLabel,
 } from '@/components/ui/field';
 import type { StudentAddProps } from '../interface/student';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandList,
-} from '@/components/ui/command';
 
 const studentSchema = z
 	.object({
@@ -62,7 +48,6 @@ const studentSchema = z
 		program: z.number().min(1, 'Program is required'),
 		section: z.string().min(1, 'Section is required'),
 		semester: z.number().min(1, 'Must select a semester').max(2),
-		instructor: z.number().min(1, 'Instructor is required'),
 		year_Level: z.number().min(1, 'Must select a year level').max(4),
 		facebook_profile: z.string().optional(),
 	})
@@ -75,14 +60,11 @@ const StudentAdd = ({
 	roles,
 	departments,
 	programs,
-	instructors,
 	onSuccess,
 }: StudentAddProps) => {
 	const [open, setOpen] = useState(false);
 	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [instructorOpen, setInstructorOpen] = useState(false);
-	const [selectInstructorId, setSelectedInstructorId] = useState(0);
 
 	type formValues = z.infer<typeof studentSchema>;
 	const defaultValues: formValues = {
@@ -95,7 +77,6 @@ const StudentAdd = ({
 		role: 0,
 		mobile_num: '',
 		semester: 0,
-		instructor: 0,
 		year_Level: 0,
 		facebook_profile: '',
 		selectedDepartmentId: 0,
@@ -119,7 +100,6 @@ const StudentAdd = ({
 				semester: value.semester,
 				facebook_profile: value.facebook_profile,
 				year_level: value.year_Level,
-				instructor_id: value.instructor,
 				role_id: value.role === 0 ? null : value.role,
 			};
 			try {
@@ -171,12 +151,6 @@ const StudentAdd = ({
 		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1,
 	);
 
-	const filteredInstructor = instructors.filter(
-		(ins) => ins.department_id === selectedDepartmentId,
-	);
-	const selectedInstructor = instructors.find(
-		(d) => d.id === selectInstructorId,
-	);
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
@@ -408,85 +382,6 @@ const StudentAdd = ({
 												))}
 											</SelectContent>
 										</Select>
-										{isInvalid && (
-											<FieldError errors={field.state.meta.errors} />
-										)}
-									</Field>
-								);
-							}}
-						/>
-						<form.Field
-							name="instructor"
-							children={(field) => {
-								const isInvalid =
-									field.state.meta.isTouched && !field.state.meta.isValid;
-								return (
-									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Instructor</FieldLabel>
-										<Popover
-											open={instructorOpen}
-											onOpenChange={setInstructorOpen}
-										>
-											<PopoverTrigger asChild>
-												<Button
-													variant="outline"
-													role="combobox"
-													aria-expanded={instructorOpen}
-													disabled={selectedDepartmentId === 0 ? true : false}
-													className={cn(
-														'w-full justify-between',
-														field.state.value === 0
-															? 'text-muted-foreground'
-															: 'text-white',
-													)}
-												>
-													{selectedDepartmentId
-														? selectedInstructor
-															? selectedInstructor.name
-															: 'Search and select instructor'
-														: 'Select a department first'}
-
-													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-												</Button>
-											</PopoverTrigger>
-											<PopoverContent className="w-[400px] p-0" align="start">
-												<Command>
-													<CommandInput placeholder="Search adviser...." />
-													<CommandList>
-														<CommandEmpty>No instructor found.</CommandEmpty>
-														<CommandGroup>
-															{filteredInstructor.map((adv) => (
-																<CommandItem
-																	key={adv.id}
-																	value={`${adv.name} ${String(adv.id)}`}
-																	onSelect={() => {
-																		field.setValue(adv.id);
-																		setSelectedInstructorId(adv.id);
-																		setInstructorOpen(false);
-																	}}
-																	className={cn(
-																		'',
-																		selectInstructorId === adv.id
-																			? 'bg-blue-600! text-white hover:bg-blue-600!'
-																			: 'hover:bg-card/50',
-																	)}
-																>
-																	<Check
-																		className={cn(
-																			'h-4 w-4',
-																			Number(field.state.value) === adv.id
-																				? 'opacity-100 text-white'
-																				: 'opacity-0',
-																		)}
-																	/>
-																	{adv.name}
-																</CommandItem>
-															))}
-														</CommandGroup>
-													</CommandList>
-												</Command>
-											</PopoverContent>
-										</Popover>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}

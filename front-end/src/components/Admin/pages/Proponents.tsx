@@ -1,19 +1,24 @@
 import { apiUrl } from '@/Routes/http';
-import {
+import type {
 	RolesProponentsProps,
 	StudentsProponentsProps,
-	type AdvisersProponentProps,
-	type ProgramsProponentProps,
-	type ProponentsProps,
+	AdvisersProponentProps,
+	ProponentsProps,
 } from '../interface/proponent';
 import ProponentsTable from '../ProponentComponents/ProponentsTable';
 import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
+import type {
+	DepartmentStudentsProps,
+	InstructorStudentsProps,
+} from '../interface/student';
 
 const Proponents = () => {
 	const [proponents, setProponents] = useState<ProponentsProps[]>([]);
 	const [advisers, setAdvisers] = useState<AdvisersProponentProps[]>([]);
 	const [students, setStudents] = useState<StudentsProponentsProps[]>([]);
+	const [departments, setDepartments] = useState<DepartmentStudentsProps[]>([]);
+	const [instructors, setInstructors] = useState<InstructorStudentsProps[]>([]);
 	const [roles, setRoles] = useState<RolesProponentsProps[]>([]);
 	const [loading, setLoading] = useState(true);
 	const fetchData = async () => {
@@ -32,6 +37,8 @@ const Proponents = () => {
 				setProponents(result.proponents);
 				setAdvisers(result.advisers);
 				setStudents(result.students);
+				setDepartments(result.departments);
+				setInstructors(result.instructors);
 				setRoles(result.roles);
 			}
 		} catch (error) {
@@ -63,6 +70,8 @@ const Proponents = () => {
 					<ProponentsTable
 						advisers={advisers}
 						students={students}
+						departments={departments}
+						instructors={instructors}
 						roles={roles}
 						proponents={proponents}
 						loading={loading}

@@ -46,11 +46,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Admin',
-		element: (
-			<RequireAuth allowedRoles={['admin']}>
-				<AdminLayout />
-			</RequireAuth>
-		),
+		element: <AdminLayout />,
 		children: [
 			{ index: true, element: <AdminDashboard /> },
 			{ path: 'Projects', element: <AdminProponents /> },
@@ -64,11 +60,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Adviser',
-		element: (
-			<RequireAuth allowedRoles={['adviser']}>
-				<AdviserLayout />
-			</RequireAuth>
-		),
+		element: <AdviserLayout />,
 		children: [
 			{
 				index: true,
@@ -80,11 +72,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Student',
-		element: (
-			<RequireAuth allowedRoles={['student']}>
-				<StundentLayout />
-			</RequireAuth>
-		),
+		element: <StundentLayout />,
 		children: [
 			{
 				index: true,
@@ -96,11 +84,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Instructor',
-		element: (
-			<RequireAuth allowedRoles={['instructor']}>
-				<InstructorLayout />
-			</RequireAuth>
-		),
+		element: <InstructorLayout />,
 		children: [
 			{
 				index: true,

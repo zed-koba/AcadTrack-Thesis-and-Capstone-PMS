@@ -22,26 +22,27 @@ const ProponentsAutoComplete = ({
 	const [searchQuery, setSearchQuery] = useState('');
 	const [open, setOpen] = useState(false);
 	const [removedStudentIds, setRemovedStudentIds] = useState<number[]>([]);
-	const addedProponents = proponents.flatMap(p => p.details.map(d => d.student_id).filter((id): id is number => id !== undefined));
+	const addedProponents = proponents.flatMap((p) =>
+		p.students.map((d) => d.id).filter((id): id is number => id !== undefined),
+	);
+	console.log(addedProponents);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const filteredStudents = students.filter((stud) => {
 		const searchLower = searchQuery.toLowerCase();
 
 		return (
-			!addedProponents.includes(stud.id) && (
-				stud.name.toLowerCase().includes(searchLower) ||
+			!addedProponents.includes(stud.id) &&
+			(stud.name.toLowerCase().includes(searchLower) ||
 				stud.student_id.toLowerCase().includes(searchLower))
 		);
 	});
-	console.log(addedProponents);
 	const selectedStudents = students.filter((s) =>
-		selectedStudentsIds.includes(s.id)
+		selectedStudentsIds.includes(s.id),
 	);
 
-
 	const availableStudents = filteredStudents.filter(
-		(s) => !selectedStudentsIds.includes(s.id)
+		(s) => !selectedStudentsIds.includes(s.id),
 	);
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -66,7 +67,7 @@ const ProponentsAutoComplete = ({
 			initialStudents.includes(student.id)
 		) {
 			const updatedRemoved = removedStudentIds.filter(
-				(id) => id !== student.id
+				(id) => id !== student.id,
 			);
 			setRemovedStudentIds(updatedRemoved);
 			onRemovedIdsChange?.(updatedRemoved);
@@ -128,7 +129,7 @@ const ProponentsAutoComplete = ({
 											onClick={() => handleSelect(student)}
 											className={cn(
 												'w-full text-left px-3 py-2 hover:bg-card/20 transition-colors',
-												'flex items-center justify-between gap-2'
+												'flex items-center justify-between gap-2',
 											)}
 										>
 											<div className="flex items-center gap-2">

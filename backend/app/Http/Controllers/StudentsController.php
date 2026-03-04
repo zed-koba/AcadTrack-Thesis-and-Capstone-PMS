@@ -39,7 +39,6 @@ class StudentsController extends Controller
         $rules = [
             'name' => 'required',
             'student_id' => 'required|unique:students,student_id',
-            'instructor_id' => 'required|integer',
             'email' => 'required|string',
             'department_id' => 'nullable|integer',
             'program_id' => 'nullable|integer',
@@ -80,7 +79,6 @@ class StudentsController extends Controller
                 'department_id' => $request->department_id,
                 'program_id' => $request->program_id,
                 'section' => $request->section,
-                'instructor_id' => $request->instructor_id,
                 'account_id' => $account->id,
                 'mobile_num' => $request->mobile_num,
                 'semester' => $request->semester,

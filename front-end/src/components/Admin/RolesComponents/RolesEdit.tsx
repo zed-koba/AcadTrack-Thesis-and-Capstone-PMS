@@ -32,7 +32,7 @@ const roleSchema = z
 	.object({
 		name: z.string().min(2, 'Department is required').max(100),
 		globalRole: z.boolean(),
-		description: z.string().max(500).optional(),
+		description: z.string().max(500).optional().nullable(),
 		selectedDepartmentId: z.number(),
 		status: z.enum(['active', 'inactive']),
 	})
@@ -186,7 +186,7 @@ const RolesEdit = ({
 											<Textarea
 												id={field.name}
 												name={field.name}
-												value={field.state.value}
+												value={field.state.value ?? ''}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
 												aria-invalid={isInvalid}

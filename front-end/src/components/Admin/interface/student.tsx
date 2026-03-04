@@ -2,6 +2,7 @@ import type { ProponentsProps } from './proponent';
 export type StudentProps = {
 	id: number;
 	student_id: string;
+	foreign_proponents_id: string;
 	role_id: number;
 	mobile_num: string;
 	program_id: number;
@@ -60,7 +61,7 @@ export type StudentAddProps = {
 	programs: ProgramsStudentsProps[];
 	departments: DepartmentStudentsProps[];
 	roles: RolesStudentsProps[];
-	instructors: InstructorStudentsProps[];
+
 	onSuccess?: () => void;
 };
 export type StudentEditProps = {
@@ -70,7 +71,7 @@ export type StudentEditProps = {
 	programs: ProgramsStudentsProps[];
 	departments: DepartmentStudentsProps[];
 	roles: RolesStudentsProps[];
-	instructors: InstructorStudentsProps[];
+
 	onSuccess?: () => void;
 };
 
@@ -81,7 +82,6 @@ export type StudentDetailsProps = {
 	role: RolesStudentsProps | null;
 	program: ProgramsStudentsProps | null;
 	department: DepartmentStudentsProps | null;
-	instructor: InstructorStudentsProps | null;
 	proponent: ProponentsProps | null;
 };
 

@@ -49,6 +49,8 @@ const proponentSchema = z.object({
 	title: z.string().min(1, 'Title is required'),
 	adviser: z.number().min(1, 'Adviser is required'),
 	studentsId: z.array(z.number()).optional(),
+	instructor: z.number().min(1, 'Instructor is required'),
+	selectedDepartmentId: z.number().min(1, 'Department is required'),
 });
 
 const ProponentsEdit = ({
@@ -59,6 +61,8 @@ const ProponentsEdit = ({
 	onSuccess,
 	proponents,
 	open,
+	instructors,
+	departments,
 	setOpen,
 }: ProponentsEditProps) => {
 	const [adviserOpen, setAdviserOpen] = useState(false);
@@ -67,18 +71,21 @@ const ProponentsEdit = ({
 	const [selectAdviserId, setSelectedAdviserId] = useState(
 		proponent.adviser_id,
 	);
+	const [instructorOpen, setInstructorOpen] = useState(false);
+	const [selectInstructorId, setSelectedInstructorId] = useState(0);
+	const [selectedDepartmentId, setSelectedDepartmentId] = useState(0);
 	const [removedStudentsIds, setRemovedStudentsIds] = useState<number[]>([]);
 	type formValues = z.infer<typeof proponentSchema>;
-	const studentsIds: number[] | undefined = proponent.details
-		.filter((d) => d.foreign_proponents_id === proponent.proponents_id)
-		.map((d) => d.student_id)
-		.filter((id): id is number => id !== undefined);
+	const studentsIds: number[] = proponent.students?.map((d) => d.id) ?? [];
+
 	const [updatedStudentsIds, setUpdatedStudentsIds] =
 		useState<number[]>(studentsIds);
 	const defaultValues: formValues = {
 		academic_yr: proponent.academic_yr,
 		title: proponent.title,
 		adviser: proponent.adviser_id,
+		instructor: 0,
+		selectedDepartmentId: 0,
 		studentsId: updatedStudentsIds,
 	};
 	const form = useForm({
@@ -135,6 +142,13 @@ const ProponentsEdit = ({
 		setUpdatedStudentsIds(student);
 	};
 	const selectedAdviser = advisers.find((adv) => adv.id === selectAdviserId);
+	const filteredInstructor = (instructors ?? []).filter(
+		(ins) => ins.department_id === selectedDepartmentId,
+	);
+	const selectedInstructor = instructors.find(
+		(d) => d.id === selectInstructorId,
+	);
+
 	useEffect(() => {
 		if (proponent) {
 			form.reset({
@@ -142,14 +156,16 @@ const ProponentsEdit = ({
 				title: proponent.title,
 				adviser: proponent.adviser_id,
 				studentsId: updatedStudentsIds,
+				instructor: 0,
+				selectedDepartmentId: 0,
 			});
-			``;
 			setUpdatedStudentsIds(studentsIds);
 			setSelectedAdviserId(proponent.adviser_id);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form, proponent]);
 	const acad_yr = ['A.Y 2024-2025', 'A.Y 2025-2026', 'A.Y 2026-2027'];
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent className="text-white">
@@ -220,6 +236,125 @@ const ProponentsEdit = ({
 												))}
 											</SelectContent>
 										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<form.Field
+							name="selectedDepartmentId"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Departments:</FieldLabel>
+										<Select
+											name={field.name}
+											defaultValue={
+												field.state.value ? String(field.state.value) : ''
+											}
+											onValueChange={(v) => {
+												field.handleChange(Number(v));
+												setSelectedDepartmentId(Number(v));
+											}}
+										>
+											<SelectTrigger
+												className="w-auto"
+												aria-invalid={isInvalid}
+												id={field.name}
+											>
+												<SelectValue placeholder="Select a Department" />
+											</SelectTrigger>
+											<SelectContent>
+												{departments?.map((dept) => (
+													<SelectItem key={dept.id} value={String(dept.id)}>
+														{dept.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<form.Field
+							name="instructor"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Instructor</FieldLabel>
+										<Popover
+											open={instructorOpen}
+											onOpenChange={setInstructorOpen}
+										>
+											<PopoverTrigger asChild>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={instructorOpen}
+													disabled={selectedDepartmentId === 0 ? true : false}
+													className={cn(
+														'w-full justify-between',
+														field.state.value === 0
+															? 'text-muted-foreground'
+															: 'text-white',
+													)}
+												>
+													{selectedDepartmentId
+														? selectedInstructor
+															? selectedInstructor.name
+															: 'Search and select instructor'
+														: 'Select a department first'}
+
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-[400px] p-0" align="start">
+												<Command>
+													<CommandInput placeholder="Search adviser...." />
+													<CommandList>
+														<CommandEmpty>No instructor found.</CommandEmpty>
+														<CommandGroup>
+															{filteredInstructor.map((adv) => (
+																<CommandItem
+																	key={adv.id}
+																	value={`${adv.name} ${String(adv.id)}`}
+																	onSelect={() => {
+																		field.setValue(adv.id);
+																		setSelectedInstructorId(adv.id);
+																		setInstructorOpen(false);
+																	}}
+																	className={cn(
+																		'',
+																		selectInstructorId === adv.id
+																			? 'bg-blue-600! text-white hover:bg-blue-600!'
+																			: 'hover:bg-card/50',
+																	)}
+																>
+																	<Check
+																		className={cn(
+																			'h-4 w-4',
+																			Number(field.state.value) === adv.id
+																				? 'opacity-100 text-white'
+																				: 'opacity-0',
+																		)}
+																	/>
+																	{adv.name}
+																</CommandItem>
+															))}
+														</CommandGroup>
+													</CommandList>
+												</Command>
+											</PopoverContent>
+										</Popover>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}

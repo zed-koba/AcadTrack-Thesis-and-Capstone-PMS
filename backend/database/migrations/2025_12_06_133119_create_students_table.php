@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('student_id', 20)->unique();
-            
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();
-            $table->string('foreign_proponents_id');
-            $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
+            $table->foreignId(column: 'department_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('program_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('foreign_proponents_id')->nullable();
+            $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->nullOnDelete();
             $table->string('section');
             $table->string('mobile_num')->nullable();
             $table->integer('semester');

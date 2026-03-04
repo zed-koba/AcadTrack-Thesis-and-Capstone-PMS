@@ -23,4 +23,9 @@ class Instructors extends Model
     public function account(): BelongsTo {
         return $this->belongsTo(Accounts::class,'account_id');
     }
+
+    public function proponent(): HasMany
+    {
+        return $this->hasMany(Proponents::class, 'instructor_id');
+    }
 }

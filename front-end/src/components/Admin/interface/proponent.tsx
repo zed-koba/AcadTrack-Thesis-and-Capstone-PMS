@@ -1,9 +1,8 @@
-export type ProponentsDetailsProps = {
-	propsdetails_id?: number;
-	foreign_proponents_id?: string;
-	student_id?: number;
-	name: string;
-};
+import type {
+	DepartmentStudentsProps,
+	InstructorStudentsProps,
+	StudentProps,
+} from './student';
 export type ProponentsProps = {
 	id: number;
 	proponents_id: string;
@@ -12,7 +11,7 @@ export type ProponentsProps = {
 	adviser_id: number;
 	created_at: string;
 	updated_at: string;
-	details: ProponentsDetailsProps[];
+	students: StudentProps[];
 };
 
 export type AdvisersProponentProps = {
@@ -36,6 +35,8 @@ export type ProponentsTableProps = {
 	advisers: AdvisersProponentProps[];
 	students: StudentsProponentsProps[];
 	roles: RolesProponentsProps[];
+	departments: DepartmentStudentsProps[];
+	instructors: InstructorStudentsProps[];
 	loading: boolean;
 	refresh?: () => void;
 };
@@ -44,6 +45,8 @@ export type ProponentAddProps = {
 	advisers: AdvisersProponentProps[];
 	students: StudentsProponentsProps[];
 	roles: RolesProponentsProps[];
+	departments: DepartmentStudentsProps[];
+	instructors: InstructorStudentsProps[];
 	refresh?: () => void;
 };
 
@@ -64,16 +67,9 @@ export type ProponentsEditProps = {
 	proponent: ProponentsProps;
 	proponents: ProponentsProps[];
 	roles: RolesProponentsProps[];
-	advisers: AdvisersProponentProps[];
-	students: StudentsProponentsProps[];
+	advisers: AdvisersProponentProps[] | [];
+	students: StudentsProponentsProps[] | [];
+	departments: DepartmentStudentsProps[] | [];
+	instructors: InstructorStudentsProps[] | [];
 	onSuccess?: () => void;
-};
-
-export type ProponentsDetails = {
-	open: boolean;
-	advisers: AdvisersProponentProps | null;
-	roles: RolesProponentsProps[];
-	students: StudentsProponentsProps[];
-	setOpen: (open: boolean) => void;
-	proponent: ProponentsProps;
 };

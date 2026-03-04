@@ -46,10 +46,12 @@ import {
 import ProponentsAutoComplete from './ProponentsAutoComplete';
 
 const proponentSchema = z.object({
-	academic_yr: z.string().min(1, 'Title is required'),
+	academic_yr: z.string().min(1, 'Academic year is required'),
 	title: z.string().min(1, 'Title is required'),
+	instructor: z.number().min(1, 'Instructor is required'),
 	adviser: z.number().min(1, 'Adviser is required'),
 	studentsId: z.array(z.number()).optional(),
+	selectedDepartmentId: z.number(),
 });
 
 const ProponentsAdd = ({
@@ -57,6 +59,8 @@ const ProponentsAdd = ({
 	students,
 	advisers,
 	roles,
+	departments,
+	instructors,
 	refresh,
 }: ProponentAddProps) => {
 	const [open, setOpen] = useState(false);
@@ -64,12 +68,17 @@ const ProponentsAdd = ({
 	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [selectAdviserId, setSelectedAdviserId] = useState(0);
+	const [instructorOpen, setInstructorOpen] = useState(false);
+	const [selectInstructorId, setSelectedInstructorId] = useState(0);
+	const [selectedDepartmentId, setSelectedDepartmentId] = useState(0);
 	type formValues = z.infer<typeof proponentSchema>;
 
 	const defaultValues: formValues = {
 		academic_yr: '',
 		title: '',
 		adviser: 0,
+		instructor: 0,
+		selectedDepartmentId: 0,
 		studentsId: [],
 	};
 	const form = useForm({
@@ -83,6 +92,7 @@ const ProponentsAdd = ({
 			const payLoad = {
 				academic_yr: value.academic_yr,
 				title: value.title,
+				instructor_id: value.instructor,
 				adviser_id: value.adviser,
 				students_id: value.studentsId,
 			};
@@ -122,6 +132,12 @@ const ProponentsAdd = ({
 	});
 	const selectedAdviser = advisers.find((adv) => adv.id === selectAdviserId);
 	const acad_yr = ['A.Y 2024-2025', 'A.Y 2025-2026', 'A.Y 2026-2027'];
+	const filteredInstructor = instructors.filter(
+		(ins) => ins.department_id === selectedDepartmentId,
+	);
+	const selectedInstructor = instructors.find(
+		(d) => d.id === selectInstructorId,
+	);
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
@@ -204,6 +220,125 @@ const ProponentsAdd = ({
 							}}
 						/>
 						<form.Field
+							name="selectedDepartmentId"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Departments:</FieldLabel>
+										<Select
+											name={field.name}
+											defaultValue={
+												field.state.value ? String(field.state.value) : ''
+											}
+											onValueChange={(v) => {
+												field.handleChange(Number(v));
+												setSelectedDepartmentId(Number(v));
+											}}
+										>
+											<SelectTrigger
+												className="w-auto"
+												aria-invalid={isInvalid}
+												id={field.name}
+											>
+												<SelectValue placeholder="Select a Department" />
+											</SelectTrigger>
+											<SelectContent>
+												{departments?.map((dept) => (
+													<SelectItem key={dept.id} value={String(dept.id)}>
+														{dept.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<form.Field
+							name="instructor"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Instructor</FieldLabel>
+										<Popover
+											open={instructorOpen}
+											onOpenChange={setInstructorOpen}
+										>
+											<PopoverTrigger asChild>
+												<Button
+													variant="outline"
+													role="combobox"
+													aria-expanded={instructorOpen}
+													disabled={selectedDepartmentId === 0 ? true : false}
+													className={cn(
+														'w-full justify-between',
+														field.state.value === 0
+															? 'text-muted-foreground'
+															: 'text-white',
+													)}
+												>
+													{selectedDepartmentId
+														? selectedInstructor
+															? selectedInstructor.name
+															: 'Search and select instructor'
+														: 'Select a department first'}
+
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-[400px] p-0" align="start">
+												<Command>
+													<CommandInput placeholder="Search adviser...." />
+													<CommandList>
+														<CommandEmpty>No instructor found.</CommandEmpty>
+														<CommandGroup>
+															{filteredInstructor.map((adv) => (
+																<CommandItem
+																	key={adv.id}
+																	value={`${adv.name} ${String(adv.id)}`}
+																	onSelect={() => {
+																		field.setValue(adv.id);
+																		setSelectedInstructorId(adv.id);
+																		setInstructorOpen(false);
+																	}}
+																	className={cn(
+																		'',
+																		selectInstructorId === adv.id
+																			? 'bg-blue-600! text-white hover:bg-blue-600!'
+																			: 'hover:bg-card/50',
+																	)}
+																>
+																	<Check
+																		className={cn(
+																			'h-4 w-4',
+																			Number(field.state.value) === adv.id
+																				? 'opacity-100 text-white'
+																				: 'opacity-0',
+																		)}
+																	/>
+																	{adv.name}
+																</CommandItem>
+															))}
+														</CommandGroup>
+													</CommandList>
+												</Command>
+											</PopoverContent>
+										</Popover>
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+						<form.Field
 							name="adviser"
 							children={(field) => {
 								const isInvalid =
@@ -276,6 +411,7 @@ const ProponentsAdd = ({
 								);
 							}}
 						/>
+
 						<div className="pt-2 flex flex-col gap-4">
 							<form.Field
 								name="studentsId"

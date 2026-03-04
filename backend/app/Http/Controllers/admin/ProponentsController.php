@@ -4,9 +4,10 @@ namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
 use App\Models\admin\Proponents;
-use App\Models\admin\ProponentsDetails;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Advisers;
+use App\Models\admin\Departments;
+use App\Models\admin\Instructors;
 use App\Models\admin\Programs;
 use App\Models\admin\Role;
 use App\Models\admin\Students;
@@ -18,10 +19,12 @@ class ProponentsController extends Controller
   //
   public function getProponents()
   {
-    $proponents = Proponents::with('details')->orderBy('created_at', 'DESC')->get();
+    $proponents = Proponents::with(relations: 'student')->orderBy('created_at', 'DESC')->get();
     $advisers = Advisers::where('status', 'active')->get();
     $programs = Programs::where('status', 'active')->get();
     $students = Students::orderBy('created_at', 'DESC')->get();
+    $departments = Departments::where('status','active')->get();
+    $instructors = Instructors::where('status','active')->get();
     $roles = Role::where('status','active')->get();
     return response()->json([
       'status' => 200,
@@ -29,6 +32,8 @@ class ProponentsController extends Controller
       'programs' => $programs,
       'advisers' => $advisers,
       'students' => $students,
+      'departments' => $departments,
+      'instructors' => $instructors,
       'roles' => $roles,
     ], 200);
   }
@@ -40,6 +45,7 @@ class ProponentsController extends Controller
       'title' => 'required|string',
       'adviser_id' => 'required|integer',
       'students_id' => 'array|nullable',
+      'instructor_id' => 'integer',
     ];
     $validator = Validator::make($request->all(), $rules);
     if ($validator->fails()) {
@@ -57,12 +63,13 @@ class ProponentsController extends Controller
         'academic_yr' => $request->academic_yr,
         'title' => $request->title,
         'adviser_id' => $request->adviser_id,
+        'instructor_id' => $request->instructor_id,
       ]);
       if (isset($request->students_id)) {
         foreach ($request->students_id as $student) {
-          ProponentsDetails::create(attributes: [
+          $studentModel = Students::findOrFail($student);
+          $studentModel->update([
             'foreign_proponents_id' => $proponents->proponents_id,
-            'student_id' => $student,
           ]);
         }
       }
@@ -113,18 +120,17 @@ class ProponentsController extends Controller
       $proponents = Proponents::find($id);
       $proponents->update($request->only(['academic_yr', 'title', 'adviser_id']));
       foreach ($request->students_id as $detail) {
-        $detailModel = ProponentsDetails::where('foreign_proponents_id', $proponents->proponents_id)->where('student_id', $detail);
+        $detailModel = Students::findOrFail($detail);
         if (!$detailModel->exists()) {
-          ProponentsDetails::create([
+          $detailModel->update([
             'foreign_proponents_id' => $proponents->proponents_id,
-            'student_id' => $detail,
           ]);
           $message = "student doesnt exist";
         }
       }
 
       if (!empty($request->deleted_ids)) {
-        ProponentsDetails::where('foreign_proponents_id', $proponents->proponents_id)->whereIn('student_id', $request->deleted_ids)->delete();
+        Students::whereIn('id', $request->deleted_ids)->update(['foreign_proponents_id' => null]);       
       }
 
       DB::commit();

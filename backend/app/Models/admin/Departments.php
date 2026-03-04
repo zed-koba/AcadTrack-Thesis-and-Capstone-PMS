@@ -34,4 +34,7 @@ class Departments extends Model
     public function instructors():HasMany {
         return $this->hasMany(Instructors::class,'department_id');
     }
+
+ 
+    
 }
