@@ -25,7 +25,7 @@ export function formatDate(dateString: string) {
 		year: 'numeric',
 	});
 }
-export const studentId = 2;
+export const studentId = 1;
 export const adviserId = 1;
 export const instructorId = 1;
 export const START_HOUR = 7;

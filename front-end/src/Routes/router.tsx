@@ -26,6 +26,7 @@ import InstructorDashboard from '../components/Instructor/pages/InstructorDashbo
 import Login from '../components/Login';
 import RequireAuth from './RequireAuth';
 import PublicRoute from './PublicRoutes';
+import StudentProjectSetup from '@/components/ProjectSetup';
 
 export const router = createBrowserRouter([
 	{
@@ -46,11 +47,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Admin',
-		element: (
-			<RequireAuth allowedRoles={['admin']}>
-				<AdminLayout />
-			</RequireAuth>
-		),
+		element: <AdminLayout />,
 		children: [
 			{ index: true, element: <AdminDashboard /> },
 			{ path: 'Projects', element: <AdminProponents /> },
@@ -79,6 +76,10 @@ export const router = createBrowserRouter([
 		],
 	},
 	{
+		path: '/Student/Project-Setup',
+		element: <StudentProjectSetup />,
+	},
+	{
 		path: '/Student',
 		element: (
 			<RequireAuth allowedRoles={['student']}>
@@ -96,11 +97,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Instructor',
-		element: (
-			<RequireAuth allowedRoles={['instructor']}>
-				<InstructorLayout />
-			</RequireAuth>
-		),
+		element: <InstructorLayout />,
 		children: [
 			{
 				index: true,

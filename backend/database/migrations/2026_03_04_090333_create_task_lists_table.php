@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('proponents', function (Blueprint $table) {
+        Schema::create('task_lists', function (Blueprint $table) {
             $table->id();
-            $table->string('proponents_id')->unique();
-            $table->string('academic_yr');
-            $table->string('title');
-            $table->foreignId('adviser_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('student_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('foreign_proponents_id');
+            $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
+            $table->string('task');
+            $table->date('deadline');
+            $table->boolean('is_completed')->default(false);
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('proponents');
+        Schema::dropIfExists('task_lists');
     }
 };

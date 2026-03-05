@@ -13,22 +13,20 @@ import { Spinner } from '@/components/ui/spinner';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { DepartmentDeleteProps } from '../interface/department';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import type { ProgramDeleteProps } from '../interface/programs';
 
-const DepartmentDelete = ({
+const ProgramDelete = ({
 	open,
 	setOpen,
-	department,
+	program,
 	onSuccess,
-}: DepartmentDeleteProps) => {
+}: ProgramDeleteProps) => {
 	const [loading, setLoading] = useState(false);
 	const handleDelete = async () => {
-		if (!department) return;
+		if (!program) return;
 		setLoading(true);
 		try {
-			const res = await fetch(`${apiUrl}/departments/delete/${department.id}`, {
+			const res = await fetch(`${apiUrl}/programs/delete/${program.id}`, {
 				method: 'DELETE',
 				headers: {
 					'Content-type': 'application/json',
@@ -62,10 +60,6 @@ const DepartmentDelete = ({
 			console.log(error);
 		}
 	};
-	const hasDeps =
-		department.roles_count > 0 ||
-		department.advisers_count > 0 ||
-		department.programs_count > 0;
 
 	return (
 		<>
@@ -75,44 +69,8 @@ const DepartmentDelete = ({
 						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 						<AlertDialogDescription>
 							This action cannot be undone. This will permanently delete the
-							department and remove your data from the servers.
+							program and remove your data from the servers.
 						</AlertDialogDescription>
-						{hasDeps && (
-							<div className="space-y-3 pt-2">
-								<p className="font-medium text-sm text-white">
-									This department has dependencies. Select what to delete
-								</p>
-								<div className="grid gap-2 text-muted-foreground">
-									{department.programs_count > 0 && (
-										<div className="space-y-2">
-											<Checkbox id="delete-programs" />
-											<Label htmlFor="delete-programs" className="text-sm">
-												Delete {department.programs_count} program
-												{department.programs_count !== 1 ? 's' : ''}
-											</Label>
-										</div>
-									)}
-									{department.roles_count > 0 && (
-										<div className="space-y-0 gap-3 items-center flex flex-row">
-											<Checkbox id="delete-programs" />
-											<Label htmlFor="delete-programs" className="text-sm">
-												Delete {department.roles_count} role
-												{department.roles_count !== 1 ? 's' : ''}
-											</Label>
-										</div>
-									)}
-									{department.advisers_count > 0 && (
-										<div className="space-y-2">
-											<Checkbox id="delete-programs" />
-											<Label htmlFor="delete-programs" className="text-sm">
-												Delete {department.advisers_count} adviser
-												{department.advisers_count !== 1 ? 's' : ''}
-											</Label>
-										</div>
-									)}
-								</div>
-							</div>
-						)}
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel className="cursor-pointer">
@@ -133,4 +91,4 @@ const DepartmentDelete = ({
 	);
 };
 
-export default DepartmentDelete;
+export default ProgramDelete;

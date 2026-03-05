@@ -1,10 +1,9 @@
 import { apiUrl } from '@/Routes/http';
-import {
+import type {
 	RolesProponentsProps,
 	StudentsProponentsProps,
-	type AdvisersProponentProps,
-	type ProgramsProponentProps,
-	type ProponentsProps,
+	AdvisersProponentProps,
+	ProponentsProps,
 } from '../interface/proponent';
 import ProponentsTable from '../ProponentComponents/ProponentsTable';
 import { useEffect, useState } from 'react';

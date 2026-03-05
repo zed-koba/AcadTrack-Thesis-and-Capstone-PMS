@@ -19,7 +19,6 @@ import {
 	ReceiptText,
 	Trash,
 	MoreHorizontal,
-	PowerOff,
 } from 'lucide-react';
 
 import {
@@ -69,12 +68,12 @@ const StudentTable = ({
 	refresh,
 }: StudentsTableProps) => {
 	const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
-		null
+		null,
 	);
 	const [selectedDepartment, setSelectedDepartment] =
 		useState<DepartmentStudentsProps | null>(null);
 	const [selectedRole, setSelectedRole] = useState<RolesStudentsProps | null>(
-		null
+		null,
 	);
 	const [selectedInstructor, setSelectedInstructor] =
 		useState<InstructorStudentsProps | null>(null);
@@ -115,7 +114,7 @@ const StudentTable = ({
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 	const paginationProps = sortedAccounts.slice(
 		startIndex,
-		startIndex + ITEMS_PER_PAGE
+		startIndex + ITEMS_PER_PAGE,
 	);
 
 	const getBadges = (id: number, type: string) => {
@@ -136,7 +135,7 @@ const StudentTable = ({
 
 	const getSelectedInfo = (
 		id: number,
-		type: SelectedType
+		type: SelectedType,
 	):
 		| RolesStudentsProps
 		| ProgramsStudentsProps
@@ -160,7 +159,7 @@ const StudentTable = ({
 	const getProponentInfo = (id: number) => {
 		const findProponent =
 			proponents.find((prop) =>
-				prop.details.find((d) => d.student_id === id)
+				prop.details.find((d) => d.student_id === id),
 			) ?? null;
 		return findProponent as ProponentsProps;
 	};
@@ -321,29 +320,29 @@ const StudentTable = ({
 																setSelectedDepartment(
 																	getSelectedInfo(
 																		student.department_id,
-																		'department'
-																	) as DepartmentStudentsProps | null
+																		'department',
+																	) as DepartmentStudentsProps | null,
 																);
 																setSelectedRole(
 																	getSelectedInfo(
 																		student.role_id,
-																		'role'
-																	) as RolesStudentsProps | null
+																		'role',
+																	) as RolesStudentsProps | null,
 																);
 																setSelectedProgram(
 																	getSelectedInfo(
 																		student.program_id,
-																		'program'
-																	) as ProgramsStudentsProps | null
+																		'program',
+																	) as ProgramsStudentsProps | null,
 																);
 																setSelectedInstructor(
 																	getSelectedInfo(
 																		student.instructor_id,
-																		'instructor'
-																	) as InstructorStudentsProps | null
+																		'instructor',
+																	) as InstructorStudentsProps | null,
 																);
 																setSelectedProponent(
-																	getProponentInfo(student.id)
+																	getProponentInfo(student.id),
 																);
 															}}
 														>
@@ -433,7 +432,7 @@ const StudentTable = ({
 												{page}
 											</PaginationLink>
 										</PaginationItem>
-									)
+									),
 								)}
 								<PaginationItem>
 									<PaginationNext

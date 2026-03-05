@@ -101,5 +101,27 @@ class ProgramsController extends Controller
             ], 500);
         }
     }
+    public function deleteProgram($id)
+    {
+        DB::beginTransaction();
+        try {
+            $program = Programs::find($id);
+
+            $program->delete();
+
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully deleted Program',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while deleting the Program.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 }

@@ -1,8 +1,7 @@
 import { apiUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
-import AdvisersDashboard from '../AdviserComponents/AdviserDashboard';
-import AdviserTable from '../AdviserComponents/AdviserTable';
+
 import type {
 	DepartmentInstructorProps,
 	InstructorProps,

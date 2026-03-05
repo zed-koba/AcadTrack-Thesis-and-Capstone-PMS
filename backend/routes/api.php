@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\admin\AccountsController;
 use App\Http\Controllers\admin\AdvisersController;
+use App\Http\Controllers\NewUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
 use App\Http\Controllers\admin\DepartmentsController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\instructor\DocumentsDeadlineController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
+use App\Http\Controllers\TaskListsController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -47,6 +49,7 @@ Route::prefix("admin")->group(function () {
     Route::get('departments', [DepartmentsController::class, 'getDepartments']);
     Route::post('departments/add', [DepartmentsController::class, 'storeDepartment']);
     Route::put('departments/edit/{id}', [DepartmentsController::class, 'updateDepartment']);
+    Route::delete('departments/delete/{id}', [DepartmentsController::class, 'deleteDepartment']);
 
 
     //Roles Routes
@@ -58,6 +61,7 @@ Route::prefix("admin")->group(function () {
     Route::get('programs', [ProgramsController::class, 'getPrograms']);
     Route::post('programs/add', [ProgramsController::class, 'storeProgram']);
     Route::put('programs/edit/{id}', [ProgramsController::class, 'updateProgram']);
+    Route::delete('programs/delete/{id}', [ProgramsController::class, 'deleteProgram']);
 
 
     //Advisers Routes
@@ -101,6 +105,18 @@ Route::prefix("student")->group(function() {
     Route::get('weekly', [AdviserWeeklyController::class, "getSchedules"]);
     Route::post('weekly/add', [AdviserWeeklyController::class, 'storeSchedule']);
     Route::get('deadlines/{id}', [DocumentsDeadlineController::class, 'getDeadlines']);
+
+    //Task
+    Route::get('tasks/{id}', [TaskListsController::class, 'getTaskList']);
+    Route::post('tasks/add', [TaskListsController::class, 'storeTask']);
+    Route::put('tasks/update/{id}', [TaskListsController::class, 'updateTask']);
+    Route::delete('tasks/delete/{id}', [TaskListsController::class, 'deleteTask']);
+
+    //Project Setup
+    Route::get('project-setup', [NewUserController::class, 'getData']);
+    Route::put('project-setup/updateStudent/{id}', [NewUserController::class, 'updateStudent']);
+    Route::post('project-setup/storeProject/{id}', [NewUserController::class, 'storeProject']);
+    Route::post('projectSetup/joinProject/{id}', [NewUserController::class, 'joinProject']);
 });
 
 Route::prefix("instructor")->group(function() {

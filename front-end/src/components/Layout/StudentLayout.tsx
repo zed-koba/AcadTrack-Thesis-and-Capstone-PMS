@@ -28,7 +28,7 @@ const StundentLayout = () => {
 			<Sidebar navItem={navItem} />
 			<main className="w-full">
 				<UserNav />
-				<div className="px-10 py-5 bg-background grow relative">
+				<div className="px-10 py-5 bg-background grow relative h-auto">
 					<Outlet />
 					<Toaster position="top-center" />
 				</div>

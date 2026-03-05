@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role', ['instructor', 'student', 'adviser'])->default('student');
+            $table->boolean('new_user')->default(1);
             $table->timestamps();
             $table->rememberToken();
         });

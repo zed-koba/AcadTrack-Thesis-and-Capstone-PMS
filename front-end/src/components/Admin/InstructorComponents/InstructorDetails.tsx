@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Castle, Mail, Stethoscope, User } from 'lucide-react';
+import { Calendar, Castle, Stethoscope, User } from 'lucide-react';
 import { formatDate } from '@/components/functions/functions';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -47,17 +47,17 @@ const InstructorDetails = ({
 		{
 			label: 'Status',
 			icon: <Stethoscope className="h-4 w-4" />,
-			value: instructor ? getStatusBadge(adviser.status) : null,
+			value: instructor ? getStatusBadge(instructor.status) : null,
 		},
 		{
 			label: 'Created At',
 			icon: <Calendar className="h-4 w-4" />,
-			value: instructor ? formatDate(adviser.created_at) : null,
+			value: instructor ? formatDate(instructor.created_at) : null,
 		},
 		{
 			label: 'Updated At',
 			icon: <Calendar className="h-4 w-4" />,
-			value: instructor ? formatDate(adviser.updated_at) : null,
+			value: instructor ? formatDate(instructor.updated_at) : null,
 		},
 	];
 

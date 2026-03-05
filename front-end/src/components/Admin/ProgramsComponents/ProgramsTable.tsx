@@ -45,6 +45,7 @@ import type {
 import ProgramAdd from './ProgramAdd';
 import ProgramEdit from './ProgramsEdit';
 import ProgramDetails from './ProgramDetails';
+import ProgramDelete from './ProgramDelete';
 
 type SortField = keyof ProgramsProps;
 type SortDirection = 'asc' | 'desc';
@@ -61,7 +62,7 @@ const ProgramsTable = ({
 	const [sortDirection, setSortDrection] = useState<SortDirection>('asc');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [selectedProgram, setSelectedProgram] = useState<ProgramsProps | null>(
-		null
+		null,
 	);
 	const [open, setOpen] = useState(false);
 	const [clickedButton, setClickedButton] = useState<string>('');
@@ -90,7 +91,7 @@ const ProgramsTable = ({
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 	const paginationProps = sortedPrograms.slice(
 		startIndex,
-		startIndex + ITEMS_PER_PAGE
+		startIndex + ITEMS_PER_PAGE,
 	);
 	const getStatusBadge = (status: string) => {
 		return status === 'active' ? (
@@ -193,8 +194,8 @@ const ProgramsTable = ({
 												{prog.description === null
 													? '-'
 													: prog.description.trim() === ''
-													? '-'
-													: prog.description}
+														? '-'
+														: prog.description}
 											</TableCell>
 											<TableCell className="text-left">
 												<Badge variant="outline">{prog.code}</Badge>
@@ -236,7 +237,7 @@ const ProgramsTable = ({
 																setOpen(true);
 																setSelectedProgram(prog);
 																setProgramDepartment(
-																	getCodeBadge(prog.department_id)
+																	getCodeBadge(prog.department_id),
 																);
 																setClickedButton('details');
 															}}
@@ -277,7 +278,12 @@ const ProgramsTable = ({
 											setOpen={setOpen}
 										/>
 									) : (
-										''
+										<ProgramDelete
+											program={selectedProgram}
+											open={open}
+											setOpen={setOpen}
+											onSuccess={refresh}
+										/>
 									))}
 							</TableBody>
 						</Table>
@@ -313,7 +319,7 @@ const ProgramsTable = ({
 												{page}
 											</PaginationLink>
 										</PaginationItem>
-									)
+									),
 								)}
 								<PaginationItem>
 									<PaginationNext

@@ -21,9 +21,9 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->string('section');
             $table->string('mobile_num')->nullable();
-            $table->integer('semester');
+            $table->integer('semester')->nullable();
             $table->string('facebook_profile')->nullable();
-            $table->integer('year_level');
+            $table->integer('year_level')->nullable();
             $table->foreignId('role_id')->nullable()->constrained();
             $table->timestamps();
         });

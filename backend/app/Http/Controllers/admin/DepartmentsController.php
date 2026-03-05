@@ -19,7 +19,7 @@ class DepartmentsController extends Controller
 
         return response()->json([
             'status' => 200,
-            'data'=> $departments,
+            'data' => $departments,
         ], 200);
     }
 
@@ -37,7 +37,7 @@ class DepartmentsController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json([
-                'status'=> 422,
+                'status' => 422,
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -55,8 +55,7 @@ class DepartmentsController extends Controller
                 'status' => 201,
                 'message' => 'Department added successfully',
             ], 201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 500,
@@ -79,7 +78,7 @@ class DepartmentsController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json([
-                'status'=> 422,
+                'status' => 422,
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -94,8 +93,7 @@ class DepartmentsController extends Controller
                 'message' => 'Department updated successfully',
                 'data' => $department,
             ], 200);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 500,
@@ -105,8 +103,26 @@ class DepartmentsController extends Controller
         }
     }
 
-    public function destroy(Departments $departments)
+    public function deleteDepartment($id)
     {
-        //
+        DB::beginTransaction();
+        try {
+            $department = Departments::find($id);
+
+            $department->delete();
+
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully deleted Department',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while deleting the Department.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
