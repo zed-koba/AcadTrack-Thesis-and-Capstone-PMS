@@ -116,7 +116,7 @@ Route::prefix("student")->group(function() {
     Route::get('project-setup', [NewUserController::class, 'getData']);
     Route::put('project-setup/updateStudent/{id}', [NewUserController::class, 'updateStudent']);
     Route::post('project-setup/storeProject/{id}', [NewUserController::class, 'storeProject']);
-    Route::post('projectSetup/joinProject/{id}', [NewUserController::class, 'joinProject']);
+    Route::post('project-setup/joinProject/{id}', [NewUserController::class, 'joinProject']);
 });
 
 Route::prefix("instructor")->group(function() {

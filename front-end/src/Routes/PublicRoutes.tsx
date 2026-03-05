@@ -10,7 +10,7 @@ const PublicRoute = ({ children }: { children: JSX.Element }) => {
 
 		try {
 			const user = JSON.parse(userString);
-
+			console.log(user);
 			switch (user.role) {
 				case 'admin':
 					destination = '/Admin';

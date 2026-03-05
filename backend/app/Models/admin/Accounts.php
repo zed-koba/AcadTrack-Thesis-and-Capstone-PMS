@@ -23,6 +23,7 @@ class Accounts extends Authenticatable
         'student_id',
         'program',
         'section',
+        'new_user'
     ];
 
     protected $hidden = [

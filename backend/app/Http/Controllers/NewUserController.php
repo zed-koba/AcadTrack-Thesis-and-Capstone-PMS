@@ -83,7 +83,7 @@ class NewUserController extends Controller
         try { 
             ProponentsDetails::create(attributes: [
                 'foreign_proponents_id' => $request->proponent_id,
-                'student_id' => $id,
+                
             ]);
 
             DB::commit();

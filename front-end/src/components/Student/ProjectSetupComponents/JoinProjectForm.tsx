@@ -14,6 +14,8 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Check, Loader2, Search } from 'lucide-react';
 import type { ProponentsProps } from '@/components/Admin/interface/proponent';
 import { toast } from 'sonner';
+import { apiStudentUrl } from '@/Routes/http';
+import { studentId } from '@/components/functions/functions';
 
 interface JoinProjectFormProps {
 	onBack: () => void;
@@ -34,12 +36,30 @@ export default function JoinProjectForm({
 	const handleSearch = () => {
 		if (code.trim().length < 4) return;
 		setIsSearching(true);
+
 		setTimeout(() => {
 			setIsSearching(false);
 			setFound(true);
 		}, 1000);
 	};
-
+	/*try {
+			setIsSearching(true);
+            const payLoad = 
+			const res = await fetch(
+				`${apiStudentUrl}/project-setup/joinProject/${studentId}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
+				},
+			);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsSearching(false);
+		}*/
 	const handleRequestJoin = () => {
 		setRequested(true);
 		toast.success('Join request sucessfully sent');

@@ -20,6 +20,10 @@ const RequireAuth = ({ children, allowedRoles }: Props) => {
 		return <Navigate to="/unauthorized" replace />;
 	}
 
+	if (parsedUser.role === 'student' && parsedUser.new_user === 1) {
+		return <Navigate to="/Student/Project-Setup" replace />;
+	}
+
 	return children;
 };
 
