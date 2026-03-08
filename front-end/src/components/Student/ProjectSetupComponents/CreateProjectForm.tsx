@@ -21,6 +21,9 @@ import { ArrowLeft, Check, Copy, Crown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
 import type { InstructorProps } from '@/components/Admin/interface/instructor';
+import { studentId, user } from '@/components/functions/functions';
+import { apiStudentUrl } from '@/Routes/http';
+import type { ProponentsProps } from '@/components/Admin/interface/proponent';
 
 interface CreateProjectFormProps {
 	onBack: () => void;
@@ -36,33 +39,72 @@ export default function CreateProjectForm({
 	instructors,
 }: CreateProjectFormProps) {
 	const [projectName, setProjectName] = useState('');
+	const [academicYear, setAcademicYear] = useState('');
 	const [adviserId, setAdviserId] = useState('');
 	const [instructorId, setInstructorId] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [created, setCreated] = useState(false);
-	const [generatedCode] = useState(() => {
-		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-		return Array.from(
-			{ length: 8 },
-			() => chars[Math.floor(Math.random() * chars.length)],
-		).join('');
-	});
 	const [copied, setCopied] = useState(false);
-
+	const [createdProject, setCreatedProject] = useState<
+		ProponentsProps | undefined
+	>();
+	const acad_yr = ['A.Y 2024-2025', 'A.Y 2025-2026', 'A.Y 2026-2027'];
 	const canSubmit = projectName.trim() && adviserId && instructorId;
 
-	const handleCreate = () => {
+	const handleCreate = async () => {
 		if (!canSubmit) return;
 		setIsSubmitting(true);
-		setTimeout(() => {
+		try {
+			const payLoad = {
+				academic_yr: academicYear,
+				title: projectName,
+				adviser_id: adviserId,
+				instructor_id: instructorId,
+			};
+			const res = await fetch(
+				`${apiStudentUrl}/project-setup/storeProject/${studentId}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
+					body: JSON.stringify(payLoad),
+				},
+			);
+			const result = await res.json();
+			if (result.status === 422) {
+				const errors = result.errors as Record<string, string[]>;
+				Object.values(errors).forEach((errorMessages) =>
+					errorMessages.forEach((message) => toast.error(message)),
+				);
+				return;
+			}
+			if (!res.ok) {
+				console.log('Failed to fetch data ' + JSON.stringify(payLoad));
+				return JSON.stringify(payLoad);
+			}
+			if (result.status === 201) {
+				setCreated(true);
+				setCreatedProject(result.project);
+				toast.success(result.message);
+				const updatedUser = {
+					...user,
+					new_user: 0,
+				};
+
+				localStorage.setItem('user', JSON.stringify(updatedUser));
+				localStorage.setItem('project', JSON.stringify(result.project));
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
 			setIsSubmitting(false);
-			setCreated(true);
-			toast.success('Sucessfully created thesis group');
-		}, 1200);
+		}
 	};
 
 	const handleCopyCode = () => {
-		navigator.clipboard.writeText(generatedCode);
+		navigator.clipboard.writeText(String(createdProject?.proponents_id));
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
 		toast.info('Copied');
@@ -83,7 +125,7 @@ export default function CreateProjectForm({
 				<CardContent className="space-y-6">
 					<div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-muted">
 						<span className="text-2xl font-mono font-bold tracking-widest">
-							{generatedCode}
+							{createdProject?.proponents_id}
 						</span>
 						<Button variant="ghost" size="icon" onClick={handleCopyCode}>
 							{copied ? (
@@ -130,11 +172,25 @@ export default function CreateProjectForm({
 						onChange={(e) => setProjectName(e.target.value)}
 					/>
 				</div>
-
+				<div className="space-y-2">
+					<Label>Academic Year</Label>
+					<Select value={academicYear} onValueChange={setAcademicYear}>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select Academic Year" />
+						</SelectTrigger>
+						<SelectContent>
+							{acad_yr.map((a) => (
+								<SelectItem key={a} value={a}>
+									{a}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
 				<div className="space-y-2">
 					<Label>Proposed Adviser</Label>
 					<Select value={adviserId} onValueChange={setAdviserId}>
-						<SelectTrigger>
+						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Select adviser" />
 						</SelectTrigger>
 						<SelectContent>
@@ -150,7 +206,7 @@ export default function CreateProjectForm({
 				<div className="space-y-2">
 					<Label>Assigned Instructor</Label>
 					<Select value={instructorId} onValueChange={setInstructorId}>
-						<SelectTrigger>
+						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Select instructor" />
 						</SelectTrigger>
 						<SelectContent>

@@ -265,6 +265,7 @@ const Registration = () => {
 													value={field.state.value}
 													onChange={(e) => field.handleChange(e.target.value)}
 													autoComplete="new-password"
+													aria-invalid={isInvalid}
 												/>
 												<button
 													type="button"

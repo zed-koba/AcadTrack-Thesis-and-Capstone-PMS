@@ -34,19 +34,20 @@ const Login = () => {
 				email,
 				password,
 			});
-			const { token, user } = response.data;
+			const { token, user, data, project } = response.data;
 			localStorage.setItem('token', token);
 			localStorage.setItem('user', JSON.stringify(user));
-			console.log(token, user);
+			localStorage.setItem('data', JSON.stringify(data));
+			localStorage.setItem('project', JSON.stringify(project));
 			switch (user.role) {
 				case 'admin':
 					navigate('/Admin');
 					break;
 				case 'student':
-					navigate('/Student');
+					navigate('/Student', { replace: true });
 					break;
 				case 'adviser':
-					navigate('/Adviser');
+					navigate('/Adviser', { replace: true });
 					break;
 				case 'instructor':
 					navigate('/Instructor');
@@ -124,7 +125,7 @@ const Login = () => {
 						<p className="text-center text-sm text-muted-foreground mt-6">
 							Don't have an account?{' '}
 							<Link
-								to="/register"
+								to="/Registration"
 								className="text-primary hover:underline font-medium"
 							>
 								Create one

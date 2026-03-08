@@ -57,9 +57,11 @@ class ProponentsController extends Controller
         'academic_yr' => $request->academic_yr,
         'title' => $request->title,
         'adviser_id' => $request->adviser_id,
+        'student_id' => $request->student_id,
       ]);
       if (isset($request->students_id)) {
         foreach ($request->students_id as $student) {
+          if($student === $proponents->student_id) return;
           ProponentsDetails::create(attributes: [
             'foreign_proponents_id' => $proponents->proponents_id,
             'student_id' => $student,

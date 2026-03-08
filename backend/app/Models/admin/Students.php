@@ -46,6 +46,9 @@ class Students extends Model
     public function proponentDetail():HasOne {
         return $this->hasOne(ProponentsDetails::class, 'student_id');
     }
+    public function project():HasOne {
+        return $this->hasOne(Proponents::class, 'student_id');
+    }
 
     public function instructor():BelongsTo {
         return $this->belongsTo(Instructors::class, 'instructor_id');

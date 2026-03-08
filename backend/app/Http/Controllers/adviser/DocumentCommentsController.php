@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\adviser;
 
+use App\Events\NotificationService;
 use App\Http\Controllers\Controller;
 use App\Models\adviser\DocumentComments;
 use App\Models\student\Documents;
@@ -61,12 +62,18 @@ class DocumentCommentsController extends Controller
                     'approved_date' => now(),
                 ]);
             }
-
+            NotificationService::store([
+                'foreign_proponents_id' => $request->foreign_proponents_id,
+                'type' => 'document',
+                'title' => $request->adviser_name,
+                'message' => 'has commented on ' . $request->document_title,
+            ]);
             DB::commit();
 
             return response()->json([
                 'status' => 201,
                 'message' => 'Comment Added',
+                
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();

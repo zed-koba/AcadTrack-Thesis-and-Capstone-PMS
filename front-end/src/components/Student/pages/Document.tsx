@@ -6,7 +6,7 @@ import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
-import { studentId } from '@/components/functions/functions';
+import { information } from '@/components/functions/functions';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 const Document = () => {
@@ -17,7 +17,7 @@ const Document = () => {
 
 	const fetchDocuments = async () => {
 		try {
-			const res = await fetch(`${apiStudentUrl}/documents`, {
+			const res = await fetch(`${apiStudentUrl}/documents/${information.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',
@@ -31,22 +31,21 @@ const Document = () => {
 				await setDocuments(result.document);
 				await setDeadline(result.deadline);
 				setProject(
-					result.projects.find((p: ProponentsDocumentsProps) =>
-						p.details.some((detail) => detail.student.id === studentId),
-					) ?? null,
+					result.projects.find((p: ProponentsDocumentsProps) => {
+						if (p.student_id === information.id) {
+							return p;
+						} else {
+							return p.details.some(
+								(detail) => detail.student.id === information.id,
+							);
+						}
+					}) ?? null,
 				);
-				return result.document;
 			}
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setLoading(false);
-
-			// console.log(
-			// 	projects.find((p) =>
-			// 		p.details.some((detail) => detail.student.id === 1),
-			// 	),
-			// );
 		}
 	};
 	useEffect(() => {

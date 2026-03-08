@@ -16,15 +16,15 @@ class DocumentsDeadlineController extends Controller
     public function getDeadlines($id)
     {
         $deadlines = DocumentsDeadline::where('instructor_id', $id)->with("instructor:id,name")->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with([
-            'details.student' => function ($query) {
+        $projects = Proponents::with([         
+            'groupLeader' => function ($query) {
                 $query->select('id', 'student_id', 'instructor_id', 'section', 'program_id', 'name')
                     ->with('program:id,name,code')
-                    ->with('document'); // load student documents
+                    ->with('document'); 
             },
             'adviser.department:id,name,code'
         ])
-            ->whereHas('details.student', function ($query) use ($id) {
+            ->whereHas('groupLeader', function ($query) use ($id) {
                 $query->where('instructor_id', $id);
             })
             ->orderBy('created_at', 'asc')

@@ -56,13 +56,17 @@ const DeadlinesComponent = ({
 		const documentName = deadline.document_title.toLowerCase();
 
 		return projects?.map((project) => {
-			const matchingDocument = project.details
-				.flatMap((detail) => detail.student.document ?? [])
-				.find(
-					(doc) =>
-						doc.title_name.toLowerCase().includes(documentName) &&
-						doc.status === 'passed',
-				);
+			const studentDocs =
+				project.details?.flatMap((d) => d.student.document ?? []) ?? [];
+
+			const leaderDocs = project.group_leader?.document ?? [];
+
+			const allDocuments = [...studentDocs, ...leaderDocs];
+			const matchingDocument = allDocuments.find(
+				(doc) =>
+					doc.status === 'passed' &&
+					doc.title_name?.toLowerCase().includes(documentName),
+			);
 			const submissionStatus = matchingDocument
 				? new Date(matchingDocument.passed_date) <= new Date(deadline.deadline)
 					? 'submitted-on-time'
@@ -77,6 +81,7 @@ const DeadlinesComponent = ({
 			};
 		});
 	};
+
 	return (
 		<>
 			<div className="pt-4">
@@ -112,6 +117,7 @@ const DeadlinesComponent = ({
 									s.submissionStatus === 'submitted-late',
 							);
 							const isExpanded = !!expandedDeadlines[deadline.id];
+
 							return (
 								<Card className="p-0" key={deadline.id}>
 									<CardContent className="p-4 space-y-3">
@@ -199,10 +205,14 @@ const DeadlinesComponent = ({
 																{project.project.title}
 															</p>
 															<p className="text-[11px] text-muted-foreground">
+																{project.project.group_leader.name}
 																{project.project.details
-																	.map((detail) => detail.student.name)
-																	.flat()
-																	.join(', ')}
+																	? ',' +
+																		project.project.details
+																			.map((detail) => detail.student.name)
+																			.flat()
+																			.join(', ')
+																	: ''}
 															</p>
 														</div>
 														<div className="flex items-center gap-2">
@@ -239,7 +249,7 @@ const DeadlinesComponent = ({
 																	variant="outline"
 																	className="text-[10px] px-1.5 gap-1 bg-muted text-muted-foreground"
 																>
-																	<MinusCircle className="h-3 w-3" /> Pending
+																	<MinusCircle className="h-3 w-3" /> Not Passed
 																</Badge>
 															)}
 															{project.submissionStatus === 'missed' && (

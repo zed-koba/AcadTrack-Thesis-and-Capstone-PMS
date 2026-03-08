@@ -24,7 +24,6 @@ import DocumentItem from './DocumentItem';
 const DocumentProjectCard = ({
 	documents,
 	project,
-	refresh,
 	isExpanded,
 	onToggle,
 	projectAdviser,
@@ -32,11 +31,15 @@ const DocumentProjectCard = ({
 	onSelectDocument,
 	selectedDocument,
 }: ProjectCollapseProps) => {
-	const studentIds = project.details.map((detail) => detail.student_id);
+	const studentIds = [
+		project.group_leader.id,
+		...project.details.map((detail) => detail.student_id),
+	];
 
 	const filterDocuments = documents.filter((d) =>
 		studentIds.includes(d.student_id),
 	);
+
 	const documentsGrouped = useMemo(() => {
 		const parents = filterDocuments.filter(
 			(d) => d.parent_document_id === null,
@@ -115,7 +118,6 @@ const DocumentProjectCard = ({
 									selectedDocument={selectedDocument}
 									projectAdviser={projectAdviser}
 									setProjectAdviser={setProjectAdviser}
-									refresh={refresh}
 								/>
 							))}
 							{documentsGrouped.length === 0 && (

@@ -4,7 +4,7 @@ import type { Deadlines } from '../interface/deadlines';
 import { apiInstructorUrl } from '@/Routes/http';
 import DeadlinesComponent from '../components/DeadlinesComponent';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
-import { instructorId } from '@/components/functions/functions';
+import { information } from '@/components/functions/functions';
 const DocumentDeadlines = () => {
 	const [loading, setLoading] = useState(false);
 	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
@@ -13,13 +13,16 @@ const DocumentDeadlines = () => {
 	const fetchDeadlines = async () => {
 		setLoading(true);
 		try {
-			const res = await fetch(`${apiInstructorUrl}/deadlines/${instructorId}`, {
-				method: 'GET',
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
+			const res = await fetch(
+				`${apiInstructorUrl}/deadlines/${information.id}`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
 				},
-			});
+			);
 			const data = await res.json();
 			await setProjects(data.projects);
 			await setDeadlines(data.deadlines);

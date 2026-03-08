@@ -7,7 +7,7 @@ import type {
 } from '../interface/consultation';
 import { apiAdviserUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
-import { adviserId } from '@/components/functions/functions';
+import { adviserId, userToken } from '@/components/functions/functions';
 
 const AdviserConsultation = () => {
 	const [availabilities, setAvabilities] = useState<AdviserAvailabilityProps[]>(
@@ -22,6 +22,7 @@ const AdviserConsultation = () => {
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 			});
 			if (!res.ok) throw new Error('Failed to fetch data');

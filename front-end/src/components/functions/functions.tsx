@@ -31,6 +31,9 @@ export const instructorId = 1;
 export const START_HOUR = 7;
 export const END_HOUR = 19;
 export const user = JSON.parse(localStorage.getItem('user') || '{}');
+export const information = JSON.parse(localStorage.getItem('data') || '{}');
+export const projectId = JSON.parse(localStorage.getItem('project') || '{}');
+export const userToken = localStorage.getItem('token');
 
 export function formatDateWithTime(dateString: string) {
 	const date = new Date(dateString);
@@ -186,9 +189,10 @@ export const getDateLabel = (dateStr: string): string => {
 };
 
 export const studentIds = (project?: ProponentsDocumentsProps | null) => {
-	return (project?.details.map((d) => d.student_id) ?? []).filter(
-		(id) => id !== undefined,
-	);
+	return [
+		project?.group_leader.id,
+		...(project?.details.map((d) => d.student_id) ?? []),
+	].filter((id) => id !== undefined);
 };
 
 // Generate time slots based on meeting duration

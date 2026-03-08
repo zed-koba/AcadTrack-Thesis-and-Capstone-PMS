@@ -16,14 +16,24 @@ class TaskListsController extends Controller
     //
     public function getTaskList($id)
     {
-        if(!$id) {
+        if (!$id) {
             return response()->json(['message' => 'Cant find the id']);
         }
+
         $project_detail = ProponentsDetails::where('student_id', $id)->first();
-        $project = Proponents::where('proponents_id', $project_detail->foreign_proponents_id)->with('adviser', 'details')->first();
+        $proponent_id = $project_detail->foreign_proponents_id ?? "";
+        if (!$project_detail) {
+            $getProject = Proponents::where('student_id', $id)->first();
+            $proponent_id = $getProject->proponents_id;
+        }
+        $project = Proponents::where('proponents_id', $proponent_id)->with('adviser', 'details', 'groupLeader:id,name,instructor_id,program_id', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->first();
         $student = Students::with('instructor', 'account')->findOrFail($id);
-        $tasks = TaskLists::where('foreign_proponents_id', $project_detail->foreign_proponents_id)->get();
-        $deadlines = DocumentsDeadline::where('instructor_id', $student->instructor_id)->with('instructor')->get();
+        $tasks = TaskLists::where('foreign_proponents_id', $proponent_id)->get();
+        $deadlines = DocumentsDeadline::where('instructor_id', $student->instructor_id)
+            ->whereDate('deadline', '>=', now())
+            ->whereDate('deadline', '<=', now()->addDays(14))
+            ->with('instructor')
+            ->get();
         return response()->json([
             'message' => 'Sucessfully fetch tasks',
             'status' => 200,
@@ -75,14 +85,14 @@ class TaskListsController extends Controller
 
     public function updateTask($id)
     {
-        if(!$id) {
+        if (!$id) {
             return response()->json(['message' => 'Cant find the task']);
         }
         DB::beginTransaction();
         try {
             $task = TaskLists::findOrFail($id);
             $task->update([
-                'is_completed' => $task->is_completed ? 0 : 1,  
+                'is_completed' => $task->is_completed ? 0 : 1,
             ]);
 
             DB::commit();
@@ -100,8 +110,9 @@ class TaskListsController extends Controller
         }
     }
 
-    public function deleteTask($id) {
-        if(!$id) {
+    public function deleteTask($id)
+    {
+        if (!$id) {
             return response()->json(['message' => 'Cant find the task']);
         }
         DB::beginTransaction();
@@ -110,8 +121,7 @@ class TaskListsController extends Controller
             $task->delete();
 
             DB::commit();
-            
-        }catch(\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occured while deleting the task',
                 'error' => $e->getMessage(),

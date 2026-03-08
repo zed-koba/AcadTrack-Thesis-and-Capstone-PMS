@@ -1,26 +1,36 @@
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
-import { apiStudentUrl } from '@/Routes/http';
+import { apiInstructorUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import GroupsComponent from '../components/GroupsComponent';
+import { information } from '@/components/functions/functions';
+import type { DocumentProps } from '@/components/Student/interface/document';
+import type { Deadlines } from '../interface/deadlines';
 
 const StudentGroups = () => {
 	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [documents, setDocuments] = useState<DocumentProps[]>([]);
+	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
 	const fetchProponents = async () => {
 		try {
-			const res = await fetch(`${apiStudentUrl}/documents`, {
-				method: 'GET',
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
+			const res = await fetch(
+				`${apiInstructorUrl}/documents/${information.id}`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
 				},
-			});
+			);
 
 			const result = await res.json();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
 				await setProjects(result.projects);
+				await setDocuments(result.document);
+				await setDeadlines(result.deadline);
 				return result.document;
 			}
 		} catch (error) {
@@ -49,7 +59,11 @@ const StudentGroups = () => {
 					<Spinner className="size-8" />
 				</div>
 			) : (
-				<GroupsComponent projects={projects} />
+				<GroupsComponent
+					projects={projects}
+					documents={documents}
+					deadlines={deadlines}
+				/>
 			)}
 		</>
 	);

@@ -1,10 +1,11 @@
-import { apiStudentUrl } from '@/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import DocumentDashboard from '../components/StudentDocumentsComponents/DocumentDashboard';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import DocumentContent from '../components/StudentDocumentsComponents/DocumentContent';
 import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
+import { information, userToken } from '@/components/functions/functions';
 
 const StudentDocument = () => {
 	const [loading, setLoading] = useState(true);
@@ -15,21 +16,23 @@ const StudentDocument = () => {
 
 	const fetchDocuments = async () => {
 		try {
-			const res = await fetch(`${apiStudentUrl}/documents`, {
+			const res = await fetch(`${apiAdviserUrl}/documents/${information.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 			});
 
 			const result = await res.json();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
-				await setDocuments(result.document);
-				await setProjects(result.projects);
+				setDocuments(result.document);
+				setProjects(result.projects);
 				return result.document;
 			}
+			console.log(result);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -40,6 +43,7 @@ const StudentDocument = () => {
 	useEffect(() => {
 		fetchDocuments();
 	}, []);
+
 	const refresh = async () => {
 		const updatedDocs = await fetchDocuments();
 

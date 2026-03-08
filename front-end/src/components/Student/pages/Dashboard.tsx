@@ -1,4 +1,4 @@
-import { formatDate, studentId, user } from '@/components/functions/functions';
+import { formatDate, information } from '@/components/functions/functions';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,11 +12,10 @@ import { apiStudentUrl } from '@/Routes/http';
 import { differenceInDays, format } from 'date-fns';
 import {
 	BookOpen,
-	CalendarClock,
 	CalendarIcon,
 	Check,
+	CircleCheck,
 	Copy,
-	FileText,
 	ListChecks,
 	Plus,
 	Timer,
@@ -31,7 +30,7 @@ import type {
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import axios from 'axios';
+
 import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -41,7 +40,8 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+
+import { Spinner } from '@/components/ui/spinner';
 
 const Dashboard = () => {
 	const [project, setProject] = useState<ProjectProps | undefined>();
@@ -56,7 +56,7 @@ const Dashboard = () => {
 	const fetchDeadlines = async () => {
 		setLoading(true);
 		try {
-			const res = await fetch(`${apiStudentUrl}/tasks/${studentId}`, {
+			const res = await fetch(`${apiStudentUrl}/tasks/${information.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',
@@ -177,6 +177,7 @@ const Dashboard = () => {
 	useEffect(() => {
 		fetchDeadlines();
 	}, []);
+
 	const completedCount = tasks?.filter((d) => d.is_completed === 1).length;
 	const progressPercent =
 		tasks?.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
@@ -193,7 +194,12 @@ const Dashboard = () => {
 						</div>
 					</div>
 				</div>
-				{!project && (
+				{loading && (
+					<div className="w-full h-full flex justify-center items-center text-muted-foreground">
+						<Spinner className="size-8" />
+					</div>
+				)}
+				{!loading && !project && (
 					<div className="flex flex-col justify-center items-center opacity-50 h-full">
 						<BookOpen className="h-24 w-24 text-muted-foreground" />
 						<p className="text-mb text-muted-foreground font-medium">
@@ -202,7 +208,7 @@ const Dashboard = () => {
 						</p>
 					</div>
 				)}
-				{project && (
+				{!loading && project && (
 					<>
 						<Card className="mb-6">
 							<CardHeader className="pb-3">
@@ -269,7 +275,9 @@ const Dashboard = () => {
 												Group Leader
 											</p>
 										</div>
-										<p className="text-sm font-medium">N/A</p>
+										<p className="text-sm font-medium">
+											{project.group_leader.name}
+										</p>
 									</div>
 									<div className="space-y-1">
 										<p className="text-xs text-muted-foreground">
@@ -290,35 +298,44 @@ const Dashboard = () => {
 										<Timer className="h-5 w-5" />
 										Deadlines
 									</CardTitle>
-									<Badge variant="secondary">{deadlines.length} active</Badge>
+									<Badge variant="default">{deadlines.length} active</Badge>
 								</CardHeader>
 								<CardContent className="space-y-3">
-									{deadlines.map((deadline) => {
-										const daysInfo = getDaysLabel(deadline.deadline);
-										return (
-											<div
-												key={deadline.id}
-												className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
-											>
-												<div className="flex-1 min-w-0">
-													<p className="font-medium text-sm truncate">
-														{deadline.document_title}
-													</p>
-													<p className="text-xs text-muted-foreground mt-0.5">
-														{deadline.instructor.name}
-													</p>
-													<p className="text-xs text-muted-foreground mt-0.5">
-														Due: {format(deadline.deadline, 'MMM d, yyyy')}
-													</p>
+									{deadlines.length === 0 && (
+										<div className="flex flex-col gap-2 items-center justify-center pt-5">
+											<CircleCheck className="text-muted-foreground w-8 h-8" />
+											<p className="text-sm text-muted-foreground font-medium">
+												There's no upcoming deadlines in next 14 days.
+											</p>
+										</div>
+									)}
+									{deadlines.length > 0 &&
+										deadlines.map((deadline) => {
+											const daysInfo = getDaysLabel(deadline.deadline);
+											return (
+												<div
+													key={deadline.id}
+													className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
+												>
+													<div className="flex-1 min-w-0">
+														<p className="font-medium text-sm truncate">
+															{deadline.document_title}
+														</p>
+														<p className="text-xs text-muted-foreground mt-0.5">
+															{deadline.instructor.name}
+														</p>
+														<p className="text-xs text-muted-foreground mt-0.5">
+															Due: {format(deadline.deadline, 'MMM d, yyyy')}
+														</p>
+													</div>
+													<div className="text-right ml-3 shrink-0">
+														<p className={`text-xs ${daysInfo.className}`}>
+															{daysInfo.text}
+														</p>
+													</div>
 												</div>
-												<div className="text-right ml-3 shrink-0">
-													<p className={`text-xs ${daysInfo.className}`}>
-														{daysInfo.text}
-													</p>
-												</div>
-											</div>
-										);
-									})}
+											);
+										})}
 								</CardContent>
 							</Card>
 

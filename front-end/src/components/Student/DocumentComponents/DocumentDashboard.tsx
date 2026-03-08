@@ -11,12 +11,15 @@ import {
 import type { DocumentDashboardProps } from '../interface/document';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { information } from '@/components/functions/functions';
 
 const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
 	const studentIds = project?.details.map((v) => v.student_id);
-	const filterStudent = documents.filter((d) =>
-		studentIds?.includes(d.student_id),
+	const filterStudent = documents.filter(
+		(d) =>
+			studentIds?.includes(d.student_id) || d.student_id === information.id,
 	);
+
 	const pendingLength = filterStudent.filter(
 		(d) => d.status === 'pending',
 	).length;
@@ -112,7 +115,7 @@ const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
 										</strong>
 									</span>
 									<span>•</span>
-									<span>{project?.details[0].student.program.name}</span>
+									<span>{project?.group_leader.program.name}</span>
 									<span>•</span>
 									<Badge variant="secondary">
 										{project?.details.length} member

@@ -158,7 +158,6 @@ const DocumentContent = ({
 												onToggle={() => toggleProject(project.proponents_id)}
 												onSelectDocument={setSelectedDocument}
 												selectedDocument={selectedDocument}
-												refresh={refresh}
 												projectAdviser={project.adviser}
 												setProjectAdviser={setProjectAdviser}
 											/>

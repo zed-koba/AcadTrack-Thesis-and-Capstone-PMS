@@ -91,7 +91,6 @@ const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 					toast.success(result.message);
 					setOpen(false);
 					refresh?.();
-					console.log(result.documents);
 				}
 			} catch (error) {
 				console.log(error);
@@ -175,16 +174,7 @@ const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 												<FieldLabel htmlFor={field.name}>
 													Document Title *
 												</FieldLabel>
-												{/* <Input
-													id={field.name}
-													name={field.name}
-													value={field.state.value}
-													onBlur={field.handleBlur}
-													onChange={(e) => field.handleChange(e.target.value)}
-													aria-invalid={isInvalid}
-													placeholder={'Ex. Rationale Draft Review'}
-													autoComplete="off"
-												/> */}
+
 												<Select
 													name={field.name}
 													defaultValue={field.state.value}
@@ -196,7 +186,13 @@ const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 														aria-invalid={isInvalid}
 														id={field.name}
 													>
-														<SelectValue placeholder="Select Document" />
+														<SelectValue
+															placeholder={
+																deadlines.length > 0
+																	? 'Select a document'
+																	: 'No deadline has been scheduled yet'
+															}
+														/>
 													</SelectTrigger>
 													<SelectContent>
 														{deadlines.map((deadline) => (

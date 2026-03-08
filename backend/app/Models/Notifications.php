@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Notifications extends Model
 {
     //
-    protected $fillable = ['student_id', 'foreign_proponents_id', 'adviser_id', 'type', 'message', 'read_at'];
+    protected $fillable = ['instructor_id', 'foreign_proponents_id', 'adviser_id', 'type', 'message', 'read_at', 'title'];
 
     protected $table = "notifications";
 
@@ -19,8 +19,8 @@ class Notifications extends Model
         return $this->belongsTo(Proponents::class, 'foreign_proponents_id', 'proponents_id');
     }
 
-    public function student(): BelongsTo {
-        return $this->belongsTo(Students::class, 'student_id');
+    public function instructor(): BelongsTo {
+        return $this->belongsTo(Students::class, 'instructor_id');
     }
 
     public function adviser(): BelongsTo {

@@ -136,7 +136,6 @@ const StudentDetailsForm = ({
 							<SelectContent>
 								<SelectItem value="3">3rd Year</SelectItem>
 								<SelectItem value="4">4th Year</SelectItem>
-								<SelectItem value="5">5th Year</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>

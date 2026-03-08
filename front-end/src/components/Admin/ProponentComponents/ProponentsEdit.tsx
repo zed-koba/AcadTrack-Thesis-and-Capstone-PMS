@@ -143,7 +143,7 @@ const ProponentsEdit = ({
 				adviser: proponent.adviser_id,
 				studentsId: updatedStudentsIds,
 			});
-			``;
+
 			setUpdatedStudentsIds(studentsIds);
 			setSelectedAdviserId(proponent.adviser_id);
 		}

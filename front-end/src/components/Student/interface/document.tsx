@@ -14,6 +14,7 @@ export type DocumentProps = {
 	size: number;
 	parent_document_id: number | null;
 	version: number;
+	passed_date: Date;
 	created_at: string;
 	updated_at: string;
 	versions: DocumentProps[];
@@ -22,6 +23,12 @@ export type DocumentProps = {
 		id: number;
 		name: string;
 		student_id: string;
+		proponent_detail: {
+			foreign_proponents_id: string;
+		};
+		project: {
+			proponents_id: string;
+		};
 	};
 };
 

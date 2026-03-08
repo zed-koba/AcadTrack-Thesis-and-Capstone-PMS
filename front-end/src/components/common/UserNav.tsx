@@ -1,5 +1,4 @@
 import { Menu } from 'lucide-react';
-import NotificationBell from './NotificationBell';
 
 const UserNav = () => {
 	return (
@@ -8,9 +7,7 @@ const UserNav = () => {
 				<div className="text-white py-2">
 					<Menu className="w-5 h-5" />
 				</div>
-				<div className="flex gap-3">
-					<NotificationBell />
-				</div>
+				<div className="flex gap-3"></div>
 			</div>
 		</>
 	);

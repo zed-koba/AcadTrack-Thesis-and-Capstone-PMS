@@ -5,13 +5,20 @@ import type { AdviserProps } from './Admin/interface/adviser';
 import type { InstructorProps } from './Admin/interface/instructor';
 import type { DepartmentProps } from './Admin/interface/department';
 import type { ProgramsProps } from './Admin/interface/programs';
-import type { StudentDetails } from './Student/interface/project-setup';
-import { apiStudentUrl } from '@/Routes/http';
+import type {
+	ProjectDetails,
+	StudentDetails,
+} from './Student/interface/project-setup';
+import { api as apiUrl, apiStudentUrl } from '@/Routes/http';
 import StudentDetailsForm from './Student/ProjectSetupComponents/StudentDetailsForm';
 import ModeSelector from './Student/ProjectSetupComponents/ModeSelector';
 import CreateProjectForm from './Student/ProjectSetupComponents/CreateProjectForm';
 import JoinProjectForm from './Student/ProjectSetupComponents/JoinProjectForm';
-import type { ProponentsProps } from './Admin/interface/proponent';
+import { toast } from 'sonner';
+import { studentId } from './functions/functions';
+import { Toaster } from './ui/sonner';
+import api from '@/lib/api';
+
 const StudentProjectSetup = () => {
 	const navigate = useNavigate();
 	const [step, setStep] = useState<'details' | 'select' | 'create' | 'join'>(
@@ -21,8 +28,19 @@ const StudentProjectSetup = () => {
 	const [instructors, setInstructors] = useState<InstructorProps[]>([]);
 	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 	const [programs, setPrograms] = useState<ProgramsProps[]>([]);
-	const [projects, setProjects] = useState<ProponentsProps[]>([]);
-
+	const [projects, setProjects] = useState<ProjectDetails[]>([]);
+	const handleLogout = async () => {
+		try {
+			await api.post(`${apiUrl}/logout`);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			localStorage.removeItem('token');
+			localStorage.removeItem('user');
+			localStorage.removeItem('data');
+			navigate('/Login');
+		}
+	};
 	const fetchData = async () => {
 		try {
 			const res = await fetch(`${apiStudentUrl}/project-setup`, {
@@ -45,10 +63,38 @@ const StudentProjectSetup = () => {
 			console.log(error);
 		}
 	};
-	const [, setStudentDetails] = useState<StudentDetails | null>(null);
 
-	const handleDetailsComplete = (details: StudentDetails) => {
-		setStudentDetails(details);
+	const handleDetailsComplete = async (details: StudentDetails) => {
+		try {
+			const res = await fetch(
+				`${apiStudentUrl}/project-setup/updateStudent/${studentId}`,
+				{
+					method: 'PUT',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+					},
+					body: JSON.stringify(details),
+				},
+			);
+			const result = await res.json();
+			if (result.status === 422) {
+				const errors = result.errors as Record<string, string[]>;
+				Object.values(errors).forEach((errorMessages) =>
+					errorMessages.forEach((message) => toast.error(message)),
+				);
+				return;
+			}
+			if (!res.ok) {
+				console.log('Failed to fetch data ' + JSON.stringify(details));
+				return JSON.stringify(details);
+			}
+			if (result.status === 200) {
+				toast.success(result.message);
+			}
+		} catch (error) {
+			console.log(error);
+		}
 		setStep('select');
 	};
 
@@ -58,8 +104,10 @@ const StudentProjectSetup = () => {
 	useEffect(() => {
 		fetchData();
 	}, []);
+
 	return (
 		<div className="min-h-screen bg-background flex items-center justify-center p-4">
+			<Toaster position="top-center" />
 			<div className="w-full max-w-2xl">
 				{/* Header */}
 				<div className="text-center mb-8">
@@ -97,7 +145,7 @@ const StudentProjectSetup = () => {
 				{step === 'create' && (
 					<CreateProjectForm
 						onBack={() => setStep('select')}
-						onSuccess={() => navigate('/student')}
+						onSuccess={() => navigate('/Student')}
 						advisers={advisers}
 						instructors={instructors}
 					/>
@@ -105,10 +153,15 @@ const StudentProjectSetup = () => {
 				{step === 'join' && (
 					<JoinProjectForm
 						onBack={() => setStep('select')}
-						onSuccess={() => navigate('/student')}
+						onSuccess={() => navigate('/Student')}
 						projects={projects}
 					/>
 				)}
+				<div className="text-center mt-8 cursor-pointer" onClick={handleLogout}>
+					<p className="text-muted-foreground font-medium text-lg underline">
+						Logout
+					</p>
+				</div>
 			</div>
 		</div>
 	);

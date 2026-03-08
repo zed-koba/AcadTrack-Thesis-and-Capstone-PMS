@@ -17,6 +17,7 @@ class Proponents extends Model
         'academic_yr',
         'title',
         'adviser_id',
+        'student_id',
     ];
 
     public function details(): HasMany
@@ -31,6 +32,10 @@ class Proponents extends Model
     public function adviser(): BelongsTo
     {
         return $this->belongsTo(Advisers::class, 'adviser_id');
+    }
+
+    public function groupLeader(): BelongsTo {
+        return $this->belongsTo(Students::class, 'student_id');
     }
     protected static function booted()
     {

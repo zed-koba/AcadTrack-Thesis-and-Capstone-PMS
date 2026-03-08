@@ -11,9 +11,15 @@ class NotificationsController extends Controller
 {
     //
 
-    public function getNotifications()
+    public function getNotifications($id, $role)
     {
-        $notification = Notifications::with('student:id,name', 'project:proponents_id,title', 'adviser:id,name')->orderBy('created_at', 'DESC')->get();
+        if($role === "student") {
+            $notification = Notifications::where("foreign_proponents_id", $id)->with("project.groupLeader.instructor:id,name", "adviser:id,name")->orderBy('created_at', 'DESC')->get();
+        }else if($role === "instructor") {
+            $notification = Notifications::where('instructor_id', $id)->with("project", "project.details")->orderBy('created_at', 'DESC')->get();
+        }else if($role === "adviser") {
+            $notification = Notifications::where('adviser_id', $id)->with("project", "project.details")->orderBy('created_at', 'DESC')->get();
+        }
 
         return response()->json([
             'status' => 200,
@@ -45,14 +51,14 @@ class NotificationsController extends Controller
     public function storeNotification(Request $request)
     {
         $rules = [
-            'student_id' => 'required|integer',
-            'adviser_id' => 'required|integer',
+            'instructor_id' => 'nullable|integer',
+            'adviser_id' => 'nullable|integer',
             'foreign_proponents_id' => 'required|string',
             'type' => 'required|string',
             'message' => 'required|string',
         ];
         $validator = Validator::make($request->all(), $rules);
-        if ($validator->fail()) {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => 422,
                 'errors' => $validator->errors(),

@@ -20,18 +20,24 @@ const ConsultationDashboard = ({
 	const filterCancelled = weeklies.filter(
 		(w) =>
 			(w.status === 'cancelled' || w.status === 'rejected') &&
-			studentIds(project).includes(w.student_id),
+			(studentIds(project).includes(w.student_id) ||
+				project?.student_id === w.student_id),
 	);
 	const filterCompleted = weeklies.filter(
 		(w) =>
-			w.status === 'completed' && studentIds(project).includes(w.student_id),
+			w.status === 'completed' &&
+			(studentIds(project).includes(w.student_id) ||
+				project?.student_id === w.student_id),
 	);
 	const filterExpired = weeklies.filter(
-		(w) => w.status === 'expired' && studentIds(project).includes(w.student_id),
+		(w) =>
+			w.status === 'expired' &&
+			(studentIds(project).includes(w.student_id) ||
+				project?.student_id === w.student_id),
 	);
 	const now = new Date();
 	const upcomingSessions = weeklies.filter((s) => {
-		if (s.status !== 'approved') return false;
+		if (s.status !== 'upcoming') return false;
 
 		const endDateTime = new Date(`${s.date}T${s.end_time}`);
 
@@ -64,6 +70,7 @@ const ConsultationDashboard = ({
 			icon: <CalendarX className="h-6 w-6 text-slate-200" />,
 		},
 	];
+
 	return (
 		<>
 			<div className="flex lg:max-xl:grid lg:max-xl:grid-rows-[6rem_1fr] xl:flex-col gap-4 mt-5 w-auto">
@@ -82,7 +89,7 @@ const ConsultationDashboard = ({
 								<div>
 									<h4 className="font-semibold">{project?.title}</h4>
 									<p className="text-sm text-muted-foreground">
-										{project?.details[0].student.program.name}
+										{project?.group_leader.instructor.name}
 									</p>
 								</div>
 							</div>

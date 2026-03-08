@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\admin\ProponentsDetails;
 use Illuminate\Http\Request;
 use App\Models\admin\Accounts;
+use App\Models\admin\Advisers;
+use App\Models\admin\Instructors;
+use App\Models\admin\Proponents;
+use App\Models\admin\Students;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +35,7 @@ class AccountsController extends Controller
     ];
     $messages = [ 
       'student_id.unique' => 'Student ID already exists',
-      'email.unique' => 'Email already exists',
+      'email.unique:accounts,email' => 'Email already exists',
     ];
     $validator = Validator::make($request->all(), $rules, $messages);
     if ($validator->fails()) {
@@ -47,7 +52,7 @@ class AccountsController extends Controller
       $account = new Accounts();
       $account->email = $request->email;
       $account->password = Hash::make($request->password);
-      $account->role = 'student';
+      $account->role = $request->role;
       $account->save();
       $token = $account->createToken('auth_token')->plainTextToken;
       if($request->role === 'student') {
@@ -176,11 +181,30 @@ class AccountsController extends Controller
       ], 401);
     }
     $token = $account->createToken('auth_token')->plainTextToken;
+    $project = null;
+    switch($account->role) {
+      case 'student':
+        $data = Students::where('account_id', $account->id)->first();
+        $project = Proponents::select("proponents_id")->where("student_id", $data->id)->first();
+        if(!$project) {
+          $project = ProponentsDetails::select("foreign_proponents_id")->where("student_id", $account->id)->first();
+        }
+        break;
+      case 'instructor':
+        $data = Instructors::where('account_id', $account->id)->first();
+        break;
+      case 'adviser':
+        $data = Advisers::where('account_id', $account->id)->first();
+        break;
+    }
+
     return response()->json([
       'status' => 200,
       'message' => 'Successfully logged in',
       'user' => $account,
       'token' => $token,
+      'data' => $data,
+      'project' => $project,
     ], 200);
   }
   public function logout(Request $request)

@@ -16,6 +16,10 @@ export type ProjectProps = ProponentsProps & {
 		id: number;
 		name: string;
 	};
+	group_leader: {
+		id: number;
+		name: string;
+	};
 };
 
 export type StudentDetailsProps = StudentProps & {

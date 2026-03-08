@@ -29,7 +29,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { apiAdviserUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import DeleteSchedule from './DeleteSchedule';
-import { generateTimeSlots } from '@/components/functions/functions';
+import { generateTimeSlots, userToken } from '@/components/functions/functions';
 
 const availabilitySchema = z.object({
 	day: z.string().optional().nullable(),
@@ -47,40 +47,11 @@ const AvailabilityConsultation = ({
 	const [endTime, setEndTime] = useState<string | undefined>();
 	const [scheduleId, setScheduleId] = useState(0);
 	const [open, setOpen] = useState(false);
-	// const [meetingDuration, setMeetingDuration] = useState(
-	// 	availabilities[0].adviser.duration,
-	// );
-	// const [maxDailyBookings, setMaxDailyBookings] = useState(
-	// 	availabilities[0].adviser.consultation_limit || 4,
-	// );
-	// const [hasChanges, setHasChanges] = useState(false);
 
-	const AVAIL_TIME = [
-		'7:00 AM',
-		'8:00 AM',
-		'9:00 AM',
-		'10:00 AM',
-		'11:00 AM',
-		'12:00 PM',
-		'1:00 PM',
-		'2:00 PM',
-		'3:00 PM',
-		'4:00 PM',
-		'5:00 PM',
-		'6:00 PM',
-		'7:00 PM',
-	];
 	const timeSlots: string[] = useMemo(
 		() => generateTimeSlots(15).map((slot) => to12HourTime(slot.time)),
 		[],
 	);
-
-	// const DURATION_OPTIONS = [
-	// 	{ value: 15, label: '15 minutes' },
-	// 	{ value: 30, label: '30 minutes' },
-	// 	{ value: 45, label: '45 minutes' },
-	// 	{ value: 60, label: '60 minutes' },
-	// ];
 
 	type formValues = z.infer<typeof availabilitySchema>;
 	const defaultValues: formValues = {
@@ -106,6 +77,7 @@ const AvailabilityConsultation = ({
 					headers: {
 						'Content-type': 'application/json',
 						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
 					body: JSON.stringify(payLoad),
 				});
@@ -145,44 +117,7 @@ const AvailabilityConsultation = ({
 			}
 		},
 	});
-	// const handleSaveChanges = async () => {
-	// 	const payLoad = {
-	// 		id: availabilities[0].adviser_id,
-	// 		consultation_limit: maxDailyBookings,
-	// 		duration: meetingDuration,
-	// 	};
-	// 	try {
-	// 		const res = await fetch(`${apiAdviserUrl}/availabilities/update`, {
-	// 			method: 'PUT',
-	// 			headers: {
-	// 				'Content-type': 'application/json',
-	// 				Accepts: 'application/json',
-	// 			},
-	// 			body: JSON.stringify(payLoad),
-	// 		});
-	// 		const result = await res.json();
-	// 		if (result.status === 500) {
-	// 			console.log(result.message);
-	// 			console.log(result.error);
-	// 			return;
-	// 		}
 
-	// 		if (result.status === 422) {
-	// 			console.log(result.errors);
-	// 			return;
-	// 		}
-
-	// 		if (!res.ok) console.log(result.status);
-	// 		if (result.status === 200) {
-	// 			toast.success(result.message);
-	// 			refresh?.();
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 	} finally {
-	// 		setHasChanges(false);
-	// 	}
-	// };
 	const validEndTimes = useMemo(() => {
 		if (!selectedDay || !startTime) return [];
 
@@ -197,82 +132,6 @@ const AvailabilityConsultation = ({
 	}, [selectedDay, availabilities]);
 	return (
 		<>
-			{/*<Card className="border-border mb-4">
-				<CardHeader className="pb-4 flex justify-between items-center">
-					<div className="flex items-center gap-3">
-						<div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-							<Settings className="h-5 w-5 text-primary" />
-						</div>
-						<div>
-							<CardTitle className="text-lg">Meeting Settings</CardTitle>
-							<CardDescription>
-								Configure your consultation preferences
-							</CardDescription>
-						</div>
-					</div>
-					{hasChanges && (
-						<Button onClick={handleSaveChanges} className="gap-2">
-							<Save className="h-4 w-4" />
-							Save Changes
-						</Button>
-					)}
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<div className="grid sm:grid-cols-2 gap-6">
-						
-						<div className="space-y-2 w-full">
-							<Label>Meeting Duration</Label>
-							<Select
-								value={String(meetingDuration)}
-								onValueChange={(v) => {
-									setMeetingDuration(Number(v) as 15 | 30 | 45 | 60);
-									setHasChanges(true);
-								}}
-							>
-								<SelectTrigger className="w-full">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									{DURATION_OPTIONS.map((opt) => (
-										<SelectItem key={opt.value} value={String(opt.value)}>
-											{opt.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<p className="text-xs text-muted-foreground">
-								Each booking slot will be {meetingDuration} minutes
-							</p>
-						</div>
-
-					
-						<div className="space-y-2">
-							<Label>Max Daily Consultations</Label>
-							<Select
-								value={String(maxDailyBookings)}
-								onValueChange={(v) => {
-									setMaxDailyBookings(Number(v));
-									setHasChanges(true);
-								}}
-							>
-								<SelectTrigger className="w-full">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									{[4, 6, 8, 10, 12, 15, 20].map((num) => (
-										<SelectItem key={num} value={String(num)}>
-											{num} consultations
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<p className="text-xs text-muted-foreground">
-								Maximum consultations per day
-							</p>
-						</div>
-					</div>
-				</CardContent>
-			</Card>*/}
 			<Card className="bg-card border-border">
 				<CardHeader>
 					<CardTitle className="text-xl font-semibold flex items-center gap-2">

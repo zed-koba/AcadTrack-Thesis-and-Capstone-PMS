@@ -1,5 +1,6 @@
 import { apiAdviserUrl } from '@/Routes/http';
 import type { DocumentProps } from '@/components/Student/interface/document';
+import { information, userToken } from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -60,12 +61,20 @@ const CommentAddDialog = ({
 					document_id: document?.id,
 					comment: value.comment,
 					comment_type: value.comment_type,
+					adviser_id: information.id,
+					foreign_proponents_id: document?.student.proponent_detail
+						? document?.student.proponent_detail.foreign_proponents_id
+						: document?.student.project.proponents_id,
+					adviser_name: information.name,
+					document_title: document?.title_name,
 				};
+
 				const res = await fetch(`${apiAdviserUrl}/comments/add`, {
 					method: 'POST',
 					headers: {
 						'Content-type': 'application/json',
 						Accepts: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
 					body: JSON.stringify(payLoad),
 				});

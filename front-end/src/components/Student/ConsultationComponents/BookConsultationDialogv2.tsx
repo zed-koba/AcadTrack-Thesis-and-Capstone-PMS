@@ -30,6 +30,7 @@ import {
 	getDayNumber,
 	getTime,
 	studentId,
+	userToken,
 } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
 import { apiStudentUrl } from '@/Routes/http';
@@ -196,6 +197,7 @@ const BookConsultationDialog = ({
 			start_time: selectedWindow?.start_time.slice(0, 5),
 			end_time: selectedWindow?.end_time.slice(0, 5),
 			purpose: purpose.trim(),
+			project_name: project?.title,
 		};
 
 		try {
@@ -204,6 +206,7 @@ const BookConsultationDialog = ({
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 				body: JSON.stringify(payLoad),
 			});

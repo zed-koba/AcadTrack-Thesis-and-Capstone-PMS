@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ChapterItem from './ChapterItem';
+import { information } from '@/components/functions/functions';
 
 const DocumentContent = ({
 	documents,
@@ -16,7 +17,11 @@ const DocumentContent = ({
 }: DocumentContentProps) => {
 	const studentIds = project?.details.map((v) => v.student_id);
 	const filterDocuments = useMemo(() => {
-		return documents.filter((doc) => studentIds?.includes(doc.student_id));
+		return documents.filter(
+			(doc) =>
+				studentIds?.includes(doc.student_id) ||
+				doc.student_id === information.id,
+		);
 	}, [documents, studentIds]);
 
 	const [searchQuery, setSearchQuery] = useState('');

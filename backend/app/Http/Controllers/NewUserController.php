@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\admin\Accounts;
 use App\Models\admin\Advisers;
 use App\Models\admin\Departments;
 use App\Models\admin\Instructors;
@@ -23,7 +24,7 @@ class NewUserController extends Controller
         $departments = Departments::where('status', 'active')->get();
         $advisers = Advisers::where('status', 'active')->get();
         $programs = Programs::where('status', 'active')->get();
-        $projects = Proponents::orderBy('created_at', 'DESC')->get();
+        $projects = Proponents::with('details', 'adviser', 'details.student:id,name', 'groupLeader:id,name,instructor_id', 'groupLeader.instructor:id,name')->orderBy('created_at', 'DESC')->get();
 
         return response()->json([
             'status' => 200,
@@ -38,10 +39,10 @@ class NewUserController extends Controller
     public function updateStudent(Request $request, $id)
     {
         $rules = [
-            'department_id' => 'required|number',
-            'program_id' => 'required|number',
-            'semester' => 'required|number',
-            'yearLevel' => 'required|number',
+            'department_id' => 'required|integer',
+            'program_id' => 'required|integer',
+            'semester' => 'required|integer',
+            'yearLevel' => 'required|integer',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -59,7 +60,7 @@ class NewUserController extends Controller
                 'department_id' => $request->department_id,
                 'program_id' => $request->program_id,
                 'semester' => $request->semester,
-                'year_Level' => $request->yearLevel,
+                'year_level' => $request->yearLevel,
             ]);
             DB::commit();
             return response()->json([
@@ -82,14 +83,23 @@ class NewUserController extends Controller
         DB::beginTransaction();
         try { 
             ProponentsDetails::create(attributes: [
-                'foreign_proponents_id' => $request->proponent_id,
-                
+                'foreign_proponents_id' => $request->foreign_proponents_id,
+                'student_id' => $id,
             ]);
-
+            $project = Proponents::findOrFail($request->project_id);
+            $groupLeader = Students::findOrFail($project->student_id);
+            $student = Students::findOrFail($id);
+            $student->update([
+                'instructor_id' => $groupLeader->instructor_id, 
+            ]);
+            Accounts::findOrFail($student->account_id)->update([
+                'new_user' => 0,
+            ]);
             DB::commit();
             return response()->json([
                 'message' => 'Successfully joined',
                 'status' => 200,
+                'project' => $project,
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -97,6 +107,7 @@ class NewUserController extends Controller
                 'status' => 500,
                 'message' => 'An error occurred while updating the task.',
                 'error' => $e->getMessage(),
+                'request' => $request,
             ], 500);
         }
     }
@@ -106,6 +117,7 @@ class NewUserController extends Controller
             'academic_yr' => 'required|string',
             'title' => 'required|string',
             'adviser_id' => 'required|integer',
+            'instructor_id' => 'required|integer',
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -125,9 +137,13 @@ class NewUserController extends Controller
                 'adviser_id' => $request->adviser_id,
                 'student_id' => $id,
             ]);
-            ProponentsDetails::create(attributes: [
-                'foreign_proponents_id' => $proponents->proponents_id,
-                'student_id' => $id,
+            $student = Students::findOrFail($id);
+            $student->update([
+                'instructor_id' => $request->instructor_id
+            ]);
+
+            Accounts::findOrFail($student->account_id)->update([
+                'new_user' => 0,
             ]);
 
 
@@ -136,10 +152,7 @@ class NewUserController extends Controller
                 [
                     'status' => 201,
                     'message' => 'Sucessfully added project',
-                    'data' => [
-                        'proponent' => $proponents,
-                        'students_id' => $request->students_id,
-                    ],
+                    'project' => $proponents,
                 ],
                 201,
             );
@@ -153,4 +166,5 @@ class NewUserController extends Controller
             );
         }
     }
+    
 }

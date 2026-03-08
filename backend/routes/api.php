@@ -13,6 +13,7 @@ use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
 use App\Http\Controllers\adviser\DocumentCommentsController;
 use App\Http\Controllers\instructor\DocumentsDeadlineController;
+use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
@@ -23,6 +24,10 @@ use App\Http\Controllers\TaskListsController;
 // })->middleware('auth:sanctum');
 Route::post('/login', [AccountsController::class, 'loginAccount']);
 Route::post('/accounts/add', [AccountsController::class, 'storeAccount']);
+
+Route::middleware('auth:sanctum')->group(function() {
+    Route::post('/logout', [AccountsController::class, 'logout']);
+});
 
 Route::prefix("admin")->group(function () {
 
@@ -92,11 +97,13 @@ Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(fu
     //Adviser Comment
     Route::get('{id}/comments', [DocumentCommentsController::class, 'getComments']);
     Route::post('comments/add', [DocumentCommentsController::class, 'storeComment']);
+    //Documents
+    Route::get('documents/{id}', [DocumentsController::class, 'getStudentDocuments']);
 });
 
 Route::prefix("student")->group(function() {
     //Student Documents
-    Route::get('documents', [DocumentsController::class, 'getDocuments']);
+    Route::get('documents/{id}', [DocumentsController::class, 'getDocuments']);
     Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
     Route::get('{id}/download/pdf', [DocumentsController::class,'downloadDocument']);
     Route::put('documents/passed/{id}', [DocumentsController::class, 'passDocument']);
@@ -124,7 +131,10 @@ Route::prefix("instructor")->group(function() {
     Route::post('deadlines/add', [DocumentsDeadlineController::class, 'addDeadlines']);
     Route::put('deadlines/update/{id}', [DocumentsDeadlineController::class, 'updateDeadline']);
     Route::delete('deadlines/delete/{id}', [DocumentsDeadlineController::class, 'deleteDeadline']);
+
+    Route::get('datas/{id}', [InstructorController::class, 'getDatas']);
+    Route::get('documents/{id}', [DocumentsController::class, 'getDocuments']);
 });
 
-Route::get('notifications', [NotificationsController::class, 'getNotifications']);
+Route::get('notifications/{id}/{role}', [NotificationsController::class, 'getNotifications']);
 Route::put('notifications/read/{id}', [NotificationsController::class, 'readNotification']);

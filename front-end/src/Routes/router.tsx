@@ -27,6 +27,9 @@ import Login from '../components/Login';
 import RequireAuth from './RequireAuth';
 import PublicRoute from './PublicRoutes';
 import StudentProjectSetup from '@/components/ProjectSetup';
+import StudentNotifications from '@/components/Student/pages/StudentNotifications';
+import InstructorNotifications from '@/components/Instructor/pages/InstructorNotifications';
+import AdviserNotifications from '@/components/Adviser/pages/AdviserNotifications';
 
 export const router = createBrowserRouter([
 	{
@@ -73,11 +76,16 @@ export const router = createBrowserRouter([
 			},
 			{ path: 'Consultation', element: <AdviserConsultation /> },
 			{ path: 'Documents', element: <AdviserStudentDocument /> },
+			{ path: 'Notifications', element: <AdviserNotifications /> },
 		],
 	},
 	{
 		path: '/Student/Project-Setup',
-		element: <StudentProjectSetup />,
+		element: (
+			<RequireAuth allowedRoles={['student']}>
+				<StudentProjectSetup />
+			</RequireAuth>
+		),
 	},
 	{
 		path: '/Student',
@@ -93,6 +101,7 @@ export const router = createBrowserRouter([
 			},
 			{ path: 'Consultation', element: <StudentConsultation /> },
 			{ path: 'Document', element: <StudentDocument /> },
+			{ path: 'Notifications', element: <StudentNotifications /> },
 		],
 	},
 	{
@@ -105,6 +114,7 @@ export const router = createBrowserRouter([
 			},
 			{ path: 'Groups', element: <StudentGroups /> },
 			{ path: 'Deadlines', element: <DocumentDeadlines /> },
+			{ path: 'Notifications', element: <InstructorNotifications /> },
 		],
 	},
 	{
