@@ -30,6 +30,7 @@ import StudentProjectSetup from '@/components/ProjectSetup';
 import StudentNotifications from '@/components/Student/pages/StudentNotifications';
 import InstructorNotifications from '@/components/Instructor/pages/InstructorNotifications';
 import AdviserNotifications from '@/components/Adviser/pages/AdviserNotifications';
+import StudentDevelopmentProcess from '@/components/Student/pages/DevelopmentProcess';
 
 export const router = createBrowserRouter([
 	{
@@ -102,6 +103,7 @@ export const router = createBrowserRouter([
 			{ path: 'Consultation', element: <StudentConsultation /> },
 			{ path: 'Document', element: <StudentDocument /> },
 			{ path: 'Notifications', element: <StudentNotifications /> },
+			{ path: 'Development-Process', element: <StudentDevelopmentProcess /> },
 		],
 	},
 	{

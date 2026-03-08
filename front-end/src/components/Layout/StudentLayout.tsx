@@ -1,7 +1,13 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
-import { Bell, CalendarClock, FileText, LayoutDashboard } from 'lucide-react';
+import {
+	Bell,
+	CalendarClock,
+	FileText,
+	GitBranch,
+	LayoutDashboard,
+} from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import UserNav from '../common/UserNav';
 
@@ -26,6 +32,11 @@ const StundentLayout = () => {
 			label: 'Notifications',
 			to: '/Student/Notifications',
 			icon: <Bell className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'Development Process',
+			to: '/Student/Development-Process',
+			icon: <GitBranch className="w-5 h-5" strokeWidth={2.5} />,
 		},
 	];
 

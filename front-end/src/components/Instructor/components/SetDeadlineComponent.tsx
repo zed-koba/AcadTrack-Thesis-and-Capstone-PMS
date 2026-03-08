@@ -50,7 +50,7 @@ const SetDeadlineComponent = ({
 			const payLoad = {
 				instructor_id: instructorId,
 				document_title: value.document_title,
-				deadline: selectedDate?.toISOString().split('T')[0],
+				deadline: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
 			};
 
 			if (!selectedDate) {

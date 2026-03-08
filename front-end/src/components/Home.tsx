@@ -157,12 +157,7 @@ const Home = () => {
 				<div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
 					<div className="flex items-center gap-2 text-muted-foreground text-sm">
 						<GraduationCap className="h-4 w-4" />
-						<span>ThesisTrack © 2026</span>
-					</div>
-					<div className="flex gap-6 text-sm text-muted-foreground">
-						<span>Privacy</span>
-						<span>Terms</span>
-						<span>Support</span>
+						<span>AcadTrack © 2026</span>
 					</div>
 				</div>
 			</footer>

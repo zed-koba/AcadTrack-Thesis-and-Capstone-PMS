@@ -148,7 +148,7 @@ const WeeklyConsultation = ({
 				refresh?.();
 			}
 		});
-	}, [weeklies]);
+	}, [weeklies, refresh]);
 	const weekConsultations = useMemo(
 		() =>
 			weeklies.filter((c) => weekDays.some((day) => isSameDay(c.date, day))),

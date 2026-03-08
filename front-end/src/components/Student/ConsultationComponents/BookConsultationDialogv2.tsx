@@ -193,7 +193,7 @@ const BookConsultationDialog = ({
 		const payLoad = {
 			adviser_id: project?.adviser_id,
 			student_id: studentId,
-			date: format(selectedDate?.toISOString() ?? '', 'yyyy-MM-dd'),
+			date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
 			start_time: selectedWindow?.start_time.slice(0, 5),
 			end_time: selectedWindow?.end_time.slice(0, 5),
 			purpose: purpose.trim(),

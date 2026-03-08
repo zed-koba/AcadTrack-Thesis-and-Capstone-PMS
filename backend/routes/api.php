@@ -15,9 +15,11 @@ use App\Http\Controllers\adviser\DocumentCommentsController;
 use App\Http\Controllers\instructor\DocumentsDeadlineController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\student\DevelopmentProcessController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\TaskListsController;
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -124,6 +126,13 @@ Route::prefix("student")->group(function() {
     Route::put('project-setup/updateStudent/{id}', [NewUserController::class, 'updateStudent']);
     Route::post('project-setup/storeProject/{id}', [NewUserController::class, 'storeProject']);
     Route::post('project-setup/joinProject/{id}', [NewUserController::class, 'joinProject']);
+
+    //Development Process
+    Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getDevelopmentProcess']);
+    Route::post('development-process/store', [DevelopmentProcessController::class, 'storeDevelopmentProcess']);
+    Route::put('development-process/edit/{id}', [DevelopmentProcessController::class, 'editDevelopmentProcess']);
+    Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
+    Route::delete('development-process/delete/{id}', [DevelopmentProcessController::class, 'deleteDevelopmentProcess']);
 });
 
 Route::prefix("instructor")->group(function() {
