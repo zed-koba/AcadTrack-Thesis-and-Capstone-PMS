@@ -100,6 +100,7 @@ class NewUserController extends Controller
                 'message' => 'Successfully joined',
                 'status' => 200,
                 'project' => $project,
+                'student' => $student,
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();

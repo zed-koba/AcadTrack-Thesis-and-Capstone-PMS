@@ -61,6 +61,15 @@ export type DetailsDocumentsProps = {
 		instructor_id: number;
 		section: string;
 		id: number;
+		role_id: number;
+		account: {
+			id: number;
+			email: string;
+		};
+		role: {
+			id: number;
+			name: string;
+		};
 		document: {
 			id: number;
 			title_name: string;

@@ -31,6 +31,8 @@ import StudentNotifications from '@/components/Student/pages/StudentNotification
 import InstructorNotifications from '@/components/Instructor/pages/InstructorNotifications';
 import AdviserNotifications from '@/components/Adviser/pages/AdviserNotifications';
 import StudentDevelopmentProcess from '@/components/Student/pages/DevelopmentProcess';
+import InstructorDevelopmentProcess from '@/components/Instructor/pages/InstructorDevelopmentProcess';
+import MyGroups from '@/components/Student/pages/MyGroups';
 
 export const router = createBrowserRouter([
 	{
@@ -100,6 +102,7 @@ export const router = createBrowserRouter([
 				index: true,
 				element: <StudentDashboard />,
 			},
+			{ path: 'MyGroup', element: <MyGroups /> },
 			{ path: 'Consultation', element: <StudentConsultation /> },
 			{ path: 'Document', element: <StudentDocument /> },
 			{ path: 'Notifications', element: <StudentNotifications /> },
@@ -117,6 +120,10 @@ export const router = createBrowserRouter([
 			{ path: 'Groups', element: <StudentGroups /> },
 			{ path: 'Deadlines', element: <DocumentDeadlines /> },
 			{ path: 'Notifications', element: <InstructorNotifications /> },
+			{
+				path: 'Development-Monitoring',
+				element: <InstructorDevelopmentProcess />,
+			},
 		],
 	},
 	{

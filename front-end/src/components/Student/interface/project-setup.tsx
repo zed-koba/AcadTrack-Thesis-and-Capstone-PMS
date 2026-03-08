@@ -6,10 +6,10 @@ import type {
 export type StudentDetails = {
 	department_id: number;
 	program_id: number;
-	yearLevel: string;
-	semester: string;
-	mobileNumber?: string;
-	facebookProfile?: string;
+	yearLevel: number;
+	semester: number;
+	mobile_num?: string;
+	facebook_profile?: string;
 };
 export type ProjectMemberDetails = ProponentsDetailsProps & {
 	student: {

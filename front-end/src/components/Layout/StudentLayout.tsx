@@ -7,6 +7,7 @@ import {
 	FileText,
 	GitBranch,
 	LayoutDashboard,
+	Users,
 } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import UserNav from '../common/UserNav';
@@ -17,6 +18,11 @@ const StundentLayout = () => {
 			label: 'Dashboard',
 			to: '/Student',
 			icon: <LayoutDashboard className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'My Group',
+			to: '/Student/MyGroup',
+			icon: <Users className="w-5 h-5" strokeWidth={2.5} />,
 		},
 		{
 			label: 'Consultation',

@@ -15,7 +15,7 @@ import { ArrowLeft, BookOpen, Check, Loader2, Search } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { apiStudentUrl } from '@/Routes/http';
-import { studentId, user } from '@/components/functions/functions';
+import { information, user } from '@/components/functions/functions';
 import type { ProjectDetails } from '../interface/project-setup';
 
 interface JoinProjectFormProps {
@@ -66,7 +66,7 @@ export default function JoinProjectForm({
 				project_id: foundProject?.id,
 			};
 			const res = await fetch(
-				`${apiStudentUrl}/project-setup/joinProject/${studentId}`,
+				`${apiStudentUrl}/project-setup/joinProject/${information.id}`,
 				{
 					method: 'POST',
 					headers: {
@@ -207,8 +207,8 @@ export default function JoinProjectForm({
 								<div>
 									<span className="text-muted-foreground">Members:</span>
 									<p className="font-medium">
-										{foundProject.details.length} member
-										{foundProject.details.length > 1 ? 's' : ''}
+										{foundProject.details.length + 1} member
+										{foundProject.details.length + 1 > 1 ? 's' : ''}
 									</p>
 								</div>
 							</div>

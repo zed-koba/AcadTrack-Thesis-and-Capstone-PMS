@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react';
-import type { DevelopmentProcessProps } from '../interface/developmentprocess';
-import { Spinner } from '@/components/ui/spinner';
-import { apiStudentUrl } from '@/Routes/http';
 import { projectId, userToken } from '@/components/functions/functions';
-import StudentDevelopmentProcessComponent from '../DevelopmentProcess.tsx/StudentDP';
+import { apiStudentUrl } from '@/Routes/http';
+import { useEffect, useState } from 'react';
+import type { MyProjectProps } from '../interface/my-group';
+import type { RolesProps } from '@/components/Admin/interface/roles';
+import { Spinner } from '@/components/ui/spinner';
+import GroupComponents from '../MyGroupComponents/GroupComponent';
 
-const StudentDevelopmentProcess = () => {
-	const [developments, setDevelopments] = useState<DevelopmentProcessProps[]>(
-		[],
-	);
+const MyGroups = () => {
+	const [project, setProject] = useState<MyProjectProps>();
+	const [roles, setRoles] = useState<RolesProps[]>([]);
 
 	const [loading, setLoading] = useState(false);
-	const fetchDevelopment = async () => {
+	const fetchGroup = async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
-				`${apiStudentUrl}/development-process/${projectId.proponents_id}`,
+				`${apiStudentUrl}/my-group/${projectId.proponents_id}`,
 				{
 					method: 'GET',
 					headers: {
@@ -28,24 +28,25 @@ const StudentDevelopmentProcess = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 
 			const result = await res.json();
-			setDevelopments(result.development);
+			setProject(result.project);
+			setRoles(result.roles);
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setLoading(false);
 		}
 	};
-
 	useEffect(() => {
-		fetchDevelopment();
+		fetchGroup();
 	}, []);
+
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
 				<div className="flex items-start flex-col w-full justify-start">
-					<span className="text-2xl text-white">Development Process</span>
+					<span className="text-2xl text-white">Group Management</span>
 					<span className="text-sm text-white">
-						Track your project features from start to finish
+						Manage your thesis/capstone group members and roles
 					</span>
 				</div>
 			</div>
@@ -55,9 +56,10 @@ const StudentDevelopmentProcess = () => {
 				</div>
 			) : (
 				<>
-					<StudentDevelopmentProcessComponent
-						developments={developments}
-						refresh={fetchDevelopment}
+					<GroupComponents
+						project={project}
+						roles={roles}
+						refresh={fetchGroup}
 					/>
 				</>
 			)}
@@ -65,4 +67,4 @@ const StudentDevelopmentProcess = () => {
 	);
 };
 
-export default StudentDevelopmentProcess;
+export default MyGroups;

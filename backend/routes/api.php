@@ -12,6 +12,7 @@ use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
 use App\Http\Controllers\adviser\DocumentCommentsController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\instructor\DocumentsDeadlineController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\NotificationsController;
@@ -133,6 +134,12 @@ Route::prefix("student")->group(function() {
     Route::put('development-process/edit/{id}', [DevelopmentProcessController::class, 'editDevelopmentProcess']);
     Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
     Route::delete('development-process/delete/{id}', [DevelopmentProcessController::class, 'deleteDevelopmentProcess']);
+
+    //My Groups
+    Route::get('my-group/{id}', [GroupController::class, 'getProjectMembers']);
+    Route::post('my-group/transfer/{id}', [GroupController::class,'transferGroupLeader']);
+    Route::put('my-group/updateRole/{id}', [GroupController::class,'updateRoleMember']);
+    Route::delete('my-group/leaveGroup/{id}', [GroupController::class,'leaveGroup']);
 });
 
 Route::prefix("instructor")->group(function() {
@@ -143,6 +150,9 @@ Route::prefix("instructor")->group(function() {
 
     Route::get('datas/{id}', [InstructorController::class, 'getDatas']);
     Route::get('documents/{id}', [DocumentsController::class, 'getDocuments']);
+
+    Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getInstructorDevelopmentProcess']);
+    Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
 });
 
 Route::get('notifications/{id}/{role}', [NotificationsController::class, 'getNotifications']);

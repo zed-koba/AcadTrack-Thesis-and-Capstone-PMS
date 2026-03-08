@@ -84,7 +84,7 @@ const AddFeatureDialog = ({
 			};
 			try {
 				const apiLink = development
-					? `${apiStudentUrl}/development-process/edit/${development.foreign_proponets_id}`
+					? `${apiStudentUrl}/development-process/edit/${development.foreign_proponents_id}`
 					: `${apiStudentUrl}/development-process/store`;
 				const res = await fetch(apiLink, {
 					method: development ? 'PUT' : 'POST',

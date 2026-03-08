@@ -13,7 +13,7 @@ export type DevelopmentHealth =
 
 export type DevelopmentProcessProps = {
 	id: number;
-	foreign_proponets_id: string;
+	foreign_proponents_id: string;
 	feature: string;
 	start_date: Date;
 	end_date: Date;

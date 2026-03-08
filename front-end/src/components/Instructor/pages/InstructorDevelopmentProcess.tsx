@@ -1,21 +1,23 @@
-import { useEffect, useState } from 'react';
-import type { DevelopmentProcessProps } from '../interface/developmentprocess';
+import type { ProponentsProps } from '@/components/Admin/interface/proponent';
+import { information, userToken } from '@/components/functions/functions';
 import { Spinner } from '@/components/ui/spinner';
-import { apiStudentUrl } from '@/Routes/http';
-import { projectId, userToken } from '@/components/functions/functions';
-import StudentDevelopmentProcessComponent from '../DevelopmentProcess.tsx/StudentDP';
+import { apiInstructorUrl } from '@/Routes/http';
+import { useEffect, useState } from 'react';
+import DevelopmentMonitoring from '../components/DPMonitoring';
+import type { DevelopmentProcessProps } from '@/components/Student/interface/developmentprocess';
 
-const StudentDevelopmentProcess = () => {
+const InstructorDevelopmentProcess = () => {
 	const [developments, setDevelopments] = useState<DevelopmentProcessProps[]>(
 		[],
 	);
+	const [projects, setProjects] = useState<ProponentsProps[]>([]);
 
 	const [loading, setLoading] = useState(false);
 	const fetchDevelopment = async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
-				`${apiStudentUrl}/development-process/${projectId.proponents_id}`,
+				`${apiInstructorUrl}/development-process/${information.id}`,
 				{
 					method: 'GET',
 					headers: {
@@ -28,7 +30,8 @@ const StudentDevelopmentProcess = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 
 			const result = await res.json();
-			setDevelopments(result.development);
+			setDevelopments(result.developments);
+			setProjects(result.projects);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -39,13 +42,16 @@ const StudentDevelopmentProcess = () => {
 	useEffect(() => {
 		fetchDevelopment();
 	}, []);
+
 	return (
 		<>
 			<div className="flex items-center justify-between text-white text-base">
 				<div className="flex items-start flex-col w-full justify-start">
-					<span className="text-2xl text-white">Development Process</span>
+					<span className="text-2xl text-white">
+						Development Process Monitoring
+					</span>
 					<span className="text-sm text-white">
-						Track your project features from start to finish
+						Oversee thesis/capstone groups development timelines (read-only)
 					</span>
 				</div>
 			</div>
@@ -55,7 +61,8 @@ const StudentDevelopmentProcess = () => {
 				</div>
 			) : (
 				<>
-					<StudentDevelopmentProcessComponent
+					<DevelopmentMonitoring
+						projects={projects}
 						developments={developments}
 						refresh={fetchDevelopment}
 					/>
@@ -65,4 +72,4 @@ const StudentDevelopmentProcess = () => {
 	);
 };
 
-export default StudentDevelopmentProcess;
+export default InstructorDevelopmentProcess;

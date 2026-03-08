@@ -15,14 +15,14 @@ import ModeSelector from './Student/ProjectSetupComponents/ModeSelector';
 import CreateProjectForm from './Student/ProjectSetupComponents/CreateProjectForm';
 import JoinProjectForm from './Student/ProjectSetupComponents/JoinProjectForm';
 import { toast } from 'sonner';
-import { studentId } from './functions/functions';
+import { information } from './functions/functions';
 import { Toaster } from './ui/sonner';
 import api from '@/lib/api';
 
 const StudentProjectSetup = () => {
 	const navigate = useNavigate();
 	const [step, setStep] = useState<'details' | 'select' | 'create' | 'join'>(
-		'details',
+		!information.department_id ? 'details' : 'select',
 	);
 	const [advisers, setAdvisers] = useState<AdviserProps[]>([]);
 	const [instructors, setInstructors] = useState<InstructorProps[]>([]);
@@ -67,7 +67,7 @@ const StudentProjectSetup = () => {
 	const handleDetailsComplete = async (details: StudentDetails) => {
 		try {
 			const res = await fetch(
-				`${apiStudentUrl}/project-setup/updateStudent/${studentId}`,
+				`${apiStudentUrl}/project-setup/updateStudent/${information.id}`,
 				{
 					method: 'PUT',
 					headers: {

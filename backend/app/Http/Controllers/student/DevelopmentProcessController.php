@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\student;
 
 use App\Http\Controllers\Controller;
+use App\Models\admin\Proponents;
 use App\Models\student\DevelopmentProcess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,18 @@ class DevelopmentProcessController extends Controller
 
         return response()->json([
             'development' => $development,
+        ], 200);
+    }
+    public function getInstructorDevelopmentProcess($id)
+    {
+        $development = DevelopmentProcess::orderBy('created_at', 'DESC')->get();
+        $projects = Proponents::whereHas('groupLeader', function ($query) use ($id) {
+            $query->where('instructor_id', $id);
+        })->orderBy('created_at', 'ASC')->get();
+
+        return response()->json([
+            'developments' => $development,
+            'projects' => $projects,
         ], 200);
     }
 
@@ -66,9 +79,25 @@ class DevelopmentProcessController extends Controller
         DB::beginTransaction();
         try {
             $development = DevelopmentProcess::findOrFail($id);
-            $development->update([
-                'status' => $request->status,
-            ]);
+            if (($request->status === 'completed' || $request->status === 'completed-late') && $development->status === 'in-progress') {
+                $development->update([
+                    'status' => $request->status,
+                    'completed_date' => now(),
+                ]);
+            }
+            if($request->status === 'in-progress') {
+                $development->update([
+                    'status' => $request->status,
+                    'completed_date' => null,
+                ]);
+            }
+
+            if($request->status === 'checked') {
+                $development->update([
+                    'status' => $request->status,
+                    'checked_date' => now(),
+                ]);
+            }
             DB::commit();
             return response()->json([
                 'status' => 200,

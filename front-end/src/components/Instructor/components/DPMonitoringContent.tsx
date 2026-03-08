@@ -5,14 +5,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import {
-	getDevelopmentHealth,
-	type DevelopmentProcessProps,
-	type StudentDevelopmentProcessProps,
-} from '../interface/developmentprocess';
+import type { DevelopmentMonitoringContentProps } from '../interface/development-process';
 import { Progress } from '@/components/ui/progress';
-import DevelopmentGanttChart from './DevelopmentGanttChart';
-import AddFeatureDialog from './AddFeatureDialog';
 import {
 	AlertTriangle,
 	Check,
@@ -21,11 +15,13 @@ import {
 	CircleCheck,
 	CircleX,
 	Clock,
-	Pencil,
-	Plus,
-	Trash2,
 } from 'lucide-react';
-import { differenceInDays, format, isAfter } from 'date-fns';
+import DevelopmentGanttChart from '@/components/Student/DevelopmentProcess.tsx/DevelopmentGanttChart';
+import {
+	getDevelopmentHealth,
+	type DevelopmentProcessProps,
+} from '@/components/Student/interface/developmentprocess';
+import { differenceInDays, format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import {
 	Tooltip,
@@ -33,25 +29,18 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { apiStudentUrl } from '@/Routes/http';
-import { userToken } from '@/components/functions/functions';
 import { toast } from 'sonner';
-import DeleteFeature from './DeleteFeature';
+import { apiInstructorUrl } from '@/Routes/http';
+import { userToken } from '@/components/functions/functions';
 
-const StudentDevelopmentProcessComponent = ({
+const DPMonitoringContent = ({
+	project,
 	developments,
 	refresh,
-}: StudentDevelopmentProcessProps) => {
+}: DevelopmentMonitoringContentProps) => {
 	const checkedDevelopmentProcess = developments.filter(
 		(development) => development.status === 'checked',
 	);
-	const [selectedFeature, setSelectedFeature] =
-		useState<DevelopmentProcessProps | null>(null);
-	const [selectedId, setSelectedId] = useState<number | null>(null);
-	const [editMode, setEditMode] = useState(false);
-	const [open, setOpen] = useState(false);
-
 	const completed = developments.filter(
 		(development) => development.status === 'completed',
 	).length;
@@ -82,7 +71,7 @@ const StudentDevelopmentProcessComponent = ({
 			classes: 'bg-green-500/15 text-green-500 border-green-500/30',
 		},
 		checked: {
-			label: 'Checked',
+			label: 'Checked ',
 			icon: CircleCheck,
 			classes: 'bg-emerald-600/15 text-emerald-600 border-green-600/30',
 		},
@@ -98,20 +87,16 @@ const StudentDevelopmentProcessComponent = ({
 		},
 	};
 	const handleMarkasComplete = async (development: DevelopmentProcessProps) => {
-		const updateStatus = isAfter(
-			format(new Date(), 'yyyy-MM-dd'),
-			format(development.end_date, 'yyyy-MM-dd'),
-		)
-			? 'completed-late'
-			: 'completed';
 		const checkStatus =
 			development.status === 'completed' ||
 			development.status === 'completed-late'
-				? 'in-progress'
-				: updateStatus;
+				? 'checked'
+				: development.status === 'checked'
+					? 'completed'
+					: '';
 		try {
 			const res = await fetch(
-				`${apiStudentUrl}/development-process/update/${development.id}`,
+				`${apiInstructorUrl}/development-process/update/${development.id}`,
 				{
 					method: 'PUT',
 					headers: {
@@ -144,7 +129,7 @@ const StudentDevelopmentProcessComponent = ({
 	};
 	return (
 		<>
-			<Card className="p-0 mb-6 mt-5">
+			<Card className="p-0 mb-6 mt-2">
 				<CardContent className="pt-5 pb-4">
 					<div className="flex items-center justify-between mb-3">
 						<div>
@@ -193,28 +178,19 @@ const StudentDevelopmentProcessComponent = ({
 			<Card className="mb-6">
 				<CardHeader className="pb-2 flex justify-between">
 					<div className="flex flex-col">
-						<CardTitle className="text-lg">Development Timeline</CardTitle>
+						<CardTitle className="text-lg">
+							{project?.title} - Development Timeline
+						</CardTitle>
 						<CardDescription>
 							Visual overview of all features. Hover on bars for details. The
 							vertical line marks today.
 						</CardDescription>
 					</div>
-					<Button
-						className="text-white cursor-pointer"
-						variant="primary"
-						onClick={() => {
-							setOpen(true);
-							setEditMode(false);
-						}}
-					>
-						Add Feature <Plus />
-					</Button>
 				</CardHeader>
 				<CardContent>
 					<DevelopmentGanttChart developments={developments} />
 				</CardContent>
 			</Card>
-
 			{/* Feature List */}
 			<Card>
 				<CardHeader className="pb-2">
@@ -230,9 +206,7 @@ const StudentDevelopmentProcessComponent = ({
 						{developments.length === 0 && (
 							<div className="text-center py-12">
 								<Circle className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-								<p className="text-muted-foreground">
-									No features yet. Click "Add Feature" to get started.
-								</p>
+								<p className="text-muted-foreground">No features added yet.</p>
 							</div>
 						)}
 						{developments.map((f) => {
@@ -252,7 +226,7 @@ const StudentDevelopmentProcessComponent = ({
 										isOverdue
 											? 'border-destructive/30 bg-destructive/5'
 											: 'border-border bg-card hover:bg-accent/5'
-									}`}
+									} ${isChecked && 'border-emerald-600/30 bg-emerald-600/5'}`}
 								>
 									<div
 										className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${
@@ -315,81 +289,34 @@ const StudentDevelopmentProcessComponent = ({
 											)}
 										</div>
 									</div>
-
-									<div className="flex items-center gap-1 shrink-0">
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													variant="ghost"
-													className="h-8 w-8 hover:bg-transparent"
-													onClick={() => handleMarkasComplete(f)}
-												>
-													{f.status === 'completed' ||
-													f.status === 'completed-late' ? (
-														<CircleX className="h-4 w-4 text-red-500" />
-													) : (
-														<CheckCircle2 className="h-4 w-4 text-green-500" />
-													)}
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>
-												{f.status === 'completed' ||
-												f.status === 'completed-late'
-													? 'Mark as not done'
-													: 'Mark as complete'}
-											</TooltipContent>
-										</Tooltip>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													variant="ghost"
-													className="h-8 w-8"
-													onClick={() => {
-														setSelectedFeature(f);
-														setOpen(true);
-														setEditMode(true);
-													}}
-												>
-													<Pencil className="h-4 w-4" />
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>Edit</TooltipContent>
-										</Tooltip>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													variant="ghost"
-													className="h-8 w-8 text-destructive"
-													onClick={() => setSelectedId(f.id)}
-												>
-													<Trash2 className="h-4 w-4" />
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>Delete</TooltipContent>
-										</Tooltip>
-									</div>
+									{isComplete && (
+										<div className="flex items-center gap-1 shrink-0">
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button
+														size="icon"
+														variant="ghost"
+														className="h-8 w-8 hover:bg-transparent"
+														onClick={() => handleMarkasComplete(f)}
+													>
+														{f.status === 'checked' ? (
+															<CircleX className="h-4 w-4 text-red-500" />
+														) : (
+															<CheckCircle2 className="h-4 w-4 text-green-500" />
+														)}
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent>
+													{f.status === 'checked'
+														? 'Mark as uncheck'
+														: 'Mark as checked'}
+												</TooltipContent>
+											</Tooltip>
+										</div>
+									)}
 								</div>
 							);
 						})}
-						{open && (
-							<AddFeatureDialog
-								development={editMode ? selectedFeature : null}
-								open={open}
-								setOpen={setOpen}
-								setSelectedFeature={() => setSelectedFeature(null)}
-								refresh={refresh}
-							/>
-						)}
-						{selectedId && (
-							<DeleteFeature
-								setSelectedId={setSelectedId}
-								selectedId={selectedId}
-								refresh={refresh}
-							/>
-						)}
 					</div>
 				</CardContent>
 			</Card>
@@ -397,4 +324,4 @@ const StudentDevelopmentProcessComponent = ({
 	);
 };
 
-export default StudentDevelopmentProcessComponent;
+export default DPMonitoringContent;

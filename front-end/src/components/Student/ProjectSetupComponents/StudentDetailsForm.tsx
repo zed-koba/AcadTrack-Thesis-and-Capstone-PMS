@@ -32,8 +32,8 @@ const StudentDetailsForm = ({
 	departments,
 	programs,
 }: StudentDetailsFormProps) => {
-	const [yearLevel, setYearLevel] = useState('');
-	const [semester, setSemester] = useState('');
+	const [yearLevel, setYearLevel] = useState(0);
+	const [semester, setSemester] = useState(0);
 	const [mobileNumber, setMobileNumber] = useState('');
 	const [facebookProfile, setFacebookProfile] = useState('');
 	const [selectedDepartment, setSelectedDepartment] = useState<number | null>(
@@ -53,11 +53,23 @@ const StudentDetailsForm = ({
 		onComplete({
 			department_id: selectedDepartment,
 			program_id: selectedProgram,
-			yearLevel,
+			yearLevel: yearLevel,
 			semester,
-			mobileNumber: mobileNumber || undefined,
-			facebookProfile: facebookProfile || undefined,
+			mobile_num: mobileNumber || undefined,
+			facebook_profile: facebookProfile || undefined,
 		});
+		const informationOld = JSON.parse(localStorage.getItem('data') || '{}');
+		const updatedData = {
+			...informationOld,
+			department_id: selectedDepartment,
+			program_id: selectedProgram,
+			year_level: yearLevel,
+			semester: semester,
+			mobile_num: mobileNumber || undefined,
+			facebook_profile: facebookProfile || undefined,
+		};
+
+		localStorage.setItem('data', JSON.stringify(updatedData));
 	};
 
 	return (
@@ -129,7 +141,10 @@ const StudentDetailsForm = ({
 						<Label>
 							Year Level <span className="text-destructive">*</span>
 						</Label>
-						<Select value={yearLevel} onValueChange={setYearLevel}>
+						<Select
+							value={String(yearLevel)}
+							onValueChange={(v) => setYearLevel(Number(v))}
+						>
 							<SelectTrigger className="w-full">
 								<SelectValue placeholder="Select year level" />
 							</SelectTrigger>
@@ -144,7 +159,10 @@ const StudentDetailsForm = ({
 						<Label>
 							Semester <span className="text-destructive">*</span>
 						</Label>
-						<Select value={semester} onValueChange={setSemester}>
+						<Select
+							value={String(semester)}
+							onValueChange={(v) => setSemester(Number(v))}
+						>
 							<SelectTrigger className="w-full">
 								<SelectValue placeholder="Select semester" />
 							</SelectTrigger>

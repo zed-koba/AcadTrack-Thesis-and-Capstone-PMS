@@ -21,7 +21,7 @@ import { ArrowLeft, Check, Copy, Crown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
 import type { InstructorProps } from '@/components/Admin/interface/instructor';
-import { studentId, user } from '@/components/functions/functions';
+import { information, user } from '@/components/functions/functions';
 import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsProps } from '@/components/Admin/interface/proponent';
 
@@ -62,7 +62,7 @@ export default function CreateProjectForm({
 				instructor_id: instructorId,
 			};
 			const res = await fetch(
-				`${apiStudentUrl}/project-setup/storeProject/${studentId}`,
+				`${apiStudentUrl}/project-setup/storeProject/${information.id}`,
 				{
 					method: 'POST',
 					headers: {

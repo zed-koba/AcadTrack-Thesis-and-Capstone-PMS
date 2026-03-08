@@ -30,11 +30,19 @@ export const adviserId = 1;
 export const instructorId = 1;
 export const START_HOUR = 7;
 export const END_HOUR = 19;
-export const user = JSON.parse(localStorage.getItem('user') || '{}');
-export const information = JSON.parse(localStorage.getItem('data') || '{}');
-export const projectId = JSON.parse(localStorage.getItem('project') || '{}');
+export const getUser = () => {
+	return JSON.parse(localStorage.getItem('user') || '{}');
+};
+export const getInformation = () => {
+	return JSON.parse(localStorage.getItem('data') || '{}');
+};
+export const getProjectId = () => {
+	return JSON.parse(localStorage.getItem('project') || '{}');
+};
+export const user = getUser();
+export const information = getInformation();
+export const projectId = getProjectId();
 export const userToken = localStorage.getItem('token');
-
 export function formatDateWithTime(dateString: string) {
 	const date = new Date(dateString);
 
