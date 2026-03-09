@@ -106,7 +106,7 @@ const StudentDevelopmentProcessComponent = ({
 			: 'completed';
 		const checkStatus =
 			development.status === 'completed' ||
-			development.status === 'completed-late'
+				development.status === 'completed-late'
 				? 'in-progress'
 				: updateStatus;
 		try {
@@ -248,24 +248,22 @@ const StudentDevelopmentProcessComponent = ({
 							return (
 								<div
 									key={f.id}
-									className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${
-										isOverdue
-											? 'border-destructive/30 bg-destructive/5'
-											: 'border-border bg-card hover:bg-accent/5'
-									}`}
+									className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isOverdue
+										? 'border-destructive/30 bg-destructive/5'
+										: 'border-border bg-card hover:bg-accent/5'
+										}`}
 								>
 									<div
-										className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${
-											isComplete
-												? 'bg-green-500/15'
-												: isOverdue
-													? 'bg-destructive/15'
-													: inProgress
-														? 'bg-primary/15'
-														: isChecked
-															? 'bg-emerald-600/15'
-															: 'bg-muted'
-										}`}
+										className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${isComplete
+											? 'bg-green-500/15'
+											: isOverdue
+												? 'bg-destructive/15'
+												: inProgress
+													? 'bg-primary/15'
+													: isChecked
+														? 'bg-emerald-600/15'
+														: 'bg-muted'
+											}`}
 									>
 										{isComplete ? (
 											<Check className="h-4 w-4 text-green-500" />
@@ -315,31 +313,32 @@ const StudentDevelopmentProcessComponent = ({
 											)}
 										</div>
 									</div>
-
 									<div className="flex items-center gap-1 shrink-0">
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													variant="ghost"
-													className="h-8 w-8 hover:bg-transparent"
-													onClick={() => handleMarkasComplete(f)}
-												>
+										{inProgress && (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button
+														size="icon"
+														variant="ghost"
+														className="h-8 w-8 hover:bg-transparent"
+														onClick={() => handleMarkasComplete(f)}
+													>
+														{f.status === 'completed' ||
+															f.status === 'completed-late' ? (
+															<CircleX className="h-4 w-4 text-red-500" />
+														) : (
+															<CheckCircle2 className="h-4 w-4 text-green-500" />
+														)}
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent>
 													{f.status === 'completed' ||
-													f.status === 'completed-late' ? (
-														<CircleX className="h-4 w-4 text-red-500" />
-													) : (
-														<CheckCircle2 className="h-4 w-4 text-green-500" />
-													)}
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>
-												{f.status === 'completed' ||
-												f.status === 'completed-late'
-													? 'Mark as not done'
-													: 'Mark as complete'}
-											</TooltipContent>
-										</Tooltip>
+														f.status === 'completed-late'
+														? 'Mark as not done'
+														: 'Mark as complete'}
+												</TooltipContent>
+											</Tooltip>)}
+
 										<Tooltip>
 											<TooltipTrigger asChild>
 												<Button

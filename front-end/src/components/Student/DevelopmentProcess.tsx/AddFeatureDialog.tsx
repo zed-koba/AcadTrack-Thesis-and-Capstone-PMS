@@ -39,8 +39,6 @@ import { toast } from 'sonner';
 
 const featureScehma = z.object({
 	feature: z.string().min(1, 'Feature title required'),
-	start_date: z.date(),
-	end_date: z.date(),
 	status: z.enum(['not-started', 'in-progress', 'completed']),
 });
 const AddFeatureDialog = ({
@@ -61,8 +59,6 @@ const AddFeatureDialog = ({
 
 	const defaultValues: formValues = {
 		feature: development ? development.feature : '',
-		start_date: development ? development.start_date : new Date(),
-		end_date: development ? development.end_date : new Date(),
 		status: development
 			? (development.status as 'not-started' | 'in-progress' | 'completed')
 			: 'not-started',
@@ -84,7 +80,7 @@ const AddFeatureDialog = ({
 			};
 			try {
 				const apiLink = development
-					? `${apiStudentUrl}/development-process/edit/${development.foreign_proponents_id}`
+					? `${apiStudentUrl}/development-process/edit/${development.id}`
 					: `${apiStudentUrl}/development-process/store`;
 				const res = await fetch(apiLink, {
 					method: development ? 'PUT' : 'POST',
@@ -167,80 +163,64 @@ const AddFeatureDialog = ({
 								}}
 							/>
 							<div className="grid grid-cols-2 gap-3">
-								<form.Field
-									name="start_date"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor="deadline">Start Date *</FieldLabel>
-												<Popover>
-													<PopoverTrigger asChild aria-invalid={isInvalid}>
-														<Button
-															variant="outline"
-															className={cn(
-																'w-full justify-start text-left font-normal',
-																!startDate && 'text-muted-foreground',
-															)}
-														>
-															<CalendarIcon className="mr-2 h-4 w-4" />
-															{startDate
-																? format(startDate, 'PPP')
-																: 'Pick date'}
-														</Button>
-													</PopoverTrigger>
-													<PopoverContent className="w-auto p-0" align="start">
-														<Calendar
-															mode="single"
-															selected={startDate}
-															onSelect={setStartDate}
-															initialFocus
-															className="p-3 pointer-events-auto"
-														/>
-													</PopoverContent>
-												</Popover>
-											</Field>
-										);
-									}}
-								/>
-								<form.Field
-									name="end_date"
-									children={(field) => {
-										const isInvalid =
-											field.state.meta.isTouched && !field.state.meta.isValid;
-										return (
-											<Field data-invalid={isInvalid}>
-												<FieldLabel htmlFor="deadline">
-													Target Date *
-												</FieldLabel>
-												<Popover>
-													<PopoverTrigger asChild aria-invalid={isInvalid}>
-														<Button
-															variant="outline"
-															className={cn(
-																'w-full justify-start text-left font-normal',
-																!endDate && 'text-muted-foreground',
-															)}
-														>
-															<CalendarIcon className="mr-2 h-4 w-4" />
-															{endDate ? format(endDate, 'PPP') : 'Pick date'}
-														</Button>
-													</PopoverTrigger>
-													<PopoverContent className="w-auto p-0" align="start">
-														<Calendar
-															mode="single"
-															selected={endDate}
-															onSelect={setEndDate}
-															initialFocus
-															className="p-3 pointer-events-auto"
-														/>
-													</PopoverContent>
-												</Popover>
-											</Field>
-										);
-									}}
-								/>
+
+								<Field >
+									<FieldLabel htmlFor="deadline">Start Date *</FieldLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button
+												variant="outline"
+												className={cn(
+													'w-full justify-start text-left font-normal',
+													!startDate && 'text-muted-foreground',
+												)}
+											>
+												<CalendarIcon className="mr-2 h-4 w-4" />
+												{startDate
+													? format(startDate, 'PPP')
+													: 'Pick date'}
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={startDate}
+												onSelect={setStartDate}
+												initialFocus
+												className="p-3 pointer-events-auto"
+											/>
+										</PopoverContent>
+									</Popover>
+								</Field>
+
+								<Field>
+									<FieldLabel htmlFor="deadline">
+										Target Date *
+									</FieldLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button
+												variant="outline"
+												className={cn(
+													'w-full justify-start text-left font-normal',
+													!endDate && 'text-muted-foreground',
+												)}
+											>
+												<CalendarIcon className="mr-2 h-4 w-4" />
+												{endDate ? format(endDate, 'PPP') : 'Pick date'}
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={endDate}
+												onSelect={setEndDate}
+												initialFocus
+												className="p-3 pointer-events-auto"
+											/>
+										</PopoverContent>
+									</Popover>
+								</Field>
 							</div>
 							<form.Field
 								name="status"

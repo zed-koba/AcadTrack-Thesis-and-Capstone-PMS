@@ -1,4 +1,4 @@
-import { formatDate, information } from '@/components/functions/functions';
+import { formatDate, getInformation } from '@/components/functions/functions';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -55,6 +55,7 @@ const Dashboard = () => {
 
 	const fetchDeadlines = async () => {
 		setLoading(true);
+		const information = getInformation();
 		try {
 			const res = await fetch(`${apiStudentUrl}/tasks/${information.id}`, {
 				method: 'GET',

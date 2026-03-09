@@ -3,7 +3,7 @@ import type {
 	AdviserAvailabilityProps,
 	AdviserWeeklyProps,
 } from '@/components/Adviser/interface/consultation';
-import { information } from '@/components/functions/functions';
+import { getInformation } from '@/components/functions/functions';
 import { apiStudentUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import ConsultationDashboard from '../ConsultationComponents/ConsultationDashboard';
@@ -29,8 +29,10 @@ const Consultation = () => {
 			});
 
 			const result = await res.json();
+			const information = getInformation();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
+				console.log(result);
 				await setWeeklies(result.schedules);
 				await setProject(
 					result.projects.find((p: ProponentsDocumentsProps) => {
@@ -38,7 +40,7 @@ const Consultation = () => {
 							return p;
 						} else {
 							return p.details.some(
-								(detail) => detail.student.id === information.id,
+								(detail) => detail.student_id === information.id,
 							);
 						}
 					}) ?? null,

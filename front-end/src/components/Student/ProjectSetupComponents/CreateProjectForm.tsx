@@ -21,7 +21,7 @@ import { ArrowLeft, Check, Copy, Crown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
 import type { InstructorProps } from '@/components/Admin/interface/instructor';
-import { information, user } from '@/components/functions/functions';
+import { getUser, information } from '@/components/functions/functions';
 import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsProps } from '@/components/Admin/interface/proponent';
 
@@ -88,8 +88,9 @@ export default function CreateProjectForm({
 				setCreated(true);
 				setCreatedProject(result.project);
 				toast.success(result.message);
+				const newUser = getUser();
 				const updatedUser = {
-					...user,
+					...newUser,
 					new_user: 0,
 				};
 

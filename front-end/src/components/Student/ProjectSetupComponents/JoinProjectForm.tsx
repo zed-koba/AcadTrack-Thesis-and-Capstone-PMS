@@ -15,7 +15,7 @@ import { ArrowLeft, BookOpen, Check, Loader2, Search } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { apiStudentUrl } from '@/Routes/http';
-import { information, user } from '@/components/functions/functions';
+import { getInformation, getUser } from '@/components/functions/functions';
 import type { ProjectDetails } from '../interface/project-setup';
 
 interface JoinProjectFormProps {
@@ -58,6 +58,7 @@ export default function JoinProjectForm({
 		}
 	};
 	const handleJoinGroup = async () => {
+		const information = getInformation();
 		setRequested(true);
 		try {
 			setIsSearching(true);
@@ -91,8 +92,9 @@ export default function JoinProjectForm({
 			if (result.status === 200) {
 				toast.success(result.message);
 				setJoined(true);
+				const newUser = getUser();
 				const updatedUser = {
-					...user,
+					...newUser,
 					new_user: 0,
 				};
 				localStorage.setItem('user', JSON.stringify(updatedUser));

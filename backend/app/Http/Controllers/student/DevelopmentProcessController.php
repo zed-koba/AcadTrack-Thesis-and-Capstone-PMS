@@ -85,14 +85,14 @@ class DevelopmentProcessController extends Controller
                     'completed_date' => now(),
                 ]);
             }
-            if($request->status === 'in-progress') {
+            if ($request->status === 'in-progress') {
                 $development->update([
                     'status' => $request->status,
                     'completed_date' => null,
                 ]);
             }
 
-            if($request->status === 'checked') {
+            if ($request->status === 'checked') {
                 $development->update([
                     'status' => $request->status,
                     'checked_date' => now(),
@@ -134,6 +134,7 @@ class DevelopmentProcessController extends Controller
                 'feature' => $request->feature,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
+                'status' => $request->status,
             ]);
             DB::commit();
             return response()->json([

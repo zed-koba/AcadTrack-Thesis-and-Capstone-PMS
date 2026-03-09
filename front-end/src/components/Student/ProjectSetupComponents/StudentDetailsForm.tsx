@@ -20,17 +20,20 @@ import { UserCircle, ArrowRight } from 'lucide-react';
 import type { StudentDetails } from '../interface/project-setup';
 import type { DepartmentProps } from '@/components/Admin/interface/department';
 import type { ProgramsProps } from '@/components/Admin/interface/programs';
+import { getInformation } from '@/components/functions/functions';
 
 interface StudentDetailsFormProps {
 	onComplete: (details: StudentDetails) => void;
 	departments: DepartmentProps[];
 	programs: ProgramsProps[];
+	loading: boolean;
 }
 
 const StudentDetailsForm = ({
 	onComplete,
 	departments,
 	programs,
+	loading,
 }: StudentDetailsFormProps) => {
 	const [yearLevel, setYearLevel] = useState(0);
 	const [semester, setSemester] = useState(0);
@@ -58,7 +61,7 @@ const StudentDetailsForm = ({
 			mobile_num: mobileNumber || undefined,
 			facebook_profile: facebookProfile || undefined,
 		});
-		const informationOld = JSON.parse(localStorage.getItem('data') || '{}');
+		const informationOld = getInformation();
 		const updatedData = {
 			...informationOld,
 			department_id: selectedDepartment,
@@ -70,6 +73,7 @@ const StudentDetailsForm = ({
 		};
 
 		localStorage.setItem('data', JSON.stringify(updatedData));
+
 	};
 
 	return (
@@ -201,9 +205,10 @@ const StudentDetailsForm = ({
 				<Button
 					className="w-full mt-2"
 					onClick={handleSubmit}
-					disabled={!canProceed}
+					disabled={(!canProceed && loading) || (canProceed && !loading)}
 				>
-					Continue <ArrowRight className="h-4 w-4 ml-2" />
+					{loading ? 'Continuing...' : `Continue`}
+					{loading ? '' : <ArrowRight className="h-4 w-4 ml-2" />}
 				</Button>
 			</CardContent>
 		</Card>

@@ -61,6 +61,7 @@ const Registration = () => {
 			onSubmit: registrationSchema,
 		},
 		onSubmit: async ({ value }) => {
+			setLoading(true);
 			const payLoad = {
 				email: value.email,
 				password: value.password,

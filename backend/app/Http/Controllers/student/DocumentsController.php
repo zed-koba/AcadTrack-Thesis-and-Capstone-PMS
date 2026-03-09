@@ -20,8 +20,9 @@ class DocumentsController extends Controller
             'comments',
             'student:id,student_id,name'
         )->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with('adviser', 'details', 'groupLeader:id,name,instructor_id,program_id,section', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->whereHas('groupLeader', function($q) use ($id) {
-            $q->where('instructor_id', $id); })->orderBy('created_at', 'asc')->get();    
+        $projects = Proponents::with('adviser', 'details', 'details.student', 'groupLeader:id,name,instructor_id,program_id,section', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->whereHas('groupLeader', function ($q) use ($id) {
+            $q->where('instructor_id', $id);
+        })->orderBy('created_at', 'asc')->get();
         $deadline = DocumentsDeadline::orderBy('created_at', 'desc')->get();
         return response()->json([
             'status' => 200,
@@ -34,9 +35,11 @@ class DocumentsController extends Controller
     {
         $document = Documents::with(
             'comments',
-            'student:id,student_id,name', 'student.proponentDetail', 'student.project',
+            'student:id,student_id,name',
+            'student.proponentDetail',
+            'student.project',
         )->orderBy('created_at', 'desc')->get();
-        $projects = Proponents::where("adviser_id", $id)->with('adviser', 'details', 'groupLeader:id,name,instructor_id,program_id,section', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->orderBy('created_at', 'asc')->get();    
+        $projects = Proponents::where("adviser_id", $id)->with('adviser', 'details', 'details.student', 'groupLeader:id,name,instructor_id,program_id,section', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->orderBy('created_at', 'asc')->get();
         $deadline = DocumentsDeadline::orderBy('created_at', 'desc')->get();
         return response()->json([
             'status' => 200,
@@ -71,12 +74,11 @@ class DocumentsController extends Controller
             $version = 1;
             $status = "pending";
             $existDocument = Documents::where("title_name", "$request->title_name")->where("parent_document_id", null)->first();
-            if($existDocument) {
+            if ($existDocument) {
                 $parentDocumentId = $existDocument->id;
                 $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
                     ->max('version');
                 $version = ($latestVersion ?? 1) + 1;
-
             }
             if ($request->filled('parent_document_id')) {
                 $parentDocumentId = $request->parent_document_id;
@@ -85,7 +87,7 @@ class DocumentsController extends Controller
                 $version = ($latestVersion ?? 1) + 1;
                 $currentDoc = Documents::findOrFail($request->currentId)->update(['status' => 'revised']);
             }
-            
+
 
             $document = Documents::create([
                 'student_id' => $request->student_id,

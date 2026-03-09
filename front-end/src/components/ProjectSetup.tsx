@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { information } from './functions/functions';
 import { Toaster } from './ui/sonner';
 import api from '@/lib/api';
+import { Button } from './ui/button';
 
 const StudentProjectSetup = () => {
 	const navigate = useNavigate();
@@ -29,7 +30,10 @@ const StudentProjectSetup = () => {
 	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 	const [programs, setPrograms] = useState<ProgramsProps[]>([]);
 	const [projects, setProjects] = useState<ProjectDetails[]>([]);
+	const [loading, setLoading] = useState(false);
+	const [loggingOut, setLoggingOut] = useState(false);
 	const handleLogout = async () => {
+		setLoggingOut(true);
 		try {
 			await api.post(`${apiUrl}/logout`);
 		} catch (error) {
@@ -38,7 +42,9 @@ const StudentProjectSetup = () => {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
 			localStorage.removeItem('data');
+			localStorage.removeItem('project');
 			navigate('/Login');
+			setLoggingOut(false);
 		}
 	};
 	const fetchData = async () => {
@@ -65,6 +71,7 @@ const StudentProjectSetup = () => {
 	};
 
 	const handleDetailsComplete = async (details: StudentDetails) => {
+		setLoading(true);
 		try {
 			const res = await fetch(
 				`${apiStudentUrl}/project-setup/updateStudent/${information.id}`,
@@ -94,6 +101,8 @@ const StudentProjectSetup = () => {
 			}
 		} catch (error) {
 			console.log(error);
+		} finally {
+			setLoading(false);
 		}
 		setStep('select');
 	};
@@ -139,6 +148,7 @@ const StudentProjectSetup = () => {
 						onComplete={handleDetailsComplete}
 						departments={departments}
 						programs={programs}
+						loading={loading}
 					/>
 				)}
 				{step === 'select' && <ModeSelector onSelect={handleModeSelect} />}
@@ -157,10 +167,12 @@ const StudentProjectSetup = () => {
 						projects={projects}
 					/>
 				)}
-				<div className="text-center mt-8 cursor-pointer" onClick={handleLogout}>
-					<p className="text-muted-foreground font-medium text-lg underline">
-						Logout
-					</p>
+				<div className="flex items-center justify-center">
+					<Button variant="ghost" className="text-center mt-8 cursor-pointer" onClick={handleLogout} disabled={loggingOut}>
+						<p className="text-muted-foreground font-medium text-lg underline">
+							{loggingOut ? "Logging Out..." : "Logout"}
+						</p>
+					</Button>
 				</div>
 			</div>
 		</div>

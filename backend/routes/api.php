@@ -28,7 +28,7 @@ use App\Http\Controllers\TaskListsController;
 Route::post('/login', [AccountsController::class, 'loginAccount']);
 Route::post('/accounts/add', [AccountsController::class, 'storeAccount']);
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AccountsController::class, 'logout']);
 });
 
@@ -87,15 +87,15 @@ Route::prefix("admin")->group(function () {
 });
 
 
-Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(function() {
+Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(function () {
     //Adviser Availability
     Route::get("{id}/availabilities", [AdviserAvailabilityController::class, "getAvailabilities"]);
     Route::post("availabilities/add", [AdviserAvailabilityController::class, "storeAvailability"]);
     Route::put("availabilities/update", [AdviserAvailabilityController::class, "updateAvailabilty"]);
-    Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class,"deleteAvailability"]);
+    Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class, "deleteAvailability"]);
 
     //Adviser Weekly
-    Route::put("{id}/weekly/update", [AdviserWeeklyController::class,"updateSchedule"]);
+    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
 
     //Adviser Comment
     Route::get('{id}/comments', [DocumentCommentsController::class, 'getComments']);
@@ -104,11 +104,11 @@ Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(fu
     Route::get('documents/{id}', [DocumentsController::class, 'getStudentDocuments']);
 });
 
-Route::prefix("student")->group(function() {
+Route::prefix("student")->group(function () {
     //Student Documents
     Route::get('documents/{id}', [DocumentsController::class, 'getDocuments']);
     Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
-    Route::get('{id}/download/pdf', [DocumentsController::class,'downloadDocument']);
+    Route::get('{id}/download/pdf', [DocumentsController::class, 'downloadDocument']);
     Route::put('documents/passed/{id}', [DocumentsController::class, 'passDocument']);
 
     //Student Consultation
@@ -137,12 +137,12 @@ Route::prefix("student")->group(function() {
 
     //My Groups
     Route::get('my-group/{id}', [GroupController::class, 'getProjectMembers']);
-    Route::post('my-group/transfer/{id}', [GroupController::class,'transferGroupLeader']);
-    Route::put('my-group/updateRole/{id}', [GroupController::class,'updateRoleMember']);
-    Route::delete('my-group/leaveGroup/{id}', [GroupController::class,'leaveGroup']);
+    Route::post('my-group/transfer/{id}', [GroupController::class, 'transferGroupLeader']);
+    Route::put('my-group/updateRole/{id}', [GroupController::class, 'updateRoleMember']);
+    Route::delete('my-group/leaveGroup/{id}', [GroupController::class, 'leaveGroup']);
 });
 
-Route::prefix("instructor")->group(function() {
+Route::prefix("instructor")->group(function () {
     Route::get('deadlines/{id}', [DocumentsDeadlineController::class, 'getDeadlines']);
     Route::post('deadlines/add', [DocumentsDeadlineController::class, 'addDeadlines']);
     Route::put('deadlines/update/{id}', [DocumentsDeadlineController::class, 'updateDeadline']);
