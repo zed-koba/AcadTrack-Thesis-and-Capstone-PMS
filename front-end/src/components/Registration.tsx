@@ -25,15 +25,17 @@ import {
 	SelectValue,
 } from './ui/select';
 const registrationSchema = z.object({
-	first_name: z.string('First name is required'),
-	last_name: z.string('Last name is required'),
+	first_name: z.string().min(1, 'First name is required'),
+	last_name: z.string().min(1, 'Last name is required'),
 	email: z.email('Invalid email address'),
 	role: z.enum(['student', 'adviser', 'instructor'], {
 		message: 'Role is required',
 	}),
 	password: z.string().min(8, 'Password must be at least 8 characters'),
 	section: z.string('Section is required'),
-	student_id: z.string('Student ID is required'),
+	student_id: z.string().min(9, 'Student ID is required').regex(/^\d{2}-\d{7}$/, {
+		message: "Follow format: ##-#######",
+	}),
 });
 
 const Registration = () => {
@@ -230,19 +232,22 @@ const Registration = () => {
 											<FieldLabel className="mb-0" htmlFor={field.name}>
 												Email:{' '}
 											</FieldLabel>
-											<Input
-												id={field.name}
-												placeholder="juan_delacruz@gmail.com"
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												aria-invalid={isInvalid}
-												onChange={(e) => field.handleChange(e.target.value)}
-												type="email"
-												autoComplete="email"
-											/>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
+
+											<div className="relative">
+												<Input
+													id={field.name}
+													placeholder="juan_delacruz@gmail.com"
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													aria-invalid={isInvalid}
+													onChange={(e) => field.handleChange(e.target.value)}
+													type="email"
+													autoComplete="email"
+												/>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</div>
 										</Field>
 									);
 								}}
@@ -258,31 +263,34 @@ const Registration = () => {
 											<FieldLabel className="mb-0" htmlFor={field.name}>
 												Password
 											</FieldLabel>
-											<div className="relative">
-												<Input
-													id="password"
-													type={showPassword ? 'text' : 'password'}
-													placeholder="••••••••"
-													value={field.state.value}
-													onChange={(e) => field.handleChange(e.target.value)}
-													autoComplete="new-password"
-													aria-invalid={isInvalid}
-												/>
-												<button
-													type="button"
-													onClick={() => setShowPassword(!showPassword)}
-													className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-												>
-													{showPassword ? (
-														<EyeOff className="h-4 w-4" />
-													) : (
-														<Eye className="h-4 w-4" />
-													)}
-												</button>
+											<div>
+												<div className="relative">
+													<Input
+														id="password"
+														type={showPassword ? 'text' : 'password'}
+														placeholder="••••••••"
+														value={field.state.value}
+														onChange={(e) => field.handleChange(e.target.value)}
+														autoComplete="new-password"
+														aria-invalid={isInvalid}
+													/>
+													<button
+														type="button"
+														onClick={() => setShowPassword(!showPassword)}
+														className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+													>
+														{showPassword ? (
+															<EyeOff className="h-4 w-4" />
+														) : (
+															<Eye className="h-4 w-4" />
+														)}
+													</button>
+												</div>
+												{isInvalid && (
+													<FieldError className="mt-0" errors={field.state.meta.errors} />
+												)}
 											</div>
-											{isInvalid && (
-												<FieldError errors={field.state.meta.errors} />
-											)}
+
 										</Field>
 									);
 								}}
@@ -299,17 +307,19 @@ const Registration = () => {
 													<FieldLabel className="mb-0" htmlFor={field.name}>
 														Student ID
 													</FieldLabel>
-													<Input
-														id={field.name}
-														placeholder="2#-########"
-														value={field.state.value}
-														onBlur={field.handleBlur}
-														aria-invalid={isInvalid}
-														onChange={(e) => field.handleChange(e.target.value)}
-													/>
-													{isInvalid && (
-														<FieldError errors={field.state.meta.errors} />
-													)}
+													<div className="relative">
+														<Input
+															id={field.name}
+															placeholder="##-########"
+															value={field.state.value}
+															onBlur={field.handleBlur}
+															aria-invalid={isInvalid}
+															onChange={(e) => field.handleChange(e.target.value)}
+														/>
+														{isInvalid && (
+															<FieldError errors={field.state.meta.errors} />
+														)}
+													</div>
 												</Field>
 											);
 										}}

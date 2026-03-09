@@ -98,7 +98,7 @@ export default function JoinProjectForm({
 					new_user: 0,
 				};
 				localStorage.setItem('user', JSON.stringify(updatedUser));
-				localStorage.setItem('project', JSON.stringify(result.project));
+				localStorage.setItem('project', JSON.stringify(foundProject));
 			}
 		} catch (error) {
 			console.log(error);

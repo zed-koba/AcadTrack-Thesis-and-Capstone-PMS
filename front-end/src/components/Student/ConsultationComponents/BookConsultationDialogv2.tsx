@@ -28,8 +28,8 @@ import {
 } from 'date-fns';
 import {
 	getDayNumber,
+	getInformation,
 	getTime,
-	studentId,
 	userToken,
 } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
@@ -50,7 +50,7 @@ const BookConsultationDialog = ({
 }: BookConsultationprops) => {
 	const [currentStep, setCurrentStep] = useState<Step>('date');
 	const [selectedDate, setSelectedDate] = useState<Date>();
-
+	const information = getInformation();
 	const [purpose, setPurpose] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [selectedWindow, setSelectedWindow] =
@@ -192,7 +192,7 @@ const BookConsultationDialog = ({
 		setIsSubmitting(true);
 		const payLoad = {
 			adviser_id: project?.adviser_id,
-			student_id: studentId,
+			student_id: information.id,
 			date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
 			start_time: selectedWindow?.start_time.slice(0, 5),
 			end_time: selectedWindow?.end_time.slice(0, 5),
@@ -290,8 +290,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-													!isCompleted &&
-													'bg-muted text-muted-foreground',
+												!isCompleted &&
+												'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />

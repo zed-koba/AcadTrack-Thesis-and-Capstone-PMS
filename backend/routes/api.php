@@ -149,7 +149,7 @@ Route::prefix("instructor")->group(function () {
     Route::delete('deadlines/delete/{id}', [DocumentsDeadlineController::class, 'deleteDeadline']);
 
     Route::get('datas/{id}', [InstructorController::class, 'getDatas']);
-    Route::get('documents/{id}', [DocumentsController::class, 'getDocuments']);
+    Route::get('documents/{id}', [DocumentsController::class, 'getInstructorDocuments']);
 
     Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getInstructorDevelopmentProcess']);
     Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);

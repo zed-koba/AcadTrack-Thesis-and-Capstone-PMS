@@ -75,7 +75,13 @@ const StudentDetailsForm = ({
 		localStorage.setItem('data', JSON.stringify(updatedData));
 
 	};
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value
+		setMobileNumber(value)
+		//const regex = /^09\d{9}$/
 
+
+	}
 	return (
 		<Card>
 			<CardHeader className="text-center pb-4">
@@ -185,7 +191,9 @@ const StudentDetailsForm = ({
 						<Input
 							placeholder="e.g., 09171234567"
 							value={mobileNumber}
-							onChange={(e) => setMobileNumber(e.target.value)}
+							type="tel"
+							onChange={handleChange}
+							maxLength={11}
 						/>
 					</div>
 
@@ -205,7 +213,7 @@ const StudentDetailsForm = ({
 				<Button
 					className="w-full mt-2"
 					onClick={handleSubmit}
-					disabled={(!canProceed && loading) || (canProceed && !loading)}
+					disabled={!canProceed || loading}
 				>
 					{loading ? 'Continuing...' : `Continue`}
 					{loading ? '' : <ArrowRight className="h-4 w-4 ml-2" />}

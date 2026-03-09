@@ -32,7 +32,6 @@ const Consultation = () => {
 			const information = getInformation();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
-				console.log(result);
 				await setWeeklies(result.schedules);
 				await setProject(
 					result.projects.find((p: ProponentsDocumentsProps) => {

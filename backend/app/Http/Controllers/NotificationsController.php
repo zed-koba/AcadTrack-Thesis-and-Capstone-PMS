@@ -13,17 +13,18 @@ class NotificationsController extends Controller
 
     public function getNotifications($id, $role)
     {
-        if($role === "student") {
+        if ($role === "student") {
             $notification = Notifications::where("foreign_proponents_id", $id)->with("project.groupLeader.instructor:id,name", "adviser:id,name")->orderBy('created_at', 'DESC')->get();
-        }else if($role === "instructor") {
+        } else if ($role === "instructor") {
             $notification = Notifications::where('instructor_id', $id)->with("project", "project.details")->orderBy('created_at', 'DESC')->get();
-        }else if($role === "adviser") {
+        } else if ($role === "adviser") {
             $notification = Notifications::where('adviser_id', $id)->with("project", "project.details")->orderBy('created_at', 'DESC')->get();
         }
 
         return response()->json([
             'status' => 200,
             'notifications' => $notification,
+            'id' => $id,
         ], 200);
     }
 

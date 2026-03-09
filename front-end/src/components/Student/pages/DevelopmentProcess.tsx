@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import type { DevelopmentProcessProps } from '../interface/developmentprocess';
 import { Spinner } from '@/components/ui/spinner';
 import { apiStudentUrl } from '@/Routes/http';
-import { projectId, userToken } from '@/components/functions/functions';
+import { getProjectId, userToken } from '@/components/functions/functions';
 import StudentDevelopmentProcessComponent from '../DevelopmentProcess.tsx/StudentDP';
 
 const StudentDevelopmentProcess = () => {
 	const [developments, setDevelopments] = useState<DevelopmentProcessProps[]>(
 		[],
 	);
-
+	const projectId = getProjectId();
 	const [loading, setLoading] = useState(false);
 	const fetchDevelopment = async () => {
 		setLoading(true);

@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import type { NavItem } from '../interface/type';
 import { CircleUserRound, LogOut } from 'lucide-react';
 import { Separator } from '../ui/separator';
-import { information, projectId, user } from '../functions/functions';
+import { getInformation, projectId, user } from '../functions/functions';
 import api from '@/lib/api';
 import { api as apiUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ type NavItemProps = {
 };
 const Sidebar = ({ navItem }: NavItemProps) => {
 	const navigate = useNavigate();
+	const information = getInformation();
 	const handleLogout = async () => {
 		try {
 			await api.post(`${apiUrl}/logout`);

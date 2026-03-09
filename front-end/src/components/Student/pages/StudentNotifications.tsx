@@ -1,4 +1,4 @@
-import { information, projectId, user } from '@/components/functions/functions';
+import { getInformation, getProjectId, getUser } from '@/components/functions/functions';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { api } from '@/Routes/http';
@@ -20,7 +20,9 @@ import { format } from 'date-fns';
 const StudentNotifications = () => {
 	const [loading, setLoading] = useState(false);
 	const [notifications, setNotifications] = useState<NotificationProps[]>([]);
-
+	const user = getUser();
+	const information = getInformation();
+	const projectId = getProjectId();
 	const fetchNotifications = async () => {
 		try {
 			const res = await fetch(
@@ -36,6 +38,7 @@ const StudentNotifications = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 			const result = await res.json();
 			await setNotifications(result.notifications);
+			console.log(result);
 		} catch (error) {
 			console.log(error);
 		} finally {

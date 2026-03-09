@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { apiStudentUrl } from '@/Routes/http';
 
-import { studentId } from '@/components/functions/functions';
+import { getInformation, studentId } from '@/components/functions/functions';
 import {
 	Select,
 	SelectContent,
@@ -36,6 +36,7 @@ const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 	const [loading, setLoading] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const information = getInformation();
 	type formValues = z.infer<typeof uploadSchema>;
 	const defaultValues: formValues = {
 		document_title: '',
@@ -58,7 +59,7 @@ const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 
 			const formData = new FormData();
 			formData.append('file', selectedFile);
-			formData.append('student_id', String(studentId));
+			formData.append('student_id', information.id);
 			formData.append('title_name', value.document_title);
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {
@@ -226,11 +227,10 @@ const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 										</div>
 									) : (
 										<div
-											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-												dragActive
-													? 'border-primary bg-primary/5'
-													: 'border-muted-foreground/25'
-											}`}
+											className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
+												? 'border-primary bg-primary/5'
+												: 'border-muted-foreground/25'
+												}`}
 											onDragEnter={handleDrag}
 											onDragLeave={handleDrag}
 											onDragOver={handleDrag}

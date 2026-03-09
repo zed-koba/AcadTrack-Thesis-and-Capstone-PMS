@@ -1,4 +1,4 @@
-import { projectId, userToken } from '@/components/functions/functions';
+import { getProjectId, userToken } from '@/components/functions/functions';
 import { apiStudentUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import type { MyProjectProps } from '../interface/my-group';
@@ -7,9 +7,9 @@ import { Spinner } from '@/components/ui/spinner';
 import GroupComponents from '../MyGroupComponents/GroupComponent';
 
 const MyGroups = () => {
+	const projectId = getProjectId();
 	const [project, setProject] = useState<MyProjectProps>();
 	const [roles, setRoles] = useState<RolesProps[]>([]);
-
 	const [loading, setLoading] = useState(false);
 	const fetchGroup = async () => {
 		setLoading(true);

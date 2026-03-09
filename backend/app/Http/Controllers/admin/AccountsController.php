@@ -33,7 +33,7 @@ class AccountsController extends Controller
       'name' => 'required|string|unique:instructors,name|unique:students,name|unique:advisers,name',
       'password' => 'required',
     ];
-    $messages = [ 
+    $messages = [
       'student_id.unique' => 'Student ID already exists',
       'email.unique:accounts,email' => 'Email already exists',
     ];
@@ -55,20 +55,20 @@ class AccountsController extends Controller
       $account->role = $request->role;
       $account->save();
       $token = $account->createToken('auth_token')->plainTextToken;
-      if($request->role === 'student') {
+      if ($request->role === 'student') {
         $account->student()->create([
           'name' => $request->name,
           'student_id' => $request->student_id,
           'program' => $request->program,
           'section' => $request->section,
         ]);
-      } else if($request->role === 'instructor') {
+      } else if ($request->role === 'instructor') {
         $account->instructor()->create([
           'name' => $request->name,
           'account_id' => $account->id,
           'status' => 'active',
         ]);
-      } else if($request->role === 'adviser') {
+      } else if ($request->role === 'adviser') {
         $account->adviser()->create([
           'name' => $request->name,
           'account_id' => $account->id,
@@ -91,7 +91,6 @@ class AccountsController extends Controller
         'error' => $e->getMessage(),
       ], 500);
     }
-
   }
 
   public function updateAccount($id, Request $request)
@@ -125,7 +124,7 @@ class AccountsController extends Controller
       return response()->json([
         'status' => 200,
         'message' => 'Successfully updated account',
-        
+
       ], 200);
     } catch (\Exception $e) {
       DB::rollBack();
@@ -134,7 +133,6 @@ class AccountsController extends Controller
         'message' => 'An error occurred while updating the account.',
       ], 500);
     }
-
   }
 
   public function deleteAccount($id)
@@ -155,10 +153,10 @@ class AccountsController extends Controller
         'message' => 'An error occurred while deleting the account.',
       ], 500);
     }
-
   }
 
-  public function loginAccount(Request $request) {
+  public function loginAccount(Request $request)
+  {
     $rules = [
       'email' => 'required|email',
       'password' => 'required',
@@ -182,12 +180,12 @@ class AccountsController extends Controller
     }
     $token = $account->createToken('auth_token')->plainTextToken;
     $project = null;
-    switch($account->role) {
+    switch ($account->role) {
       case 'student':
         $data = Students::where('account_id', $account->id)->first();
         $project = Proponents::select("proponents_id")->where("student_id", $data->id)->first();
-        if(!$project) {
-          $project = ProponentsDetails::select("foreign_proponents_id")->where("student_id", $account->id)->first();
+        if (!$project) {
+          $project = ProponentsDetails::select("foreign_proponents_id")->where("student_id", $data->id)->first();
         }
         break;
       case 'instructor':
@@ -208,11 +206,11 @@ class AccountsController extends Controller
     ], 200);
   }
   public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
+  {
+    $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logged out'
-        ]);
-    }
+    return response()->json([
+      'message' => 'Logged out'
+    ]);
+  }
 }

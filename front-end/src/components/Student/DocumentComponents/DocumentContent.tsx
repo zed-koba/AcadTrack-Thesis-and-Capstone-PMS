@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ChapterItem from './ChapterItem';
-import { information } from '@/components/functions/functions';
+
 
 const DocumentContent = ({
 	documents,
@@ -16,11 +16,12 @@ const DocumentContent = ({
 	refresh,
 }: DocumentContentProps) => {
 	const studentIds = project?.details.map((v) => v.student_id);
+
 	const filterDocuments = useMemo(() => {
 		return documents.filter(
 			(doc) =>
 				studentIds?.includes(doc.student_id) ||
-				doc.student_id === information.id,
+				doc.student_id === project?.student_id,
 		);
 	}, [documents, studentIds]);
 
@@ -119,16 +120,7 @@ const DocumentContent = ({
 									</div>
 								) : (
 									<div className="space-y-4">
-										{/* {filteredChaptersGrouped.map((chapter) => (
-											<ChaptersDocument
-												key={chapter.chapter}
-												chapter={chapter}
-												isExpanded={expandedChapters.has(chapter.chapter)}
-												onToggle={() => toggleChapter(chapter.chapter)}
-												projectAdviser={project?.adviser ?? null}
-												refresh={refresh}
-											/>
-										))} */}
+
 										{filteredDocumentsGrouped.map((doc) => (
 											<ChapterItem
 												key={doc.id}
@@ -143,15 +135,7 @@ const DocumentContent = ({
 						</CardContent>
 					</Card>
 				</div>
-				{/* {selectedDocument && (
-					<DocumentsComments
-						document={selectedDocument}
-						refresh={refresh}
-						loading={loading}
-						adviser={projectAdviser}
-						setSelectedDocument={setSelectedDocument}
-					/>
-				)} */}
+
 			</section>
 		</>
 	);

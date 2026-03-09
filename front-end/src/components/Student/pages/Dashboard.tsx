@@ -52,6 +52,7 @@ const Dashboard = () => {
 	const [newTaskText, setNewTaskText] = useState('');
 	const [newTaskDeadline, setNewTaskDeadline] = useState<Date | undefined>();
 	const [copied, setCopied] = useState(false);
+	const [addingTask, setAddingTask] = useState(false);
 
 	const fetchDeadlines = async () => {
 		setLoading(true);
@@ -90,83 +91,95 @@ const Dashboard = () => {
 	};
 	const addTask = async () => {
 		if (!newTaskText.trim() && newTaskDeadline) return;
+		setAddingTask(true);
 		const payLoad = {
 			proponents_id: project?.proponents_id,
 			task: newTaskText,
 			deadline: format(newTaskDeadline?.toISOString() ?? '', 'yyyy-MM-dd'),
 		};
-		const res = await fetch(`${apiStudentUrl}/tasks/add`, {
-			method: 'POST',
-			headers: {
-				'Content-type': 'application/json',
-				Accept: 'application/json',
-			},
-			body: JSON.stringify(payLoad),
-		});
-		const result = await res.json();
-		if (result.status == 422) {
-			const errors = result.errors as Record<string, string[]>;
-			Object.values(errors).forEach((errorMessages) =>
-				errorMessages.forEach((message) => toast.error(message)),
-			);
-			return;
-		} else if (result.status == 500) {
-			toast.error(result.message);
-			console.log(result.error);
-			return;
-		}
-		if (!res.ok) {
-			console.log(result.status);
-			console.log('Failed to fetch data ' + JSON.stringify(payLoad));
-			return;
-		}
-		if (result.status === 201) {
-			toast.success(result.message);
-			setNewTaskText('');
-			setNewTaskDeadline(undefined);
-
-			setTasks((prev) => [
-				...prev,
-				{
-					id: tasks[tasks.length - 1]?.id + 1 || 1,
-					task: newTaskText.trim(),
-					is_completed: 0,
-					deadline: newTaskDeadline || new Date(),
-					foreign_proponents_id: project?.proponents_id || '',
-					created_at: new Date().toISOString(),
-					updated_at: new Date().toISOString(),
+		try {
+			const res = await fetch(`${apiStudentUrl}/tasks/add`, {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json',
+					Accept: 'application/json',
 				},
-			]);
+				body: JSON.stringify(payLoad),
+			});
+			const result = await res.json();
+			if (result.status == 422) {
+				const errors = result.errors as Record<string, string[]>;
+				Object.values(errors).forEach((errorMessages) =>
+					errorMessages.forEach((message) => toast.error(message)),
+				);
+				return;
+			} else if (result.status == 500) {
+				toast.error(result.message);
+				console.log(result.error);
+				return;
+			}
+			if (!res.ok) {
+				console.log(result.status);
+				console.log('Failed to fetch data ' + JSON.stringify(payLoad));
+				return;
+			}
+			if (result.status === 201) {
+				toast.success(result.message);
+				setNewTaskText('');
+				setNewTaskDeadline(undefined);
+
+				setTasks((prev) => [
+					...prev,
+					{
+						id: tasks[tasks.length - 1]?.id + 1 || 1,
+						task: newTaskText.trim(),
+						is_completed: 0,
+						deadline: newTaskDeadline || new Date(),
+						foreign_proponents_id: project?.proponents_id || '',
+						created_at: new Date().toISOString(),
+						updated_at: new Date().toISOString(),
+					},
+				]);
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setAddingTask(false);
 		}
 	};
 	const toggleTask = async (id: number) => {
-		const res = await fetch(`${apiStudentUrl}/tasks/update/${id}`, {
-			method: 'PUT',
-		});
-		const result = await res.json();
-		if (result.status == 422) {
-			const errors = result.errors as Record<string, string[]>;
-			Object.values(errors).forEach((errorMessages) =>
-				errorMessages.forEach((message) => console.log(message)),
-			);
-			return;
-		} else if (result.status == 500) {
-			toast.error(result.message);
-			console.log(result.error);
-			return;
-		}
-		if (!res.ok) {
-			console.log(result.status);
-			return;
-		}
-		if (result.status === 200) {
-			setTasks((prev) =>
-				prev.map((t) =>
-					t.id === id
-						? { ...t, is_completed: t.is_completed === 1 ? 0 : 1 }
-						: t,
-				),
-			);
+
+		try {
+			const res = await fetch(`${apiStudentUrl}/tasks/update/${id}`, {
+				method: 'PUT',
+			});
+			const result = await res.json();
+			if (result.status == 422) {
+				const errors = result.errors as Record<string, string[]>;
+				Object.values(errors).forEach((errorMessages) =>
+					errorMessages.forEach((message) => console.log(message)),
+				);
+				return;
+			} else if (result.status == 500) {
+				toast.error(result.message);
+				console.log(result.error);
+				return;
+			}
+			if (!res.ok) {
+				console.log(result.status);
+				return;
+			}
+			if (result.status === 200) {
+				setTasks((prev) =>
+					prev.map((t) =>
+						t.id === id
+							? { ...t, is_completed: t.is_completed === 1 ? 0 : 1 }
+							: t,
+					),
+				);
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	};
 	const handleCopyCode = () => {
@@ -396,8 +409,13 @@ const Dashboard = () => {
 											variant="outline"
 											onClick={addTask}
 											className="h-8 px-2"
+											disabled={!newTaskText.trim() || !newTaskDeadline || addingTask}
 										>
-											<Plus className="h-4 w-4" />
+											{addingTask ? (
+												<Spinner className="h-4 w-4" />
+											) : (
+												<Plus className="h-4 w-4" />
+											)}
 										</Button>
 									</div>
 									<div className="space-y-1 max-h-[280px] overflow-y-auto">
@@ -420,10 +438,10 @@ const Dashboard = () => {
 												</div>
 												<Badge
 													variant="outline"
-													className="text-[10px] shrink-0"
+													className="text-[10px] shrink-0 flex gap-1 items-center"
 												>
 													{/* task.deadline */}
-													No Due
+													{format(task.deadline, 'MMM d')}
 												</Badge>
 											</div>
 										))}

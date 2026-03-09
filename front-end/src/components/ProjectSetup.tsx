@@ -15,13 +15,14 @@ import ModeSelector from './Student/ProjectSetupComponents/ModeSelector';
 import CreateProjectForm from './Student/ProjectSetupComponents/CreateProjectForm';
 import JoinProjectForm from './Student/ProjectSetupComponents/JoinProjectForm';
 import { toast } from 'sonner';
-import { information } from './functions/functions';
+import { getInformation } from './functions/functions';
 import { Toaster } from './ui/sonner';
 import api from '@/lib/api';
 import { Button } from './ui/button';
 
 const StudentProjectSetup = () => {
 	const navigate = useNavigate();
+	const information = getInformation();
 	const [step, setStep] = useState<'details' | 'select' | 'create' | 'join'>(
 		!information.department_id ? 'details' : 'select',
 	);
@@ -73,6 +74,7 @@ const StudentProjectSetup = () => {
 	const handleDetailsComplete = async (details: StudentDetails) => {
 		setLoading(true);
 		try {
+			console.log(information.id);
 			const res = await fetch(
 				`${apiStudentUrl}/project-setup/updateStudent/${information.id}`,
 				{

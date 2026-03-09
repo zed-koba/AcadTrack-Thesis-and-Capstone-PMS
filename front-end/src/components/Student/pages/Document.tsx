@@ -6,7 +6,7 @@ import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
-import { information } from '@/components/functions/functions';
+import { getInformation } from '@/components/functions/functions';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 const Document = () => {
@@ -14,7 +14,7 @@ const Document = () => {
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 	const [deadlines, setDeadline] = useState<Deadlines[]>([]);
 	const [project, setProject] = useState<ProponentsDocumentsProps | null>(null);
-
+	const information = getInformation();
 	const fetchDocuments = async () => {
 		try {
 			const res = await fetch(`${apiStudentUrl}/documents/${information.id}`, {
@@ -41,6 +41,7 @@ const Document = () => {
 						}
 					}) ?? null,
 				);
+				console.log(result);
 			}
 		} catch (error) {
 			console.log(error);
