@@ -100,16 +100,21 @@ const ReportsContent = ({
 			const findDeadline = filterDeadlines.find(
 				(deadline) => deadline.document_title === doc.title_name,
 			);
-			const submitted = documentsGrouped.filter(
-				(doc) =>
-					doc.status === 'passed' &&
-					findDeadline?.document_title === doc.title_name,
+			const submitted = documentsGrouped.filter((doc) =>
+				doc.versions.length > 0
+					? doc.versions[0].status === 'passed' &&
+						findDeadline?.document_title === doc.versions[0].title_name
+					: doc.status === 'passed' &&
+						findDeadline?.document_title === doc.title_name,
 			).length;
 
-			const approved = documentsGrouped.filter(
-				(doc) =>
-					(doc.status === 'passed' || doc.status === 'approved') &&
-					findDeadline?.document_title === doc.title_name,
+			const approved = documentsGrouped.filter((doc) =>
+				doc.versions.length > 0
+					? (doc.versions[0].status === 'passed' ||
+							doc.versions[0].status === 'approved') &&
+						findDeadline?.document_title === doc.versions[0].title_name
+					: (doc.status === 'passed' || doc.status === 'approved') &&
+						findDeadline?.document_title === doc.title_name,
 			).length;
 
 			const totalRevision = doc.versions.length;
@@ -122,7 +127,7 @@ const ReportsContent = ({
 			};
 		});
 	}, [filterDeadlines, documentsGrouped]);
-
+	console.log(documentsGrouped);
 	const getDeadlinesData = useMemo(() => {
 		const totalOnTime = documentsGrouped.filter((doc) => {
 			const findDeadline = filterDeadlines.find(

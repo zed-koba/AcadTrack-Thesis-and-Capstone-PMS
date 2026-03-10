@@ -57,6 +57,7 @@ class DocumentsDeadlineController extends Controller
                 'instructor_id' => $request->instructor_id,
                 'document_title' => $request->document_title,
                 'deadline' => $request->deadline,
+                'is_finalManuscript' => $request->is_finalManuscript,
             ]);
 
             DB::commit();
@@ -93,12 +94,14 @@ class DocumentsDeadlineController extends Controller
             $deadline->update([
                 'document_title' => $request->document_title,
                 'deadline' => $request->deadline,
+                'is_finalManuscript' => $request->is_finalManuscript,
             ]);
 
             DB::commit();
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully updated deadline',
+                'deadline' => $deadline,
             ], 200);
         } catch (Exception $e) {
             DB::rollBack();

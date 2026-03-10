@@ -9,7 +9,7 @@ class DocumentsDeadline extends Model
 {
     //
     protected $table = 'documents_deadlines';
-    protected $fillable = ['instructor_id', 'document_title', 'deadline'];
+    protected $fillable = ['instructor_id', 'document_title', 'deadline', 'is_finalManuscript'];
 
     public function instructor() {
         return $this->belongsTo(Instructors::class, 'instructor_id');

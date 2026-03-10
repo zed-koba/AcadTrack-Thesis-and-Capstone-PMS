@@ -62,7 +62,7 @@ const SetDeadlineComponent = ({
 				instructor_id: instructorId,
 				document_title: value.document_title,
 				deadline: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
-				is_finalManuscript: value.is_finalManuscript,
+				is_finalManuscript: value.is_finalManuscript ? 1 : 0,
 			};
 
 			if (!selectedDate) {
@@ -181,6 +181,9 @@ const SetDeadlineComponent = ({
 																id="toggle-checkbox-2"
 																name="toggle-checkbox-2"
 																checked={field.state.value}
+																onCheckedChange={(v) =>
+																	field.handleChange(v as boolean)
+																}
 															/>
 															<FieldContent>
 																<FieldTitle>Final Manuscript</FieldTitle>
