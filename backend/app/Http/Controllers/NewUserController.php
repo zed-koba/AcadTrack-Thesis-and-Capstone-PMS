@@ -46,7 +46,6 @@ class NewUserController extends Controller
     public function updateStudent(Request $request, $id)
     {
         $rules = [
-            'department_id' => 'required|integer',
             'program_id' => 'required|integer',
             'semester' => 'required|integer',
             'yearLevel' => 'required|integer',
@@ -64,7 +63,6 @@ class NewUserController extends Controller
         try {
             $student = Students::findOrFail($id);
             $student->update([
-                'department_id' => $request->department_id,
                 'program_id' => $request->program_id,
                 'semester' => $request->semester,
                 'year_level' => $request->yearLevel,

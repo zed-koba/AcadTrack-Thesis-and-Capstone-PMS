@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('instructor_id')->constrained()->cascadeOnDelete();
             $table->string('document_title');
             $table->date('deadline');
+            $table->boolean('is_finalManuscript');
             $table->timestamps();
         });
     }
