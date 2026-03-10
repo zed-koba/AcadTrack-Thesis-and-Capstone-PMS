@@ -169,6 +169,7 @@ const WeeklyConsultation = ({
 		}),
 		[weekConsultations],
 	);
+
 	return (
 		<>
 			<Card className="bg-card border-border">

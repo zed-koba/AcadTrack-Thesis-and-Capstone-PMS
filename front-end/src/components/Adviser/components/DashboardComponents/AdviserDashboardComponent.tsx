@@ -153,54 +153,64 @@ const AdviserDashboardComponent = ({
 					</CardHeader>
 					<CardContent>
 						<ScrollArea className="max-h-[300px]">
-							<div className="space-y-2">
-								{projects.map((project) =>
-									project.features
-										.sort(
-											(a, b) =>
-												new Date(a.end_date).getTime() -
-												new Date(b.end_date).getTime(),
-										)
-										.map((item, i) => {
-											const days = differenceInDays(item.end_date, new Date());
-											const isOverdue = days < 0;
-											return (
-												<div
-													key={i}
-													className={`flex items-center justify-between p-3 rounded-lg border ${isOverdue ? 'bg-destructive/5 border-destructive/30' : days <= 3 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-muted/20'}`}
-												>
-													<div className="min-w-0">
-														<p className="font-medium text-sm truncate">
-															{item.feature}
-														</p>
-														<p className="text-[10px] text-muted-foreground">
-															{project.title}
-														</p>
-													</div>
-													<div className="flex items-center gap-2 shrink-0">
-														<div className="text-right">
-															<p className="text-xs font-medium">
-																{format(item.end_date, 'MMM dd')}
+							{projects.length > 0 ? (
+								<div className="space-y-2">
+									{projects.map((project) =>
+										project.features
+											.sort(
+												(a, b) =>
+													new Date(a.end_date).getTime() -
+													new Date(b.end_date).getTime(),
+											)
+											.map((item, i) => {
+												const days = differenceInDays(
+													item.end_date,
+													new Date(),
+												);
+												const isOverdue = days < 0;
+												return (
+													<div
+														key={i}
+														className={`flex items-center justify-between p-3 rounded-lg border ${isOverdue ? 'bg-destructive/5 border-destructive/30' : days <= 3 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-muted/20'}`}
+													>
+														<div className="min-w-0">
+															<p className="font-medium text-sm truncate">
+																{item.feature}
 															</p>
-															<p
-																className={`text-[10px] font-medium ${isOverdue ? 'text-destructive' : days <= 3 ? 'text-amber-500' : 'text-muted-foreground'}`}
-															>
-																{isOverdue
-																	? `${Math.abs(days)}d overdue`
-																	: days === 0
-																		? 'Due today'
-																		: `${days}d left`}
+															<p className="text-[10px] text-muted-foreground">
+																{project.title}
 															</p>
 														</div>
-														{isOverdue && (
-															<AlertTriangle className="h-4 w-4 text-destructive" />
-														)}
+														<div className="flex items-center gap-2 shrink-0">
+															<div className="text-right">
+																<p className="text-xs font-medium">
+																	{format(item.end_date, 'MMM dd')}
+																</p>
+																<p
+																	className={`text-[10px] font-medium ${isOverdue ? 'text-destructive' : days <= 3 ? 'text-amber-500' : 'text-muted-foreground'}`}
+																>
+																	{isOverdue
+																		? `${Math.abs(days)}d overdue`
+																		: days === 0
+																			? 'Due today'
+																			: `${days}d left`}
+																</p>
+															</div>
+															{isOverdue && (
+																<AlertTriangle className="h-4 w-4 text-destructive" />
+															)}
+														</div>
 													</div>
-												</div>
-											);
-										}),
-								)}
-							</div>
+												);
+											}),
+									)}
+								</div>
+							) : (
+								<div className="text-center py-8 text-muted-foreground">
+									<CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
+									<p className="text-sm">No features added yet.</p>
+								</div>
+							)}
 						</ScrollArea>
 					</CardContent>
 				</Card>

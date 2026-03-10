@@ -11,6 +11,7 @@ export type Deadlines = {
 	document_title: string;
 	deadline: Date;
 	instructor_id: number;
+	is_finalManuscript: number;
 	instructor: {
 		id: number;
 		name: string;

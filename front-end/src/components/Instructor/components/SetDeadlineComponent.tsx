@@ -12,17 +12,27 @@ import { Edit, Plus } from 'lucide-react';
 import { useState } from 'react';
 import z from 'zod';
 import type { SetDealineComponentProps } from '../interface/deadlines';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import {
+	Field,
+	FieldContent,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+	FieldTitle,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { apiInstructorUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { instructorId } from '@/components/functions/functions';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const deadlineschema = z.object({
 	document_title: z.string().min(1, 'Title is required'),
 	deadline: z.date(),
+	is_finalManuscript: z.boolean().optional(),
 });
 const SetDeadlineComponent = ({
 	deadline,
@@ -38,6 +48,7 @@ const SetDeadlineComponent = ({
 	const defaultValues: formValues = {
 		document_title: deadline?.document_title || '',
 		deadline: deadline ? new Date(deadline.deadline) : new Date(),
+		is_finalManuscript: deadline?.is_finalManuscript === 1 ? true : false,
 	};
 	const form = useForm({
 		defaultValues,
@@ -51,6 +62,7 @@ const SetDeadlineComponent = ({
 				instructor_id: instructorId,
 				document_title: value.document_title,
 				deadline: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
+				is_finalManuscript: value.is_finalManuscript,
 			};
 
 			if (!selectedDate) {
@@ -149,6 +161,40 @@ const SetDeadlineComponent = ({
 														<FieldError errors={field.state.meta.errors} />
 													)}
 												</Field>
+											</>
+										);
+									}}
+								/>
+							</div>
+							<div className="space-y-2">
+								<form.Field
+									name="is_finalManuscript"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<>
+												<FieldGroup className="w-full">
+													<FieldLabel>
+														<Field orientation="horizontal">
+															<Checkbox
+																id="toggle-checkbox-2"
+																name="toggle-checkbox-2"
+																checked={field.state.value}
+															/>
+															<FieldContent>
+																<FieldTitle>Final Manuscript</FieldTitle>
+																<FieldDescription>
+																	Mark this as the final manuscript for the
+																	deadline.
+																</FieldDescription>
+															</FieldContent>
+														</Field>
+													</FieldLabel>
+												</FieldGroup>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
 											</>
 										);
 									}}

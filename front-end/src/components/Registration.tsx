@@ -355,7 +355,7 @@ const Registration = () => {
 									return (
 										<Field data-invalid={isInvalid} className="space-y-2">
 											<FieldLabel className="mb-0" htmlFor={field.name}>
-												Register as
+												Departments:
 											</FieldLabel>
 											<Select
 												name={field.name}
