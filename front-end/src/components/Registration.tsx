@@ -4,7 +4,7 @@ import { toast, Toaster } from 'sonner';
 import { GraduationCap, EyeOff, Eye } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
 	Card,
 	CardContent,
@@ -24,19 +24,37 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from './ui/select';
-const registrationSchema = z.object({
-	first_name: z.string().min(1, 'First name is required'),
-	last_name: z.string().min(1, 'Last name is required'),
-	email: z.email('Invalid email address'),
-	role: z.enum(['student', 'adviser', 'instructor'], {
-		message: 'Role is required',
-	}),
-	password: z.string().min(8, 'Password must be at least 8 characters'),
-	section: z.string('Section is required'),
-	student_id: z.string().min(9, 'Student ID is required').regex(/^\d{2}-\d{7}$/, {
-		message: "Follow format: ##-#######",
-	}),
-});
+const registrationSchema = z
+	.object({
+		first_name: z.string().min(1, 'First name is required'),
+		last_name: z.string().min(1, 'Last name is required'),
+		email: z.string().email('Invalid email address'),
+		role: z.enum(['student', 'adviser', 'instructor'], {
+			message: 'Role is required',
+		}),
+		password: z.string().min(8, 'Password must be at least 8 characters'),
+		section: z.string().optional(), // make optional for now
+		student_id: z.string().optional(), // make optional for now
+	})
+	.superRefine((data, ctx) => {
+		if (data.role === 'student') {
+			if (!data.section || data.section.trim() === '') {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['section'],
+					message: 'Section is required for students',
+				});
+			}
+
+			if (!data.student_id || !/^\d{2}-\d{7}$/.test(data.student_id)) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['student_id'],
+					message: 'Student ID is required and must follow ##-#######',
+				});
+			}
+		}
+	});
 
 const Registration = () => {
 	const [showPassword, setShowPassword] = useState(false);
@@ -44,7 +62,7 @@ const Registration = () => {
 	const [role, setRole] = useState<'student' | 'adviser' | 'instructor'>(
 		'student',
 	);
-
+	const navigate = useNavigate();
 	type formValues = z.infer<typeof registrationSchema>;
 	const defaultValues: formValues = {
 		first_name: '',
@@ -64,6 +82,7 @@ const Registration = () => {
 		},
 		onSubmit: async ({ value }) => {
 			setLoading(true);
+
 			const payLoad = {
 				email: value.email,
 				password: value.password,
@@ -77,6 +96,7 @@ const Registration = () => {
 					method: 'POST',
 					headers: {
 						'Content-type': 'application/json',
+						Accept: 'application/json',
 					},
 					body: JSON.stringify(payLoad),
 				});
@@ -90,6 +110,7 @@ const Registration = () => {
 				if (result.status == 200) {
 					toast.success(result.message);
 					form.reset();
+					navigate('/Login');
 				}
 			} catch (error) {
 				toast.error('Registration failed. Please try again.');
@@ -287,10 +308,12 @@ const Registration = () => {
 													</button>
 												</div>
 												{isInvalid && (
-													<FieldError className="mt-0" errors={field.state.meta.errors} />
+													<FieldError
+														className="mt-0"
+														errors={field.state.meta.errors}
+													/>
 												)}
 											</div>
-
 										</Field>
 									);
 								}}
@@ -314,7 +337,9 @@ const Registration = () => {
 															value={field.state.value}
 															onBlur={field.handleBlur}
 															aria-invalid={isInvalid}
-															onChange={(e) => field.handleChange(e.target.value)}
+															onChange={(e) =>
+																field.handleChange(e.target.value)
+															}
 														/>
 														{isInvalid && (
 															<FieldError errors={field.state.meta.errors} />
