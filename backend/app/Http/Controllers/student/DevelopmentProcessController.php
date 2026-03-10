@@ -92,7 +92,7 @@ class DevelopmentProcessController extends Controller
             if (($request->status === 'completed' || $request->status === 'completed-late') && $development->status === 'in-progress') {
                 $development->update([
                     'status' => $request->status,
-                    'completed_date' => now(),
+                    'completed_date' => today(),
                 ]);
             }
             if ($request->status === 'in-progress') {
@@ -105,7 +105,7 @@ class DevelopmentProcessController extends Controller
             if ($request->status === 'checked') {
                 $development->update([
                     'status' => $request->status,
-                    'checked_date' => now(),
+                    'checked_date' => today(),
                 ]);
             }
             DB::commit();
@@ -113,6 +113,7 @@ class DevelopmentProcessController extends Controller
                 'status' => 200,
                 'message' => 'Sucessfully updated the status',
                 'development' => $development,
+
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

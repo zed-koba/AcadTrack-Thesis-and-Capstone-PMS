@@ -10,7 +10,7 @@ class DevelopmentProcess extends Model
 {
     //
     protected $table = "development_processes";
-    protected $fillable = ['foreign_proponents_id', 'feature', 'start_date', 'end_date', 'status'];
+    protected $fillable = ['foreign_proponents_id', 'feature', 'start_date', 'end_date', 'checked_date', 'completed_date', 'status'];
 
     public function project(): BelongsTo {
         return $this->belongsTo(Proponents::class, 'foreign_proponents_id', 'proponents_id');

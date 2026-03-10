@@ -104,6 +104,9 @@ Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(fu
     Route::get('documents/{id}', [DocumentsController::class, 'getStudentDocuments']);
 
     Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getAdviserDevelopmentProcess']);
+
+    Route::get('datas/{id}', [InstructorController::class, 'getAdviserDatas']);
+    Route::get('datas/reports/{id}', [InstructorController::class, 'getReportsData']);
 });
 
 Route::prefix("student")->group(function () {
@@ -142,6 +145,8 @@ Route::prefix("student")->group(function () {
     Route::post('my-group/transfer/{id}', [GroupController::class, 'transferGroupLeader']);
     Route::put('my-group/updateRole/{id}', [GroupController::class, 'updateRoleMember']);
     Route::delete('my-group/leaveGroup/{id}', [GroupController::class, 'leaveGroup']);
+
+    
 });
 
 Route::prefix("instructor")->group(function () {

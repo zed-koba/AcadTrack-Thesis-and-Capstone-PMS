@@ -29,7 +29,10 @@ import { Spinner } from '@/components/ui/spinner';
 import { apiAdviserUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import DeleteSchedule from './DeleteSchedule';
-import { generateTimeSlots, userToken } from '@/components/functions/functions';
+import {
+	generateTimeSlots,
+	getUserToken,
+} from '@/components/functions/functions';
 
 const availabilitySchema = z.object({
 	day: z.string().optional().nullable(),
@@ -47,7 +50,7 @@ const AvailabilityConsultation = ({
 	const [endTime, setEndTime] = useState<string | undefined>();
 	const [scheduleId, setScheduleId] = useState(0);
 	const [open, setOpen] = useState(false);
-
+	const userToken = getUserToken();
 	const timeSlots: string[] = useMemo(
 		() => generateTimeSlots(15).map((slot) => to12HourTime(slot.time)),
 		[],

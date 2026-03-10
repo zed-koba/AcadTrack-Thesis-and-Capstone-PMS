@@ -1,5 +1,3 @@
-import type { ProponentsDocumentsProps } from './adviserdocument';
-
 export const DAYS = [
 	'Monday',
 	'Tuesday',

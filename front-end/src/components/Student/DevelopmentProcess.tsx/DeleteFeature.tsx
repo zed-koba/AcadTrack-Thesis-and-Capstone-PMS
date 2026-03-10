@@ -10,14 +10,15 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { DeleteFeatureProps } from '../interface/developmentprocess';
 import { apiStudentUrl } from '@/Routes/http';
-import { userToken } from '@/components/functions/functions';
 import { toast } from 'sonner';
+import { getUserToken } from '@/components/functions/functions';
 
 const DeleteFeature = ({
 	setSelectedId,
 	selectedId,
 	refresh,
 }: DeleteFeatureProps) => {
+	const userToken = getUserToken();
 	const handleDelete = async () => {
 		try {
 			const res = await fetch(

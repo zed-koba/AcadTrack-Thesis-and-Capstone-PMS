@@ -27,6 +27,13 @@ const statusConfig = {
 		bgClass: 'bg-green-500/15',
 		textClass: 'text-green-500',
 	},
+	'completed-late': {
+		label: 'Late',
+		icon: AlertTriangle,
+		barClass: 'bg-amber-500',
+		bgClass: 'bg-amber-500/15',
+		textClass: 'text-amber-500',
+	},
 	checked: {
 		label: 'Checked',
 		icon: Check,
@@ -196,11 +203,7 @@ const DevelopmentGanttChart = ({
 							const cfg = getConfig(health, f.status);
 							const Icon = cfg.icon;
 							const left = getPos(f.start_date);
-							const end =
-								f.status === 'completed' && f.completed_date
-									? f.completed_date
-									: f.end_date;
-							const barWidth = getWidth(f.start_date, end);
+							const barWidth = getWidth(f.start_date, f.end_date);
 
 							// Progress fill for in-progress items
 							let fillWidth = barWidth;
@@ -212,14 +215,34 @@ const DevelopmentGanttChart = ({
 							}
 
 							const daysLeft = differenceInDays(f.end_date, new Date());
-							const tooltipText =
-								f.status === 'completed'
-									? `Completed ${f.completed_date ? format(f.completed_date, 'MMM dd, yyyy') : ''}`
-									: health === 'overdue'
-										? `${Math.abs(daysLeft)} days overdue`
-										: f.status === 'not-started'
-											? `Starts ${format(f.start_date, 'MMMM dd')} | ${daysLeft} days until deadline`
-											: `${daysLeft} days remaining`;
+							let tooltipText;
+
+							if (f.status === 'checked') {
+								tooltipText = (
+									<>
+										Checked at {format(f.checked_date, 'MMM dd, yyyy')}
+										<br />
+										Completed {format(f.completed_date, 'MMM dd, yyyy')}
+									</>
+								);
+							} else if (
+								f.status === 'completed' ||
+								f.status === 'completed-late'
+							) {
+								tooltipText = (
+									<>Completed {format(f.completed_date, 'MMM dd, yyyy')}</>
+								);
+							} else if (f.status === 'not-started') {
+								tooltipText = (
+									<>
+										Starts {format(f.start_date, 'MMMM dd')}
+										<br />
+										{daysLeft} days until deadline
+									</>
+								);
+							} else {
+								tooltipText = <>{daysLeft} days remaining</>;
+							}
 
 							return (
 								<div
@@ -295,11 +318,15 @@ const DevelopmentGanttChart = ({
 													{/* Label inside bar */}
 													{barWidth > 8 && (
 														<span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-white drop-shadow-sm z-10">
-															{f.status === 'completed'
-																? 'Done'
-																: f.status === 'in-progress'
-																	? `${Math.round((fillWidth / barWidth) * 100)}%`
-																	: 'Not Started'}
+															{f.status === 'checked'
+																? 'Checked'
+																: health === 'completed'
+																	? 'Done'
+																	: health === 'completed-late'
+																		? 'Completed Late'
+																		: f.status === 'in-progress'
+																			? `${Math.round((fillWidth / barWidth) * 100)}%`
+																			: 'Not Started'}
 														</span>
 													)}
 												</div>
@@ -310,19 +337,23 @@ const DevelopmentGanttChart = ({
 											>
 												<p className="font-medium text-white">{f.feature}</p>
 												<p className="text-muted-foreground">{tooltipText}</p>
+												{health === 'completed-late' && (
+													<p className="text-muted-foreground">{`${Math.abs(daysLeft)} days overdue`}</p>
+												)}
 											</TooltipContent>
 										</Tooltip>
 
 										{/* Overdue extension */}
-										{health === 'overdue' && (
-											<div
-												className="absolute top-1.5 h-5 rounded-r-md bg-destructive/20 border-r-2 border-destructive border-dashed"
-												style={{
-													left: `${getPos(f.end_date)}%`,
-													width: `${getWidth(f.end_date, new Date())}%`,
-												}}
-											/>
-										)}
+										{health === 'overdue' ||
+											(health === 'completed-late' && (
+												<div
+													className="absolute top-1.5 h-5 rounded-r-md bg-destructive/20 border-r-2 border-destructive border-dashed"
+													style={{
+														left: `${getPos(f.end_date)}%`,
+														width: `${getWidth(f.end_date, new Date())}%`,
+													}}
+												/>
+											))}
 									</div>
 								</div>
 							);

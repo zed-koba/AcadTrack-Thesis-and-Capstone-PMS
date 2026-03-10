@@ -34,8 +34,8 @@ import {
 } from '@/components/ui/tooltip';
 import {
 	consultationIcon,
+	getUserToken,
 	statusColor,
-	userToken,
 } from '@/components/functions/functions';
 import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
 import { cn } from '@/lib/utils';
@@ -53,6 +53,7 @@ const ConsultationDetails = ({
 	);
 	const nowDateTime = format(new Date(), 'HH:mm');
 	const [rescheduleDialog, setRescheduleDialog] = useState(false);
+	const userToken = getUserToken();
 	if (!weekly) return null;
 
 	const updateStatus = async (

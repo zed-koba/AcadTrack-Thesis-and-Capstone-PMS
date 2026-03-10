@@ -7,7 +7,7 @@ import type {
 } from '../interface/consultation';
 import { apiAdviserUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
-import { adviserId, userToken } from '@/components/functions/functions';
+import { adviserId, getUserToken } from '@/components/functions/functions';
 
 const AdviserConsultation = () => {
 	const [availabilities, setAvabilities] = useState<AdviserAvailabilityProps[]>(
@@ -15,6 +15,7 @@ const AdviserConsultation = () => {
 	);
 	const [weeklies, setWeeklies] = useState<AdviserWeeklyProps[]>([]);
 	const [loading, setLoading] = useState(true);
+	const userToken = getUserToken();
 	const fetchAvaibilities = async () => {
 		try {
 			const res = await fetch(`${apiAdviserUrl}/${adviserId}/availabilities`, {

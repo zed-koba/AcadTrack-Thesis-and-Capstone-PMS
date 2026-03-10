@@ -1,4 +1,4 @@
-import { getProjectId, userToken } from '@/components/functions/functions';
+import { getProjectId, getUserToken } from '@/components/functions/functions';
 import { apiStudentUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import type { MyProjectProps } from '../interface/my-group';
@@ -8,6 +8,7 @@ import GroupComponents from '../MyGroupComponents/GroupComponent';
 
 const MyGroups = () => {
 	const projectId = getProjectId();
+	const userToken = getUserToken();
 	const [project, setProject] = useState<MyProjectProps>();
 	const [roles, setRoles] = useState<RolesProps[]>([]);
 	const [loading, setLoading] = useState(false);

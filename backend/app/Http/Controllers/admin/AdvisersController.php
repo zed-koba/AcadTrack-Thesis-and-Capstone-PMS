@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 class AdvisersController extends Controller
 {
     //
-
     public function getAdvisers(Request $request)
     {
         $advisers = Advisers::with('account:id,email')->orderBy('created_at', 'DESC')->get();

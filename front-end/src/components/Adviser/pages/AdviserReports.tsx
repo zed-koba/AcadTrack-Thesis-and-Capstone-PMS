@@ -1,24 +1,30 @@
-import type { ProponentsProps } from '@/components/Admin/interface/proponent';
 import { getInformation, getUserToken } from '@/components/functions/functions';
+import type { DevelopmentProcessProps } from '@/components/Student/interface/developmentprocess';
 import { Spinner } from '@/components/ui/spinner';
 import { apiAdviserUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
-import type { DevelopmentProcessProps } from '@/components/Student/interface/developmentprocess';
-import AdviserDevelopmentMonitoring from '../components/AdviserDevelopmentMonitoring/AdviserDPMonitoring';
+import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
+import type { AdviserWeeklyProps } from '../interface/consultation';
+import type { DocumentProps } from '@/components/Student/interface/document';
+import ReportsContent from '../components/ReportsComponents.tsx/ReportsContent';
+import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
-const AdviserDevelopmentProcess = () => {
+const AdviserReports = () => {
 	const [developments, setDevelopments] = useState<DevelopmentProcessProps[]>(
 		[],
 	);
-	const [projects, setProjects] = useState<ProponentsProps[]>([]);
-	const information = getInformation();
-	const userToken = getUserToken();
+	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [weeklies, setWeeklies] = useState<AdviserWeeklyProps[]>([]);
+	const [documents, setDocuments] = useState<DocumentProps[]>([]);
+	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
 	const [loading, setLoading] = useState(false);
+	const userToken = getUserToken();
+	const information = getInformation();
 	const fetchDevelopment = async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
-				`${apiAdviserUrl}/development-process/${information.id}`,
+				`${apiAdviserUrl}/datas/reports/${information.id}`,
 				{
 					method: 'GET',
 					headers: {
@@ -33,6 +39,9 @@ const AdviserDevelopmentProcess = () => {
 			const result = await res.json();
 			setDevelopments(result.developments);
 			setProjects(result.projects);
+			setWeeklies(result.weeklies);
+			setDocuments(result.documents);
+			setDeadlines(result.deadlines);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -48,11 +57,9 @@ const AdviserDevelopmentProcess = () => {
 		<>
 			<div className="flex items-center justify-between text-white text-base">
 				<div className="flex items-start flex-col w-full justify-start">
-					<span className="text-2xl text-white">
-						Development Process Monitoring
-					</span>
+					<span className="text-2xl text-white">Students Documents</span>
 					<span className="text-sm text-white">
-						Oversee thesis/capstone groups development timelines (read-only)
+						Review, and provide comments on student submissions
 					</span>
 				</div>
 			</div>
@@ -62,10 +69,12 @@ const AdviserDevelopmentProcess = () => {
 				</div>
 			) : (
 				<>
-					<AdviserDevelopmentMonitoring
+					<ReportsContent
+						documents={documents}
 						projects={projects}
 						developments={developments}
-						refresh={fetchDevelopment}
+						weeklies={weeklies}
+						deadlines={deadlines}
 					/>
 				</>
 			)}
@@ -73,4 +82,4 @@ const AdviserDevelopmentProcess = () => {
 	);
 };
 
-export default AdviserDevelopmentProcess;
+export default AdviserReports;

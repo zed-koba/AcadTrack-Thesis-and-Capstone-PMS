@@ -30,7 +30,7 @@ import {
 	getDayNumber,
 	getInformation,
 	getTime,
-	userToken,
+	getUserToken,
 } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
 import { apiStudentUrl } from '@/Routes/http';
@@ -51,6 +51,7 @@ const BookConsultationDialog = ({
 	const [currentStep, setCurrentStep] = useState<Step>('date');
 	const [selectedDate, setSelectedDate] = useState<Date>();
 	const information = getInformation();
+	const userToken = getUserToken();
 	const [purpose, setPurpose] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [selectedWindow, setSelectedWindow] =
@@ -290,8 +291,8 @@ const BookConsultationDialog = ({
 												isActive && 'bg-primary text-primary-foreground',
 												isCompleted && 'bg-primary/20 text-primary',
 												!isActive &&
-												!isCompleted &&
-												'bg-muted text-muted-foreground',
+													!isCompleted &&
+													'bg-muted text-muted-foreground',
 											)}
 										>
 											<StepIcon className="h-4 w-4" />

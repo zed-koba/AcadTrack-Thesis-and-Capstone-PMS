@@ -46,6 +46,21 @@ class DocumentsController extends Controller
             'deadline' => $deadline,
         ], 200);
     }
+    public function getAdviserDocuments($id)
+    {
+        $document = Documents::with(
+            'comments',
+            'student:id,student_id,name'
+        )->orderBy('created_at', 'desc')->get();
+        $projects = Proponents::with('adviser', 'details', 'details.student', 'groupLeader:id,name,instructor_id,program_id,section', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->where('adviser_id', $id)->orderBy('created_at', 'asc')->get();
+        $deadline = DocumentsDeadline::orderBy('created_at', 'desc')->get();
+        return response()->json([
+            'status' => 200,
+            'document' => $document,
+            'projects' => $projects,
+            'deadline' => $deadline,
+        ], 200);
+    }
     public function getStudentDocuments($id)
     {
         $document = Documents::with(

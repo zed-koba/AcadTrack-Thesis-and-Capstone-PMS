@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
 import {
+	Activity,
 	Bell,
 	Calendar,
 	FileText,
@@ -37,6 +38,11 @@ const AdviserLayout = () => {
 			label: 'Development Monitoring',
 			to: '/Adviser/Development-Monitoring',
 			icon: <GitBranch className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'Reports',
+			to: '/Adviser/Reports',
+			icon: <Activity className="w-5 h-5" strokeWidth={2.5} />,
 		},
 	];
 	return (

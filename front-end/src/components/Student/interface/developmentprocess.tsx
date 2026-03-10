@@ -58,8 +58,10 @@ export const getDevelopmentHealth = (
 		}
 		return 'completed';
 	}
-
-	if (today > development.end_date) {
+	if (development.status === 'checked') {
+		return 'checked';
+	}
+	if (today > new Date(development.end_date)) {
 		return 'overdue';
 	}
 

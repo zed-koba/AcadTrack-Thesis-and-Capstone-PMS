@@ -19,12 +19,14 @@ const AdviserDPMonitoringContent = ({
 	project,
 	developments,
 }: DevelopmentMonitoringContentProps) => {
+	const progress = developments.filter(
+		(development) =>
+			development.status === 'checked' || development.status === 'completed',
+	).length;
 	const checkedDevelopmentProcess = developments.filter(
 		(development) => development.status === 'checked',
 	);
-	const completed = developments.filter(
-		(development) => development.status === 'completed',
-	).length;
+
 	const notStarted = developments.filter(
 		(development) => development.status === 'not-started',
 	).length;
@@ -36,7 +38,7 @@ const AdviserDPMonitoringContent = ({
 	).length;
 	const completionPct =
 		developments.length > 0
-			? Math.round((completed / developments.length) * 100)
+			? Math.round((progress / developments.length) * 100)
 			: 0;
 	const statusInfo: Record<
 		string,
@@ -50,6 +52,11 @@ const AdviserDPMonitoringContent = ({
 			label: 'Completed',
 			icon: Check,
 			classes: 'bg-green-500/15 text-green-500 border-green-500/30',
+		},
+		'completed-late': {
+			label: 'Completed Late',
+			icon: Check,
+			classes: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
 		},
 		checked: {
 			label: 'Checked ',
@@ -85,9 +92,7 @@ const AdviserDPMonitoringContent = ({
 								<p className="text-[11px] text-muted-foreground">Checked</p>
 							</div>
 							<div>
-								<p className="text-xl font-bold text-emerald-600">
-									{completed}
-								</p>
+								<p className="text-xl font-bold text-emerald-600">{progress}</p>
 								<p className="text-[11px] text-muted-foreground">Completed</p>
 							</div>
 							<div>
@@ -112,7 +117,7 @@ const AdviserDPMonitoringContent = ({
 					</div>
 					<Progress value={completionPct} className="h-2" />
 					<p className="text-[11px] text-muted-foreground mt-1.5">
-						{completed} of {developments.length} features completed
+						{progress} of {developments.length} features completed
 					</p>
 				</CardContent>
 			</Card>
@@ -153,10 +158,11 @@ const AdviserDPMonitoringContent = ({
 						{developments.map((f) => {
 							const health = getDevelopmentHealth(f);
 							const isOverdue = health === 'overdue';
-							const isComplete = f.status === 'completed';
+							const isComplete = health === 'completed';
 							const inProgress = f.status === 'in-progress';
 							const isChecked = f.status === 'checked';
-							const si = statusInfo[f.status];
+							const isCompletedLate = health === 'completed-late';
+							const si = statusInfo[health];
 							const Icon = si.icon;
 							const daysLeft = differenceInDays(f.end_date, new Date());
 
@@ -198,7 +204,7 @@ const AdviserDPMonitoringContent = ({
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2">
 											<p
-												className={`font-medium text-sm truncate ${isComplete ? 'line-through text-muted-foreground' : ''}`}
+												className={`font-medium text-sm truncate ${isComplete || isCompletedLate ? 'line-through text-muted-foreground' : ''}`}
 											>
 												{f.feature}
 											</p>
