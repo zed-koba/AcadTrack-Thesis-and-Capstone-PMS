@@ -1,3 +1,5 @@
+import type { ProjectDetails } from '@/components/Student/interface/project-setup';
+
 export const DAYS = [
 	'Monday',
 	'Tuesday',
@@ -64,24 +66,11 @@ export type AdviserWeeklyProps = {
 	status: string;
 	purpose: string;
 	feedback: string;
+
 	student: {
 		id: number;
 		name: string;
-		proponent_detail: {
-			student_id: number;
-			foreign_proponents_id: string;
-			proponent: {
-				proponents_id: string;
-				title: string;
-				details: {
-					student_id: number;
-					student: {
-						id: number;
-						name: string;
-					};
-				}[];
-			};
-		};
+		project: ProjectDetails;
 	};
 	adviser: {
 		id: number;

@@ -418,8 +418,7 @@ const WeeklyConsultation = ({
 																										<BookOpen className="h-4 w-4 shrink-0" />
 																										{
 																											consultation.student
-																												.proponent_detail
-																												.proponent.title
+																												.project.title
 																										}
 																									</div>
 																									<div className="opacity-80 text-[12px]">
@@ -438,8 +437,7 @@ const WeeklyConsultation = ({
 																						<div className="space-y-1">
 																							<div className="font-semibold text-sm">
 																								{
-																									consultation.student
-																										.proponent_detail.proponent
+																									consultation.student.project
 																										.title
 																								}
 																							</div>

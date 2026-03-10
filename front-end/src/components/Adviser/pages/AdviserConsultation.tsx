@@ -35,6 +35,7 @@ const AdviserConsultation = () => {
 			if (result.status === 200) {
 				setAvabilities(result.availabilities);
 				setWeeklies(result.weeklies);
+				console.log(result);
 			}
 		} catch (error) {
 			console.log(error);

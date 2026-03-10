@@ -175,7 +175,7 @@ const ConsultationDetails = ({
 								<div>
 									<p className="text-sm font-medium">Thesis/Capstone:</p>
 									<p className="text-sm text-muted-foreground">
-										{weekly.student.proponent_detail.proponent.title}
+										{weekly.student.project.title}
 									</p>
 								</div>
 							</div>
@@ -184,19 +184,23 @@ const ConsultationDetails = ({
 								<div>
 									<p className="text-sm font-medium">Members:</p>
 									<div className="text-sm text-muted-foreground flex gap-1.5 mt-1">
-										{weekly.student.proponent_detail.proponent.details.map(
-											(student) => (
-												<div
-													key={student.student.id}
-													className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
-												>
-													<User className="w-4 h-4" />
-													<p className="text-xs font-medium">
-														{student.student.name}
-													</p>
-												</div>
-											),
-										)}
+										<div className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary">
+											<User className="w-4 h-4" />
+											<p className="text-xs font-medium">
+												{weekly.student.project.group_leader.name}
+											</p>
+										</div>
+										{weekly.student.project.details.map((student) => (
+											<div
+												key={student.student.id}
+												className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
+											>
+												<User className="w-4 h-4" />
+												<p className="text-xs font-medium">
+													{student.student.name}
+												</p>
+											</div>
+										))}
 									</div>
 								</div>
 							</div>
