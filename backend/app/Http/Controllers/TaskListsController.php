@@ -29,9 +29,11 @@ class TaskListsController extends Controller
         $project = Proponents::where('proponents_id', $proponent_id)->with('adviser', 'details', 'groupLeader:id,name,instructor_id,program_id', 'groupLeader.instructor:id,name', 'groupLeader.program:id,name,code')->first();
         $student = Students::with('instructor', 'account')->findOrFail($id);
         $tasks = TaskLists::where('foreign_proponents_id', $proponent_id)->get();
+        $start = now()->toDateString(); 
+        $end = now()->addDays(14)->toDateString(); 
+
         $deadlines = DocumentsDeadline::where('instructor_id', $student->instructor_id)
-            ->whereDate('deadline', '>=', now())
-            ->whereDate('deadline', '<=', now()->addDays(14))
+            ->whereBetween('deadline', [$start, $end])
             ->with('instructor')
             ->get();
         return response()->json([

@@ -27,7 +27,7 @@ use App\Http\Controllers\TaskListsController;
 // })->middleware('auth:sanctum');
 Route::post('/login', [AccountsController::class, 'loginAccount']);
 Route::post('/accounts/add', [AccountsController::class, 'storeAccount']);
-
+Route::get('/getDepartments', [NewUserController::class, 'getDepartments']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AccountsController::class, 'logout']);
 });

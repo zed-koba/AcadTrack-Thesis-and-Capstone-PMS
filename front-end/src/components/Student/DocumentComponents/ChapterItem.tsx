@@ -138,14 +138,7 @@ const ChapterItem = ({
 						Submit to Instructor
 					</Button>
 				)}
-				{setOpenPass && (
-					<DocumentPass
-						document_id={checkVersion.id}
-						open={openPass}
-						setOpen={setOpenPass}
-						refresh={refresh}
-					/>
-				)}
+
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -327,6 +320,14 @@ const ChapterItem = ({
 					selectedDocumentId={1}
 					refresh={refresh}
 					checkIfLatestVersion={checkIfVersionLatest}
+				/>
+			)}
+			{setOpenPass && (
+				<DocumentPass
+					document_id={checkVersion.id}
+					open={openPass}
+					setOpen={setOpenPass}
+					refresh={refresh}
 				/>
 			)}
 		</div>

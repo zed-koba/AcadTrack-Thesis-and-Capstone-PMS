@@ -17,7 +17,14 @@ use Illuminate\Support\Facades\Validator;
 class NewUserController extends Controller
 {
     //
-
+    public function getDepartments()
+    {
+        $departments = Departments::where('status', 'active')->get();
+        return response()->json([
+            'status' => 200,
+            'departments' => $departments,
+        ], 200);
+    }
     public function getData()
     {
         $instructor = Instructors::where('status', 'active')->get();
@@ -76,12 +83,13 @@ class NewUserController extends Controller
         }
     }
 
-    public function joinProject(Request $request, $id) {
-        if(!$request) {
+    public function joinProject(Request $request, $id)
+    {
+        if (!$request) {
             return response()->json(['message' => 'Cant find the thesis group']);
         }
         DB::beginTransaction();
-        try { 
+        try {
             ProponentsDetails::create(attributes: [
                 'foreign_proponents_id' => $request->foreign_proponents_id,
                 'student_id' => $id,
@@ -90,7 +98,7 @@ class NewUserController extends Controller
             $groupLeader = Students::findOrFail($project->student_id);
             $student = Students::findOrFail($id);
             $student->update([
-                'instructor_id' => $groupLeader->instructor_id, 
+                'instructor_id' => $groupLeader->instructor_id,
             ]);
             Accounts::findOrFail($student->account_id)->update([
                 'new_user' => 0,
@@ -167,5 +175,4 @@ class NewUserController extends Controller
             );
         }
     }
-    
 }

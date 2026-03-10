@@ -62,7 +62,6 @@ type MonthlyConsultation = {
 	totalCancelledConsultation: number;
 };
 const ReportsContent = ({
-	developments,
 	deadlines,
 	documents,
 	weeklies,
@@ -73,9 +72,7 @@ const ReportsContent = ({
 	);
 	const project = projects.find((p) => p.id === selectedId);
 	const studentIdsArray = studentIds(project);
-	const filteredDevelopments = developments.filter(
-		(d) => d.foreign_proponents_id === project?.proponents_id,
-	);
+
 	const filteredWeeklies = project
 		? weeklies.filter((w) => studentIdsArray.includes(w.student_id))
 		: [];

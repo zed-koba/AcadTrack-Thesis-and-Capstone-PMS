@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('foreign_proponents_id')->nullable();
             $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
-            $table->foreignId('adviser_id')->constrained()->nullable()->cascadeOnDelete();
-            $table->foreignId('instructor_id')->constrained()->nullable()->cascadeOnDelete();
+            $table->foreignId('adviser_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('instructor_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('type');
             $table->string('title');
             $table->string('message');

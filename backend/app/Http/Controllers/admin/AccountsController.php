@@ -61,18 +61,21 @@ class AccountsController extends Controller
           'student_id' => $request->student_id,
           'program' => $request->program,
           'section' => $request->section,
+          'department_id' => $request->department_id,
         ]);
       } else if ($request->role === 'instructor') {
         $account->instructor()->create([
           'name' => $request->name,
           'account_id' => $account->id,
           'status' => 'active',
+          'department_id' => $request->department_id,
         ]);
       } else if ($request->role === 'adviser') {
         $account->adviser()->create([
           'name' => $request->name,
           'account_id' => $account->id,
           'status' => 'active',
+          'department_id' => $request->department_id,
         ]);
       }
 

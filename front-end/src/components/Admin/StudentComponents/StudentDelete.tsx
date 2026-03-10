@@ -14,7 +14,6 @@ import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { StudentDeleteProps } from '../interface/student';
-import { fa } from 'zod/v4/locales';
 
 const StudentDelete = ({
 	open,

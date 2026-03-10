@@ -4,7 +4,6 @@ import type {
 } from '@/components/Admin/interface/proponent';
 
 export type StudentDetails = {
-	department_id: number;
 	program_id: number;
 	yearLevel: number;
 	semester: number;

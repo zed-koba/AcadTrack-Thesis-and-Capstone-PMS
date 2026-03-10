@@ -1,5 +1,5 @@
 import { getInformation, getUserToken } from '@/components/functions/functions';
-import type { DevelopmentProcessProps } from '@/components/Student/interface/developmentprocess';
+
 import { Spinner } from '@/components/ui/spinner';
 import { apiAdviserUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
@@ -10,9 +10,6 @@ import ReportsContent from '../components/ReportsComponents.tsx/ReportsContent';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 const AdviserReports = () => {
-	const [developments, setDevelopments] = useState<DevelopmentProcessProps[]>(
-		[],
-	);
 	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
 	const [weeklies, setWeeklies] = useState<AdviserWeeklyProps[]>([]);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
@@ -37,7 +34,7 @@ const AdviserReports = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 
 			const result = await res.json();
-			setDevelopments(result.developments);
+
 			setProjects(result.projects);
 			setWeeklies(result.weeklies);
 			setDocuments(result.documents);
@@ -72,7 +69,6 @@ const AdviserReports = () => {
 					<ReportsContent
 						documents={documents}
 						projects={projects}
-						developments={developments}
 						weeklies={weeklies}
 						deadlines={deadlines}
 					/>

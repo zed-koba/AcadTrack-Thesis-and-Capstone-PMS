@@ -18,43 +18,35 @@ import {
 } from '@/components/ui/select';
 import { UserCircle, ArrowRight } from 'lucide-react';
 import type { StudentDetails } from '../interface/project-setup';
-import type { DepartmentProps } from '@/components/Admin/interface/department';
 import type { ProgramsProps } from '@/components/Admin/interface/programs';
 import { getInformation } from '@/components/functions/functions';
 
 interface StudentDetailsFormProps {
 	onComplete: (details: StudentDetails) => void;
-	departments: DepartmentProps[];
+
 	programs: ProgramsProps[];
 	loading: boolean;
 }
 
 const StudentDetailsForm = ({
 	onComplete,
-	departments,
 	programs,
 	loading,
 }: StudentDetailsFormProps) => {
-	const [yearLevel, setYearLevel] = useState(0);
-	const [semester, setSemester] = useState(0);
+	const [yearLevel, setYearLevel] = useState<number>();
+	const [semester, setSemester] = useState<number>();
 	const [mobileNumber, setMobileNumber] = useState('');
 	const [facebookProfile, setFacebookProfile] = useState('');
-	const [selectedDepartment, setSelectedDepartment] = useState<number | null>(
-		null,
-	);
+	const information = getInformation();
 	const [selectedProgram, setSelectedProgram] = useState<number | null>(null);
-
 	const filteredPrograms = programs.filter(
-		(p) => p.department_id === selectedDepartment,
+		(prog) => prog.department_id === information.department_id,
 	);
-
-	const canProceed =
-		selectedDepartment && selectedProgram && yearLevel && semester;
+	const canProceed = selectedProgram && yearLevel && semester;
 
 	const handleSubmit = () => {
 		if (!canProceed) return;
 		onComplete({
-			department_id: selectedDepartment,
 			program_id: selectedProgram,
 			yearLevel: yearLevel,
 			semester,
@@ -64,7 +56,7 @@ const StudentDetailsForm = ({
 		const informationOld = getInformation();
 		const updatedData = {
 			...informationOld,
-			department_id: selectedDepartment,
+
 			program_id: selectedProgram,
 			year_level: yearLevel,
 			semester: semester,
@@ -73,15 +65,12 @@ const StudentDetailsForm = ({
 		};
 
 		localStorage.setItem('data', JSON.stringify(updatedData));
-
 	};
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value
-		setMobileNumber(value)
+		const value = e.target.value;
+		setMobileNumber(value);
 		//const regex = /^09\d{9}$/
-
-
-	}
+	};
 	return (
 		<Card>
 			<CardHeader className="text-center pb-4">
@@ -94,31 +83,7 @@ const StudentDetailsForm = ({
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				<div className="grid gap-4 sm:grid-cols-2">
-					<div className="space-y-2">
-						<Label>
-							Department <span className="text-destructive">*</span>
-						</Label>
-						<Select
-							value={selectedDepartment?.toString() || ''}
-							onValueChange={(v) => {
-								setSelectedDepartment(Number(v));
-								setSelectedProgram(null);
-							}}
-						>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Select department" />
-							</SelectTrigger>
-							<SelectContent>
-								{departments.map((d) => (
-									<SelectItem key={d.id} value={d.id.toString()}>
-										{d.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-
+				<div className="grid gap-4 sm:grid-cols-1">
 					<div className="space-y-2">
 						<Label>
 							Program <span className="text-destructive">*</span>
@@ -126,16 +91,9 @@ const StudentDetailsForm = ({
 						<Select
 							value={selectedProgram?.toString() || ''}
 							onValueChange={(v) => setSelectedProgram(Number(v))}
-							disabled={!selectedDepartment}
 						>
 							<SelectTrigger className="w-full">
-								<SelectValue
-									placeholder={
-										selectedDepartment
-											? 'Select program'
-											: 'Select department first'
-									}
-								/>
+								<SelectValue placeholder="Select program" />
 							</SelectTrigger>
 							<SelectContent>
 								{filteredPrograms.map((p) => (
@@ -152,7 +110,7 @@ const StudentDetailsForm = ({
 							Year Level <span className="text-destructive">*</span>
 						</Label>
 						<Select
-							value={String(yearLevel)}
+							value={undefined}
 							onValueChange={(v) => setYearLevel(Number(v))}
 						>
 							<SelectTrigger className="w-full">
@@ -170,7 +128,7 @@ const StudentDetailsForm = ({
 							Semester <span className="text-destructive">*</span>
 						</Label>
 						<Select
-							value={String(semester)}
+							value={undefined}
 							onValueChange={(v) => setSemester(Number(v))}
 						>
 							<SelectTrigger className="w-full">

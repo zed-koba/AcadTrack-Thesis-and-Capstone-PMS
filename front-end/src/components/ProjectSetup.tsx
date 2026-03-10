@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import type { AdviserProps } from './Admin/interface/adviser';
 import type { InstructorProps } from './Admin/interface/instructor';
-import type { DepartmentProps } from './Admin/interface/department';
 import type { ProgramsProps } from './Admin/interface/programs';
 import type {
 	ProjectDetails,
@@ -24,11 +23,10 @@ const StudentProjectSetup = () => {
 	const navigate = useNavigate();
 	const information = getInformation();
 	const [step, setStep] = useState<'details' | 'select' | 'create' | 'join'>(
-		!information.department_id ? 'details' : 'select',
+		!information.program_id ? 'details' : 'select',
 	);
 	const [advisers, setAdvisers] = useState<AdviserProps[]>([]);
 	const [instructors, setInstructors] = useState<InstructorProps[]>([]);
-	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 	const [programs, setPrograms] = useState<ProgramsProps[]>([]);
 	const [projects, setProjects] = useState<ProjectDetails[]>([]);
 	const [loading, setLoading] = useState(false);
@@ -63,7 +61,6 @@ const StudentProjectSetup = () => {
 				setAdvisers(response.advisers);
 				setInstructors(response.instructors);
 				setPrograms(response.programs);
-				setDepartments(response.departments);
 				setProjects(response.projects);
 			}
 		} catch (error) {
@@ -148,7 +145,6 @@ const StudentProjectSetup = () => {
 				{step === 'details' && (
 					<StudentDetailsForm
 						onComplete={handleDetailsComplete}
-						departments={departments}
 						programs={programs}
 						loading={loading}
 					/>
@@ -170,9 +166,14 @@ const StudentProjectSetup = () => {
 					/>
 				)}
 				<div className="flex items-center justify-center">
-					<Button variant="ghost" className="text-center mt-8 cursor-pointer" onClick={handleLogout} disabled={loggingOut}>
+					<Button
+						variant="ghost"
+						className="text-center mt-8 cursor-pointer"
+						onClick={handleLogout}
+						disabled={loggingOut}
+					>
 						<p className="text-muted-foreground font-medium text-lg underline">
-							{loggingOut ? "Logging Out..." : "Logout"}
+							{loggingOut ? 'Logging Out...' : 'Logout'}
 						</p>
 					</Button>
 				</div>

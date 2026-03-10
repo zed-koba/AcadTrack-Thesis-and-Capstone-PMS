@@ -194,6 +194,7 @@ const Dashboard = () => {
 	const completedCount = tasks?.filter((d) => d.is_completed === 1).length;
 	const progressPercent =
 		tasks?.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+	console.log(deadlines);
 	return (
 		<>
 			<main className="flex-1 p-6 h-full">

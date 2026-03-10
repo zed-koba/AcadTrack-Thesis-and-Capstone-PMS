@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../Routes/http';
 import { toast, Toaster } from 'sonner';
 import { GraduationCap, EyeOff, Eye } from 'lucide-react';
@@ -24,6 +24,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from './ui/select';
+
+import type { DepartmentProps } from './Admin/interface/department';
 const registrationSchema = z
 	.object({
 		first_name: z.string().min(1, 'First name is required'),
@@ -32,6 +34,7 @@ const registrationSchema = z
 		role: z.enum(['student', 'adviser', 'instructor'], {
 			message: 'Role is required',
 		}),
+		department_id: z.number().min(1, 'Select a department'),
 		password: z.string().min(8, 'Password must be at least 8 characters'),
 		section: z.string().optional(), // make optional for now
 		student_id: z.string().optional(), // make optional for now
@@ -62,6 +65,7 @@ const Registration = () => {
 	const [role, setRole] = useState<'student' | 'adviser' | 'instructor'>(
 		'student',
 	);
+	const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 	const navigate = useNavigate();
 	type formValues = z.infer<typeof registrationSchema>;
 	const defaultValues: formValues = {
@@ -72,6 +76,7 @@ const Registration = () => {
 		password: '',
 		section: '',
 		student_id: '',
+		department_id: 0,
 	};
 
 	const form = useForm({
@@ -90,6 +95,7 @@ const Registration = () => {
 				role: value.role,
 				section: value.role === 'student' ? value.section : undefined,
 				student_id: value.role === 'student' ? value.student_id : undefined,
+				department_id: value.department_id,
 			};
 			try {
 				const res = await fetch(`${api}/accounts/add`, {
@@ -122,7 +128,28 @@ const Registration = () => {
 			}
 		},
 	});
+	const fetchData = async () => {
+		try {
+			const res = await fetch(`${api}/getDepartments`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+			});
+			if (!res.ok) throw new Error('Failed to fetch data');
+			const response = await res.json();
+			if (response.status === 200) {
+				setDepartments(response.departments);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
+	useEffect(() => {
+		fetchData();
+	}, []);
 	return (
 		<div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
 			<Toaster position="top-center" />
@@ -316,6 +343,45 @@ const Registration = () => {
 													/>
 												)}
 											</div>
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="department_id"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid} className="space-y-2">
+											<FieldLabel className="mb-0" htmlFor={field.name}>
+												Register as
+											</FieldLabel>
+											<Select
+												name={field.name}
+												value={undefined}
+												onValueChange={(v) => {
+													field.handleChange(Number(v));
+												}}
+											>
+												<SelectTrigger
+													className="w-auto"
+													aria-invalid={isInvalid}
+													id={field.name}
+												>
+													<SelectValue placeholder="Select your department" />
+												</SelectTrigger>
+												<SelectContent>
+													{departments.map((dept) => (
+														<SelectItem key={dept.id} value={String(dept.id)}>
+															{dept.name}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
 										</Field>
 									);
 								}}

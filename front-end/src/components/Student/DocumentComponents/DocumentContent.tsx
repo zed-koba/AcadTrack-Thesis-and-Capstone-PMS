@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ChapterItem from './ChapterItem';
 
-
 const DocumentContent = ({
 	documents,
 	project,
@@ -23,7 +22,7 @@ const DocumentContent = ({
 				studentIds?.includes(doc.student_id) ||
 				doc.student_id === project?.student_id,
 		);
-	}, [documents, studentIds]);
+	}, [documents, studentIds, project?.student_id]);
 
 	const [searchQuery, setSearchQuery] = useState('');
 	const documentsGrouped = useMemo(() => {
@@ -120,7 +119,6 @@ const DocumentContent = ({
 									</div>
 								) : (
 									<div className="space-y-4">
-
 										{filteredDocumentsGrouped.map((doc) => (
 											<ChapterItem
 												key={doc.id}
@@ -135,7 +133,6 @@ const DocumentContent = ({
 						</CardContent>
 					</Card>
 				</div>
-
 			</section>
 		</>
 	);
