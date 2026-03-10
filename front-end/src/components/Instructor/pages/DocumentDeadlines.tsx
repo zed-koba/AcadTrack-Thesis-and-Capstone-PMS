@@ -4,12 +4,13 @@ import type { Deadlines } from '../interface/deadlines';
 import { apiInstructorUrl } from '@/Routes/http';
 import DeadlinesComponent from '../components/DeadlinesComponent';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
-import { getInformation } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 const DocumentDeadlines = () => {
 	const [loading, setLoading] = useState(false);
 	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
 	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
 	const information = getInformation();
+	const userToken = getUserToken();
 	const fetchDeadlines = async () => {
 		setLoading(true);
 		try {
@@ -20,6 +21,7 @@ const DocumentDeadlines = () => {
 					headers: {
 						'Content-type': 'application/json',
 						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
 				},
 			);

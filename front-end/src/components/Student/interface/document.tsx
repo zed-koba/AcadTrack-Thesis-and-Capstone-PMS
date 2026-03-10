@@ -14,6 +14,7 @@ export type DocumentProps = {
 	size: number;
 	parent_document_id: number | null;
 	version: number;
+	approved_date: Date;
 	passed_date: Date;
 	created_at: string;
 	updated_at: string;

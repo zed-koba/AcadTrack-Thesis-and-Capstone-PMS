@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('contact_number')->nullable();
             $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
-            $table->integer('duration')->nullable();
-            $table->integer('consultation_limit')->nullable();
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
 import {
+	Archive,
 	Bell,
 	CalendarClock,
 	FileText,
@@ -37,6 +38,11 @@ const InstructorLayout = () => {
 			label: 'Development Process',
 			to: '/Instructor/Development-Monitoring',
 			icon: <GitBranch className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'Archives',
+			to: '/Instructor/Archives',
+			icon: <Archive className="w-5 h-5" strokeWidth={2.5} />,
 		},
 	];
 	return (

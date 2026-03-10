@@ -3,13 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
-import {
 	Table,
 	TableBody,
 	TableCell,
@@ -18,19 +11,50 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Archive, CheckCircle2, Clock, Download, Search } from 'lucide-react';
 import {
-	Archive,
-	CheckCircle2,
-	Clock,
-	Download,
-	Eye,
-	Search,
-} from 'lucide-react';
+	type ArchivingPendingProps,
+	type ArchivingContentProps,
+} from '../interface/archiving';
+import { format } from 'date-fns';
+import { useState } from 'react';
+import FinalApprovalDialog from './FinalApprovalDialog';
+import { toast } from 'sonner';
+import { apiInstructorUrl } from '@/Routes/http';
+import { downloadDocument } from '@/components/functions/functions';
 
-const ArchivingContent = () => {
+const ArchivingContent = ({
+	documents,
+	deadlines,
+	archives,
+	refresh,
+}: ArchivingContentProps) => {
+	const finalDeadlines = deadlines.map((deadline) => deadline.document_title);
+	const [selectedDoc, setSelectedDoc] = useState<
+		ArchivingPendingProps | undefined
+	>();
+	const [open, setOpen] = useState(false);
+	const archivedDocuments = archives
+		? archives.map((archive) => archive.foreign_proponents_id)
+		: [];
+	const pendingDocs = documents.filter(
+		(doc) =>
+			finalDeadlines.includes(doc.title_name) &&
+			!archivedDocuments.includes(doc.student.project.proponents_id),
+	);
+	const [searchQuery, setSearchQuery] = useState('');
+	const filteredArchived = archives.filter((doc) => {
+		const matchesSearch =
+			doc.project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			doc.project.details.some((m) =>
+				m.student.name.toLowerCase().includes(searchQuery.toLowerCase()),
+			);
+		return matchesSearch;
+	});
+
 	return (
 		<>
-			<Tabs defaultValue="pending" className="space-y-4">
+			<Tabs defaultValue="pending" className="space-y-4 mt-5">
 				<TabsList>
 					<TabsTrigger value="pending" className="gap-1.5">
 						<Clock className="h-3.5 w-3.5" />
@@ -57,32 +81,11 @@ const ArchivingContent = () => {
 						</CardHeader>
 						<CardContent>
 							{/* Flow diagram */}
-							<div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-6 flex-wrap">
-								<Badge variant="outline" className="text-xs">
-									Student Submits
-								</Badge>
-								<span>→</span>
-								<Badge className="bg-green-600/20 text-green-400 border-green-600/30 text-xs">
-									Adviser Approves ✓
-								</Badge>
-								<span>→</span>
-								<Badge
-									variant="outline"
-									className="border-primary/50 text-primary text-xs font-semibold"
-								>
-									Instructor Confirms (You)
-								</Badge>
-								<span>→</span>
-								<Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
-									Auto-Archived
-								</Badge>
-							</div>
-
 							<Table>
 								<TableHeader>
 									<TableRow>
 										<TableHead>Project Title</TableHead>
-										<TableHead>Group</TableHead>
+										<TableHead className="text-center">Project</TableHead>
 										<TableHead>Program</TableHead>
 										<TableHead>Adviser Approved By</TableHead>
 										<TableHead>Approved Date</TableHead>
@@ -96,24 +99,31 @@ const ArchivingContent = () => {
 											<TableCell>
 												<div>
 													<p className="font-medium text-foreground">
-														{doc.projectTitle}
+														{doc.title_name}
 													</p>
 													<p className="text-xs text-muted-foreground">
-														{doc.members.join(', ')}
+														{doc.student.project.details
+															?.map((d) => d.student?.name)
+															.filter(Boolean)
+															.join(', ')}
 													</p>
 												</div>
 											</TableCell>
-											<TableCell>
-												<Badge variant="outline">{doc.groupName}</Badge>
+											<TableCell className="text-center">
+												<Badge variant="outline">
+													{doc.student.project.title}
+												</Badge>
 											</TableCell>
 											<TableCell>
-												<Badge variant="secondary">{doc.program}</Badge>
+												<Badge variant="secondary">
+													{doc.student.program.code}
+												</Badge>
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm">
-												{doc.adviserApprovedBy}
+												{doc.student.project.adviser.name}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm">
-												{doc.adviserApprovedDate.toLocaleDateString()}
+												{format(new Date(doc.approved_date), 'yyyy-MM-dd')}
 											</TableCell>
 											<TableCell>
 												<Badge variant="outline">v{doc.version}</Badge>
@@ -123,7 +133,7 @@ const ArchivingContent = () => {
 													size="sm"
 													onClick={() => {
 														setSelectedDoc(doc);
-														setDialogOpen(true);
+														setOpen(true);
 													}}
 												>
 													<CheckCircle2 className="h-4 w-4 mr-1" />
@@ -164,32 +174,6 @@ const ArchivingContent = () => {
 										className="pl-9"
 									/>
 								</div>
-								<Select value={filterYear} onValueChange={setFilterYear}>
-									<SelectTrigger className="w-[160px]">
-										<SelectValue placeholder="Academic Year" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="all">All Years</SelectItem>
-										{uniqueYears.map((y) => (
-											<SelectItem key={y} value={y}>
-												{y}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<Select
-									value={filterSemester}
-									onValueChange={setFilterSemester}
-								>
-									<SelectTrigger className="w-[160px]">
-										<SelectValue placeholder="Semester" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="all">All Semesters</SelectItem>
-										<SelectItem value="1st Semester">1st Semester</SelectItem>
-										<SelectItem value="2nd Semester">2nd Semester</SelectItem>
-									</SelectContent>
-								</Select>
 							</div>
 						</CardContent>
 					</Card>
@@ -205,12 +189,12 @@ const ArchivingContent = () => {
 								<TableHeader>
 									<TableRow>
 										<TableHead>Project Title</TableHead>
-										<TableHead>Group</TableHead>
+
 										<TableHead>Program</TableHead>
 										<TableHead>Semester</TableHead>
 										<TableHead>Adviser Approved</TableHead>
 										<TableHead>Archived Date</TableHead>
-										<TableHead>Size</TableHead>
+										<TableHead>Version</TableHead>
 										<TableHead className="text-right">Actions</TableHead>
 									</TableRow>
 								</TableHeader>
@@ -220,30 +204,35 @@ const ArchivingContent = () => {
 											<TableCell>
 												<div>
 													<p className="font-medium text-foreground">
-														{doc.projectTitle}
+														{doc.project.title}
 													</p>
 													<p className="text-xs text-muted-foreground">
-														{doc.members.join(', ')}
+														{doc.project.details
+															?.map((d) => d.student?.name)
+															.filter(Boolean)
+															.join(', ')}
 													</p>
 												</div>
 											</TableCell>
+
 											<TableCell>
-												<Badge variant="outline">{doc.groupName}</Badge>
-											</TableCell>
-											<TableCell>
-												<Badge variant="secondary">{doc.program}</Badge>
-											</TableCell>
-											<TableCell className="text-muted-foreground text-sm">
-												{doc.semester} {doc.academicYear}
+												<Badge variant="secondary">
+													{doc.project.group_leader.program.code}
+												</Badge>
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm">
-												{doc.approvedBy}
+												{doc.project.group_leader.semester}{' '}
+												{doc.project.academic_yr}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm">
-												{doc.archivedDate.toLocaleDateString()}
+												{doc.project.adviser.name}
+											</TableCell>
+
+											<TableCell className="text-muted-foreground text-sm">
+												{format(new Date(doc.archived_date), 'yyyy-MM-dd')}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm">
-												{doc.fileSize}
+												<Badge variant="outline">v{doc.version}</Badge>
 											</TableCell>
 											<TableCell className="text-right">
 												<div className="flex items-center justify-end gap-1">
@@ -251,13 +240,9 @@ const ArchivingContent = () => {
 														variant="ghost"
 														size="icon"
 														className="h-8 w-8"
-													>
-														<Eye className="h-4 w-4" />
-													</Button>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8"
+														onClick={() => {
+															downloadDocument(doc.id, doc.original_name);
+														}}
 													>
 														<Download className="h-4 w-4" />
 													</Button>
@@ -281,14 +266,14 @@ const ArchivingContent = () => {
 					</Card>
 				</TabsContent>
 			</Tabs>
-
-			<FinalApprovalDialog
-				open={dialogOpen}
-				onOpenChange={setDialogOpen}
-				document={selectedDoc}
-				onConfirm={handleConfirmArchive}
-				onReject={handleRejectDoc}
-			/>
+			{selectedDoc && open && (
+				<FinalApprovalDialog
+					open={open}
+					setOpen={setOpen}
+					document={selectedDoc}
+					refresh={refresh}
+				/>
+			)}
 		</>
 	);
 };

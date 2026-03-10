@@ -32,6 +32,7 @@ export type ProponentsDocumentsProps = Omit<ProponentsProps, 'details'> & {
 		instructor_id: number;
 		program_id: number;
 		section: string;
+		semester: string;
 		instructor: {
 			id: number;
 			name: string;

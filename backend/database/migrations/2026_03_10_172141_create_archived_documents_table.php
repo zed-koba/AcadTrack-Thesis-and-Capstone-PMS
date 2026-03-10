@@ -16,9 +16,7 @@ return new class extends Migration
             $table->string('foreign_proponents_id');
             $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
             $table->string('original_name');
-            $table->string('title_name');
-            $table->string('stored_name');
-            $table->enum('status', ['under-review', 'archived'])->default('under-review');
+            $table->string('stored_name');      
             $table->string('path');
             $table->string('mime_type', 100);
             $table->unsignedBigInteger('size');

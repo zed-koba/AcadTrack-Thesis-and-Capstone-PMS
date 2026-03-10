@@ -35,6 +35,7 @@ import InstructorDevelopmentProcess from '@/components/Instructor/pages/Instruct
 import MyGroups from '@/components/Student/pages/MyGroups';
 import AdviserDevelopmentProcess from '@/components/Adviser/pages/AdviserDevelopmentProcess';
 import AdviserReports from '@/components/Adviser/pages/AdviserReports';
+import InstructorArchiving from '@/components/Instructor/pages/InstructorArchiving';
 
 export const router = createBrowserRouter([
 	{
@@ -137,6 +138,10 @@ export const router = createBrowserRouter([
 			{
 				path: 'Development-Monitoring',
 				element: <InstructorDevelopmentProcess />,
+			},
+			{
+				path: 'Archives',
+				element: <InstructorArchiving />,
 			},
 		],
 	},

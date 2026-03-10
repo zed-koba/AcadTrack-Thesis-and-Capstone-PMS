@@ -12,6 +12,7 @@ use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
 use App\Http\Controllers\adviser\DocumentCommentsController;
+use App\Http\Controllers\ArchivedDocumentsController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\instructor\DocumentsDeadlineController;
 use App\Http\Controllers\InstructorController;
@@ -20,7 +21,6 @@ use App\Http\Controllers\student\DevelopmentProcessController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\TaskListsController;
-
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -84,6 +84,8 @@ Route::prefix("admin")->group(function () {
     Route::post('instructors/add', [InstructorsController::class, 'storeInstructor']);
     Route::put('instructors/edit/{id}', [InstructorsController::class, 'updateInstructor']);
     Route::delete('instructors/delete/{id}', [InstructorsController::class, 'deleteInstructor']);
+
+   
 });
 
 
@@ -160,6 +162,11 @@ Route::prefix("instructor")->group(function () {
 
     Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getInstructorDevelopmentProcess']);
     Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
+
+     //Archiving
+    Route::get('archiving', [ArchivedDocumentsController::class, 'getDocuments']);
+    Route::post('archiving/add', [ArchivedDocumentsController::class,'storeDocument']);
+    Route::get('archving/{id}/download/pdf', [ArchivedDocumentsController::class, 'downloadDocument']);
 });
 
 Route::get('notifications/{id}/{role}', [NotificationsController::class, 'getNotifications']);
