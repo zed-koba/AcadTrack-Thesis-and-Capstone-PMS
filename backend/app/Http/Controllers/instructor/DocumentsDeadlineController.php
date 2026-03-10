@@ -22,7 +22,7 @@ class DocumentsDeadlineController extends Controller
                     ->with('program:id,name,code')
                     ->with('document'); 
             },
-            'adviser.department:id,name,code'
+            'adviser.department:id,name,code', 'details', 'details.student', 'details.student.document'
         ])
             ->whereHas('groupLeader', function ($query) use ($id) {
                 $query->where('instructor_id', $id);

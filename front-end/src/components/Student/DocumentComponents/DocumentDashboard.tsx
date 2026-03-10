@@ -11,10 +11,11 @@ import {
 import type { DocumentDashboardProps } from '../interface/document';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { information } from '@/components/functions/functions';
+import { getInformation } from '@/components/functions/functions';
 
 const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
 	const studentIds = project?.details.map((v) => v.student_id);
+	const information = getInformation();
 	const filterStudent = documents.filter(
 		(d) =>
 			studentIds?.includes(d.student_id) || d.student_id === information.id,

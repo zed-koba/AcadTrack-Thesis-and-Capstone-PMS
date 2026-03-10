@@ -185,7 +185,7 @@ class AccountsController extends Controller
         $data = Students::where('account_id', $account->id)->first();
         $project = Proponents::select("proponents_id")->where("student_id", $data->id)->first();
         if (!$project) {
-          $project = ProponentsDetails::select("foreign_proponents_id")->where("student_id", $data->id)->first();
+          $project = ProponentsDetails::select("foreign_proponents_id as proponents_id")->where("student_id", $data->id)->first();
         }
         break;
       case 'instructor':

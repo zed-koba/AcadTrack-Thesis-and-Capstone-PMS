@@ -46,34 +46,36 @@ class DocumentCommentsController extends Controller
             ]);
             $document = Documents::find($request->document_id);
             if (!$document) return response()->json(['message' => 'Document doesnt exist'], 404);
+
             if ($request->comment_type === 'general') {
                 $document->update([
                     'status' => 'under review',
                 ]);
-                $message = 'general';
+                $message = 'Under Review';
             } else if ($request->comment_type === 'need revision') {
                 $document->update([
                     'status' => 'need revision',
                 ]);
-                $message = 'revision';
+                $message = 'Need Revision';
             } else {
                 $document->update([
                     'status' => 'approved',
                     'approved_date' => now(),
                 ]);
+                $message = 'Approved';
             }
             NotificationService::store([
                 'foreign_proponents_id' => $request->foreign_proponents_id,
                 'type' => 'document',
                 'title' => $request->adviser_name,
-                'message' => 'has commented on ' . $request->document_title,
+                'message' => 'has commented and updated the status to "'. $message . '" for ' . $request->document_title,
             ]);
             DB::commit();
 
             return response()->json([
                 'status' => 201,
                 'message' => 'Comment Added',
-                
+
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -33,6 +33,16 @@ class DevelopmentProcessController extends Controller
             'projects' => $projects,
         ], 200);
     }
+    public function getAdviserDevelopmentProcess($id)
+    {
+        $development = DevelopmentProcess::orderBy('created_at', 'DESC')->get();
+        $projects = Proponents::where('adviser_id', $id)->orderBy('created_at', 'ASC')->get();
+
+        return response()->json([
+            'developments' => $development,
+            'projects' => $projects,
+        ], 200);
+    }
 
     public function storeDevelopmentProcess(Request $request)
     {

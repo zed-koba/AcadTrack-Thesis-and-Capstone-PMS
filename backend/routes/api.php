@@ -102,6 +102,8 @@ Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(fu
     Route::post('comments/add', [DocumentCommentsController::class, 'storeComment']);
     //Documents
     Route::get('documents/{id}', [DocumentsController::class, 'getStudentDocuments']);
+
+    Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getAdviserDevelopmentProcess']);
 });
 
 Route::prefix("student")->group(function () {

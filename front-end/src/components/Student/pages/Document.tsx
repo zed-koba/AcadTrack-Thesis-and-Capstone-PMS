@@ -6,7 +6,7 @@ import type { DocumentProps } from '../interface/document';
 import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
-import { getInformation } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 const Document = () => {
@@ -14,6 +14,7 @@ const Document = () => {
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 	const [deadlines, setDeadline] = useState<Deadlines[]>([]);
 	const [project, setProject] = useState<ProponentsDocumentsProps | null>(null);
+	const userToken = getUserToken();
 	const information = getInformation();
 	const fetchDocuments = async () => {
 		try {
@@ -22,6 +23,7 @@ const Document = () => {
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 			});
 
@@ -41,7 +43,6 @@ const Document = () => {
 						}
 					}) ?? null,
 				);
-				console.log(result);
 			}
 		} catch (error) {
 			console.log(error);

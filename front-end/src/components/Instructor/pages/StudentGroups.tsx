@@ -3,7 +3,7 @@ import { apiInstructorUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import GroupsComponent from '../components/GroupsComponent';
-import { information } from '@/components/functions/functions';
+import { getInformation } from '@/components/functions/functions';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import type { Deadlines } from '../interface/deadlines';
 
@@ -12,6 +12,7 @@ const StudentGroups = () => {
 	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
+	const information = getInformation();
 	const fetchProponents = async () => {
 		try {
 			const res = await fetch(

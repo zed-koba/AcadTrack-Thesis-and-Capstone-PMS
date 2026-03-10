@@ -1,6 +1,6 @@
 import { apiAdviserUrl } from '@/Routes/http';
 import type { DocumentProps } from '@/components/Student/interface/document';
-import { information, userToken } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,8 +42,9 @@ const CommentAddDialog = ({
 }) => {
 	const [open, setOpen] = useState(false);
 	const [submitLoading, setSubmitLoading] = useState(false);
-
+	const information = getInformation();
 	type formValues = z.infer<typeof commentSchema>;
+	const userToken = getUserToken();
 	const defaultValues: formValues = {
 		comment_type: 'general',
 		comment: '',

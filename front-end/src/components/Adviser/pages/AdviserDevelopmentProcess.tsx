@@ -1,24 +1,23 @@
 import type { ProponentsProps } from '@/components/Admin/interface/proponent';
-import { getInformation, getUserToken } from '@/components/functions/functions';
+import { getInformation, userToken } from '@/components/functions/functions';
 import { Spinner } from '@/components/ui/spinner';
-import { apiInstructorUrl } from '@/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
-import DevelopmentMonitoring from '../components/DPMonitoring';
 import type { DevelopmentProcessProps } from '@/components/Student/interface/developmentprocess';
+import AdviserDevelopmentMonitoring from '../components/AdviserDevelopmentMonitoring/AdviserDPMonitoring';
 
-const InstructorDevelopmentProcess = () => {
+const AdviserDevelopmentProcess = () => {
 	const [developments, setDevelopments] = useState<DevelopmentProcessProps[]>(
 		[],
 	);
 	const [projects, setProjects] = useState<ProponentsProps[]>([]);
 	const information = getInformation();
-	const userToken = getUserToken();
 	const [loading, setLoading] = useState(false);
 	const fetchDevelopment = async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
-				`${apiInstructorUrl}/development-process/${information.id}`,
+				`${apiAdviserUrl}/development-process/${information.id}`,
 				{
 					method: 'GET',
 					headers: {
@@ -62,7 +61,7 @@ const InstructorDevelopmentProcess = () => {
 				</div>
 			) : (
 				<>
-					<DevelopmentMonitoring
+					<AdviserDevelopmentMonitoring
 						projects={projects}
 						developments={developments}
 						refresh={fetchDevelopment}
@@ -73,4 +72,4 @@ const InstructorDevelopmentProcess = () => {
 	);
 };
 
-export default InstructorDevelopmentProcess;
+export default AdviserDevelopmentProcess;

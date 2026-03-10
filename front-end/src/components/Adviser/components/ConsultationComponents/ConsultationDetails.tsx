@@ -35,6 +35,7 @@ import {
 import {
 	consultationIcon,
 	statusColor,
+	userToken,
 } from '@/components/functions/functions';
 import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
 import { cn } from '@/lib/utils';
@@ -73,6 +74,7 @@ const ConsultationDetails = ({
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 				body: JSON.stringify(payLoad),
 			});
@@ -353,6 +355,7 @@ const ConsultationDetails = ({
 									}}
 									className="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-500 col-start-1 col-span-2"
 									variant="outline"
+									disabled={!feedback}
 								>
 									<Check />
 									Leave a feedback

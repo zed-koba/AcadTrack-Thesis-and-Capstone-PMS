@@ -1,17 +1,18 @@
-import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 import { useEffect, useState } from 'react';
 import type { Deadlines } from '../interface/deadlines';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import { apiInstructorUrl } from '@/Routes/http';
-import { information } from '@/components/functions/functions';
+import { getInformation } from '@/components/functions/functions';
 import { Spinner } from '@/components/ui/spinner';
 import DashboardComponent from '../components/DashboardComponent';
+import type { ProponentsWithFeatures } from '../interface/dashboard';
 
 const InstructorDashboard = () => {
-	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [projects, setProjects] = useState<ProponentsWithFeatures[]>([]);
 	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 	const [loading, setLoading] = useState(false);
+	const information = getInformation();
 	const fetchDatas = async () => {
 		try {
 			setLoading(true);

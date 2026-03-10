@@ -12,7 +12,7 @@ import { Crown, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { apiStudentUrl } from '@/Routes/http';
-import { information, userToken } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 import { toast } from 'sonner';
 
 const TransferLeadership = ({
@@ -22,6 +22,8 @@ const TransferLeadership = ({
 	refresh,
 }: TransferLeadershipProps) => {
 	const [selectedId, setSelectedId] = useState<number | null>(null);
+	const information = getInformation();
+	const userToken = getUserToken();
 	const handleConfirm = async () => {
 		const payLoad = {
 			id: selectedId,

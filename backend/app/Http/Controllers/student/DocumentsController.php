@@ -84,16 +84,24 @@ class DocumentsController extends Controller
         try {
             $file = $request->file('file');
             $path = $file->store('documents', 'public');
-
+            $project = Proponents::where('proponents_id', $request->project_id)->first();
             $parentDocumentId = null;
             $version = 1;
             $status = "pending";
-            $existDocument = Documents::where("title_name", "$request->title_name")->where("parent_document_id", null)->first();
+            $notif_message = 'has uploaded a new document';
+            $existDocument = Documents::where("title_name", $request->title_name)->where("parent_document_id", null)->first();
             if ($existDocument) {
                 $parentDocumentId = $existDocument->id;
                 $latestVersion = Documents::where('parent_document_id', $parentDocumentId)
                     ->max('version');
                 $version = ($latestVersion ?? 1) + 1;
+                if ($latestVersion) {
+                    $getLatestVersion = Documents::where('parent_document_id', $parentDocumentId)->where('version', $latestVersion);
+                    $getLatestVersion->update(['status' => 'revised']);
+                } else {
+                    $existDocument->update(['status' => 'revised']);
+                }
+                $notif_message = 'has uploaded a revision of ' . $request->title_name;
             }
             if ($request->filled('parent_document_id')) {
                 $parentDocumentId = $request->parent_document_id;
@@ -101,6 +109,7 @@ class DocumentsController extends Controller
                     ->max('version');
                 $version = ($latestVersion ?? 1) + 1;
                 $currentDoc = Documents::findOrFail($request->currentId)->update(['status' => 'revised']);
+                $notif_message = 'has uploaded a revision of ' . $request->title_name;
             }
 
 
@@ -117,19 +126,24 @@ class DocumentsController extends Controller
                 'status' => $status,
             ]);
 
-            //event(NotificationService($document));
+            NotificationService::store([
+                'adviser_id' => $project->adviser_id,
+                'type' => 'document',
+                'title' => $project->title,
+                'message' => $notif_message,
+            ]);
             DB::commit();
             return response()->json([
                 'status' => 201,
                 'message' => 'Document uploaded succesfully',
 
-            ], 201);
+            ], status: 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 500,
                 'message' => 'Failed to insert document',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { apiStudentUrl } from '@/Routes/http';
-import { projectId, userToken } from '@/components/functions/functions';
+import { getProjectId, getUserToken } from '@/components/functions/functions';
 import { toast } from 'sonner';
 
 const featureScehma = z.object({
@@ -48,6 +48,8 @@ const AddFeatureDialog = ({
 	setOpen,
 	setSelectedFeature,
 }: AddFeatureProps) => {
+	const projectId = getProjectId();
+	const userToken = getUserToken();
 	const [loading, setLoading] = useState(false);
 	const [startDate, setStartDate] = useState<Date | undefined>(
 		development ? development.start_date : undefined,
@@ -163,8 +165,7 @@ const AddFeatureDialog = ({
 								}}
 							/>
 							<div className="grid grid-cols-2 gap-3">
-
-								<Field >
+								<Field>
 									<FieldLabel htmlFor="deadline">Start Date *</FieldLabel>
 									<Popover>
 										<PopoverTrigger asChild>
@@ -176,9 +177,7 @@ const AddFeatureDialog = ({
 												)}
 											>
 												<CalendarIcon className="mr-2 h-4 w-4" />
-												{startDate
-													? format(startDate, 'PPP')
-													: 'Pick date'}
+												{startDate ? format(startDate, 'PPP') : 'Pick date'}
 											</Button>
 										</PopoverTrigger>
 										<PopoverContent className="w-auto p-0" align="start">
@@ -194,9 +193,7 @@ const AddFeatureDialog = ({
 								</Field>
 
 								<Field>
-									<FieldLabel htmlFor="deadline">
-										Target Date *
-									</FieldLabel>
+									<FieldLabel htmlFor="deadline">Target Date *</FieldLabel>
 									<Popover>
 										<PopoverTrigger asChild>
 											<Button

@@ -33,6 +33,7 @@ import AdviserNotifications from '@/components/Adviser/pages/AdviserNotification
 import StudentDevelopmentProcess from '@/components/Student/pages/DevelopmentProcess';
 import InstructorDevelopmentProcess from '@/components/Instructor/pages/InstructorDevelopmentProcess';
 import MyGroups from '@/components/Student/pages/MyGroups';
+import AdviserDevelopmentProcess from '@/components/Adviser/pages/AdviserDevelopmentProcess';
 
 export const router = createBrowserRouter([
 	{
@@ -80,6 +81,10 @@ export const router = createBrowserRouter([
 			{ path: 'Consultation', element: <AdviserConsultation /> },
 			{ path: 'Documents', element: <AdviserStudentDocument /> },
 			{ path: 'Notifications', element: <AdviserNotifications /> },
+			{
+				path: 'Development-Monitoring',
+				element: <AdviserDevelopmentProcess />,
+			},
 		],
 	},
 	{

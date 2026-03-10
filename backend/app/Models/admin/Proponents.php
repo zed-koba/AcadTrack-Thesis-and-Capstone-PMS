@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\admin\ProponentsDetails;
 use App\Models\Notifications;
+use App\Models\student\DevelopmentProcess;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -36,6 +37,10 @@ class Proponents extends Model
 
     public function groupLeader(): BelongsTo {
         return $this->belongsTo(Students::class, 'student_id');
+    }
+
+    public function features(): HasMany {
+        return $this->hasMany(DevelopmentProcess::class, 'foreign_proponents_id', 'proponents_id');
     }
     protected static function booted()
     {

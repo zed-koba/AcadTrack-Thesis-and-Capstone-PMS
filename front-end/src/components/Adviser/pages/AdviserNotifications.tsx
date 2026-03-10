@@ -1,4 +1,8 @@
-import { information, projectId, user } from '@/components/functions/functions';
+import {
+	getInformation,
+	getProjectId,
+	getUser,
+} from '@/components/functions/functions';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { api } from '@/Routes/http';
@@ -21,7 +25,9 @@ import type { NotificationProps } from '@/components/Student/interface/notificat
 const AdviserNotifications = () => {
 	const [loading, setLoading] = useState(false);
 	const [notifications, setNotifications] = useState<NotificationProps[]>([]);
-
+	const information = getInformation();
+	const user = getUser();
+	const projectId = getProjectId();
 	const fetchNotifications = async () => {
 		try {
 			const res = await fetch(

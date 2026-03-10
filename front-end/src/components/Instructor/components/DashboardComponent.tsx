@@ -1,8 +1,10 @@
 import {
+	AlertTriangle,
 	CalendarClock,
 	CheckCircle2,
 	ChevronRight,
 	FileText,
+	GitBranch,
 	Users,
 } from 'lucide-react';
 import type { InstructorDashboardProps } from '../interface/dashboard';
@@ -88,7 +90,7 @@ const DashboardComponent = ({
 						<Button
 							variant="outline"
 							size="sm"
-							onClick={() => navigate('/Instructor/deadlines')}
+							onClick={() => navigate('/Instructor/Deadlines')}
 						>
 							Manage <ChevronRight className="h-4 w-4 ml-1" />
 						</Button>
@@ -134,6 +136,78 @@ const DashboardComponent = ({
 											No upcoming deadlines in the next 14 days
 										</p>
 									</div>
+								)}
+							</div>
+						</ScrollArea>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="pb-2 flex flex-row items-center justify-between">
+						<div>
+							<CardTitle className="text-lg flex items-center gap-2">
+								<GitBranch className="h-5 w-5" />
+								Development Features to Check
+							</CardTitle>
+							<CardDescription>
+								Features approaching or past their target dates
+							</CardDescription>
+						</div>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => navigate('/Instructor/Development-Monitoring')}
+						>
+							View All <ChevronRight className="h-4 w-4 ml-1" />
+						</Button>
+					</CardHeader>
+					<CardContent>
+						<ScrollArea className="max-h-[300px]">
+							<div className="space-y-2">
+								{projects.map((project) =>
+									project.features
+										.sort(
+											(a, b) =>
+												new Date(a.end_date).getTime() -
+												new Date(b.end_date).getTime(),
+										)
+										.map((item, i) => {
+											const days = differenceInDays(item.end_date, new Date());
+											const isOverdue = days < 0;
+											return (
+												<div
+													key={i}
+													className={`flex items-center justify-between p-3 rounded-lg border ${isOverdue ? 'bg-destructive/5 border-destructive/30' : days <= 3 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-muted/20'}`}
+												>
+													<div className="min-w-0">
+														<p className="font-medium text-sm truncate">
+															{item.feature}
+														</p>
+														<p className="text-[10px] text-muted-foreground">
+															{project.title}
+														</p>
+													</div>
+													<div className="flex items-center gap-2 shrink-0">
+														<div className="text-right">
+															<p className="text-xs font-medium">
+																{format(item.end_date, 'MMM dd')}
+															</p>
+															<p
+																className={`text-[10px] font-medium ${isOverdue ? 'text-destructive' : days <= 3 ? 'text-amber-500' : 'text-muted-foreground'}`}
+															>
+																{isOverdue
+																	? `${Math.abs(days)}d overdue`
+																	: days === 0
+																		? 'Due today'
+																		: `${days}d left`}
+															</p>
+														</div>
+														{isOverdue && (
+															<AlertTriangle className="h-4 w-4 text-destructive" />
+														)}
+													</div>
+												</div>
+											);
+										}),
 								)}
 							</div>
 						</ScrollArea>

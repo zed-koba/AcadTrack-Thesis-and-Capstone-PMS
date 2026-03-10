@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { LeaveGroupProps } from '../interface/my-group';
 import { apiStudentUrl } from '@/Routes/http';
-import { user, userToken } from '@/components/functions/functions';
+import { getUser, getUserToken } from '@/components/functions/functions';
 
 const LeaveGroupComponent = ({
 	open,
@@ -18,6 +18,8 @@ const LeaveGroupComponent = ({
 	selectedId,
 	refresh,
 }: LeaveGroupProps) => {
+	const user = getUser();
+	const userToken = getUserToken();
 	const handleDelete = async () => {
 		try {
 			const res = await fetch(

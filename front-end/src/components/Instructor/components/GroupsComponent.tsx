@@ -1,5 +1,5 @@
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
-import { information, studentIds } from '@/components/functions/functions';
+import { getInformation, studentIds } from '@/components/functions/functions';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,6 +41,7 @@ const GroupsComponent = ({
 	documents,
 	deadlines,
 }: GroupsComponentProps) => {
+	const information = getInformation();
 	const filterProjects = projects.filter(
 		(project) => project.group_leader.instructor_id === information.id,
 	);

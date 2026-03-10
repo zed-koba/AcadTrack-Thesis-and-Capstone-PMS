@@ -21,7 +21,7 @@ import {
 	User,
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { information, userToken } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 import {
 	Select,
 	SelectContent,
@@ -36,6 +36,8 @@ import { apiStudentUrl } from '@/Routes/http';
 
 const GroupComponents = ({ project, roles, refresh }: GroupComponentProps) => {
 	const [copied, setCopied] = useState(false);
+	const information = getInformation();
+	const userToken = getUserToken();
 	const [transferOpen, setTransferOpen] = useState(false);
 	const [members] = useState<DetailsDocumentsProps[]>(
 		project ? project.details : [],
@@ -59,7 +61,7 @@ const GroupComponents = ({ project, roles, refresh }: GroupComponentProps) => {
 	// 		project.group_leader.role_id !== role.id ||
 	// 		project.details.map((d) => d.student.role_id).includes(role.id),
 	// );
-	console.log(project.group_leader.department_id);
+
 	const handleRole = async (student_id: number, role_id: number) => {
 		try {
 			const res = await fetch(

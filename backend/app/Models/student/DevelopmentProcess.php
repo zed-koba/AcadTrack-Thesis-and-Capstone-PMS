@@ -13,6 +13,6 @@ class DevelopmentProcess extends Model
     protected $fillable = ['foreign_proponents_id', 'feature', 'start_date', 'end_date', 'status'];
 
     public function project(): BelongsTo {
-        return $this->belongsTo(Proponents::class, 'foreign_proponents_id');
+        return $this->belongsTo(Proponents::class, 'foreign_proponents_id', 'proponents_id');
     }
 }

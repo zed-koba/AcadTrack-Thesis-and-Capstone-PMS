@@ -1,4 +1,8 @@
-import { getInformation, getProjectId, getUser } from '@/components/functions/functions';
+import {
+	getInformation,
+	getProjectId,
+	getUser,
+} from '@/components/functions/functions';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { api } from '@/Routes/http';

@@ -62,6 +62,7 @@ const DeadlinesComponent = ({
 			const leaderDocs = project.group_leader?.document ?? [];
 
 			const allDocuments = [...studentDocs, ...leaderDocs];
+
 			const matchingDocument = allDocuments.find(
 				(doc) =>
 					doc.status === 'passed' &&
@@ -111,6 +112,7 @@ const DeadlinesComponent = ({
 					<div className="grid gap-3">
 						{activeDeadlines.map((deadline) => {
 							const groupStatuses = getGroupStatusForDeadline(deadline) ?? [];
+							console.log(groupStatuses);
 							const submitted = groupStatuses?.filter(
 								(s) =>
 									s.submissionStatus === 'submitted-on-time' ||
@@ -337,10 +339,14 @@ const DeadlinesComponent = ({
 																{project.project.title}
 															</p>
 															<p className="text-[11px] text-muted-foreground">
+																{project.project.group_leader.name}
+																{project.project.details ? ', ' : ''}
 																{project.project.details
-																	.map((detail) => detail.student.name)
-																	.flat()
-																	.join(', ')}
+																	? project.project.details
+																			.map((detail) => detail.student.name)
+																			.flat()
+																			.join(', ')
+																	: ''}
 															</p>
 														</div>
 														<div className="flex items-center gap-2">

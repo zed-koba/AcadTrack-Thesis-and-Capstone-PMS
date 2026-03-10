@@ -39,10 +39,10 @@ export const getInformation = () => {
 export const getProjectId = () => {
 	return JSON.parse(localStorage.getItem('project') || '{}');
 };
-export const user = getUser();
-export const information = getInformation();
-export const projectId = getProjectId();
-export const userToken = localStorage.getItem('token');
+export const getUserToken = () => {
+	return localStorage.getItem('token') || '';
+};
+
 export function formatDateWithTime(dateString: string) {
 	const date = new Date(dateString);
 

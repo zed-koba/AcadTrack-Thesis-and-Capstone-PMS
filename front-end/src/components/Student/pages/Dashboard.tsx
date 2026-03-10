@@ -9,7 +9,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { apiStudentUrl } from '@/Routes/http';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays, format, isBefore } from 'date-fns';
 import {
 	BookOpen,
 	CalendarIcon,
@@ -148,7 +148,6 @@ const Dashboard = () => {
 		}
 	};
 	const toggleTask = async (id: number) => {
-
 		try {
 			const res = await fetch(`${apiStudentUrl}/tasks/update/${id}`, {
 				method: 'PUT',
@@ -400,6 +399,11 @@ const Dashboard = () => {
 													selected={newTaskDeadline}
 													onSelect={setNewTaskDeadline}
 													initialFocus
+													disabled={(date) => {
+														const checkDate = new Date(date);
+														checkDate.setHours(0, 0, 0, 0);
+														return checkDate < new Date();
+													}}
 													className={cn('p-3 pointer-events-auto')}
 												/>
 											</PopoverContent>
@@ -409,7 +413,9 @@ const Dashboard = () => {
 											variant="outline"
 											onClick={addTask}
 											className="h-8 px-2"
-											disabled={!newTaskText.trim() || !newTaskDeadline || addingTask}
+											disabled={
+												!newTaskText.trim() || !newTaskDeadline || addingTask
+											}
 										>
 											{addingTask ? (
 												<Spinner className="h-4 w-4" />
@@ -419,32 +425,47 @@ const Dashboard = () => {
 										</Button>
 									</div>
 									<div className="space-y-1 max-h-[280px] overflow-y-auto">
-										{tasks.map((task) => (
-											<div
-												key={task.id}
-												className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
-												onClick={() => toggleTask(task.id)}
-											>
-												<Checkbox
-													checked={task.is_completed === 1 ? true : false}
-													onCheckedChange={() => toggleTask(task.id)}
-												/>
-												<div className="flex-1 min-w-0">
-													<p
-														className={`text-sm ${task.is_completed ? 'line-through text-muted-foreground' : ''}`}
-													>
-														{task.task}
-													</p>
-												</div>
-												<Badge
-													variant="outline"
-													className="text-[10px] shrink-0 flex gap-1 items-center"
+										{tasks.map((task) => {
+											const isDeadlineOverdue = isBefore(
+												task.deadline,
+												new Date(),
+											);
+											return (
+												<div
+													key={task.id}
+													className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
+													onClick={() => toggleTask(task.id)}
 												>
-													{/* task.deadline */}
-													{format(task.deadline, 'MMM d')}
-												</Badge>
-											</div>
-										))}
+													<Checkbox
+														checked={task.is_completed === 1 ? true : false}
+														onCheckedChange={() => toggleTask(task.id)}
+													/>
+													<div className="flex-1 min-w-0">
+														<p
+															className={`text-sm ${task.is_completed ? 'line-through text-muted-foreground' : ''}`}
+														>
+															{task.task}
+														</p>
+													</div>
+													<div className="flex gap-1">
+														<Badge
+															variant="outline"
+															className="text-[10px] shrink-0 flex gap-1 items-center"
+														>
+															{format(task.deadline, 'MMM d')}
+														</Badge>
+														{isDeadlineOverdue && (
+															<Badge
+																variant="destructive"
+																className="text-[10px] shrink-0 flex gap-1 items-center bg-red-500/20 text-red-500"
+															>
+																Overdue
+															</Badge>
+														)}
+													</div>
+												</div>
+											);
+										})}
 									</div>
 								</CardContent>
 							</Card>
