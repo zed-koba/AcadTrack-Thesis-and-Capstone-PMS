@@ -9,6 +9,7 @@ export type DevelopmentHealth =
 	| 'completed'
 	| 'completed-late'
 	| 'overdue'
+	| 'not-started'
 	| 'checked';
 
 export type DevelopmentProcessProps = {
@@ -64,8 +65,8 @@ export const getDevelopmentHealth = (
 	if (today > new Date(development.end_date)) {
 		return 'overdue';
 	}
-
-	return 'in-progress';
+	if (development.status === 'in-progress') return 'in-progress';
+	return 'not-started';
 };
 
 export const getHealthColor = (health: DevelopmentHealth): string => {

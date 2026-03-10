@@ -74,6 +74,7 @@ const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
 			label: 'Approved',
 		},
 	];
+	const memberCount = (project?.details?.length ?? 0) + 1;
 	return (
 		<>
 			<div className="flex flex-col gap-3 mt-5 w-full text-white">
@@ -119,8 +120,8 @@ const DocumentDashboard = ({ documents, project }: DocumentDashboardProps) => {
 									<span>{project?.group_leader.program.name}</span>
 									<span>•</span>
 									<Badge variant="secondary">
-										{project?.details.length} member
-										{project?.details.length !== 1 ? 's' : ''}
+										{memberCount} member
+										{memberCount !== 1 ? 's' : ''}
 									</Badge>
 								</div>
 							</div>

@@ -242,7 +242,7 @@ const StudentDevelopmentProcessComponent = ({
 							const health = getDevelopmentHealth(f);
 							const isOverdue = health === 'overdue';
 							const isComplete = health === 'completed';
-							const inProgress = f.status === 'in-progress';
+							const inProgress = health === 'in-progress';
 							const isChecked = f.status === 'checked';
 							const isCompletedLate = health === 'completed-late';
 							const si = statusInfo[health];
