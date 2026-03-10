@@ -121,7 +121,11 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/Instructor',
-		element: <InstructorLayout />,
+		element: (
+			<RequireAuth allowedRoles={['instructor']}>
+				<InstructorLayout />
+			</RequireAuth>
+		),
 		children: [
 			{
 				index: true,
