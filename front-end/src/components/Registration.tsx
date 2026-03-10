@@ -110,7 +110,9 @@ const Registration = () => {
 				if (result.status == 200) {
 					toast.success(result.message);
 					form.reset();
-					navigate('/Login');
+					setTimeout(() => {
+						navigate('/Login');
+					}, 2000);
 				}
 			} catch (error) {
 				toast.error('Registration failed. Please try again.');
