@@ -178,6 +178,16 @@ const SetDeadlineComponent = ({
 														id="dueDate"
 														mode="single"
 														selected={selectedDate}
+														disabled={(date) => {
+															const checkDate = format(
+																new Date(date),
+																'yyyy-MM-dd',
+															);
+
+															const today = format(new Date(), 'yyyy-MM-dd');
+
+															return checkDate < today;
+														}}
 														onSelect={setSelectedDate}
 														className="rounded-md border border-border pointer-events-auto focus:outline-none focus:border-none"
 													/>

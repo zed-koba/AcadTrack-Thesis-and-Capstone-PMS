@@ -112,7 +112,7 @@ const DeadlinesComponent = ({
 					<div className="grid gap-3">
 						{activeDeadlines.map((deadline) => {
 							const groupStatuses = getGroupStatusForDeadline(deadline) ?? [];
-							console.log(groupStatuses);
+
 							const submitted = groupStatuses?.filter(
 								(s) =>
 									s.submissionStatus === 'submitted-on-time' ||
