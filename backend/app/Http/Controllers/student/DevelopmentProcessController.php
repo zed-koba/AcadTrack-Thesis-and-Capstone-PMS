@@ -23,7 +23,7 @@ class DevelopmentProcessController extends Controller
     }
     public function getInstructorDevelopmentProcess($id)
     {
-        $development = DevelopmentProcess::orderBy('created_at', 'DESC')->get();
+        $development = DevelopmentProcess::get();
         $projects = Proponents::whereHas('groupLeader', function ($query) use ($id) {
             $query->where('instructor_id', $id);
         })->orderBy('created_at', 'ASC')->get();

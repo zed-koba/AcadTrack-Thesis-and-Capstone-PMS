@@ -27,6 +27,7 @@ const AdviserDashboardComponent = ({
 	projects,
 	documents,
 }: InstructorDashboardProps) => {
+	const filterDeadlines = projects.length > 0 ? deadlines.filter((deadline) => deadline.instructor_id === projects[0].group_leader.instructor_id) : [];
 	const widgets = [
 		{
 			label: 'Total Groups',
@@ -36,7 +37,7 @@ const AdviserDashboardComponent = ({
 		},
 		{
 			label: 'Deadlines',
-			value: `${deadlines.length}`,
+			value: `${filterDeadlines.length}`,
 			icon: FileText,
 			color: 'bg-blue-500/10 text-blue-500',
 		},
@@ -48,7 +49,7 @@ const AdviserDashboardComponent = ({
 		},
 		{
 			label: 'Upcoming (14d)',
-			value: deadlines.length,
+			value: filterDeadlines.length,
 			icon: CalendarClock,
 			color: 'bg-amber-500/10 text-amber-500',
 		},
@@ -92,7 +93,7 @@ const AdviserDashboardComponent = ({
 					<CardContent>
 						<ScrollArea className="max-h-[300px]">
 							<div className="space-y-2">
-								{deadlines.length > 0 ? (
+								{filterDeadlines.length > 0 ? (
 									deadlines
 										.sort(
 											(a, b) =>

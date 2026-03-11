@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 import DeleteSchedule from './DeleteSchedule';
 import {
 	generateTimeSlots,
+	getInformation,
 	getUserToken,
 } from '@/components/functions/functions';
 
@@ -51,6 +52,7 @@ const AvailabilityConsultation = ({
 	const [scheduleId, setScheduleId] = useState(0);
 	const [open, setOpen] = useState(false);
 	const userToken = getUserToken();
+	const information = getInformation();
 	const timeSlots: string[] = useMemo(
 		() => generateTimeSlots(15).map((slot) => to12HourTime(slot.time)),
 		[],
@@ -75,7 +77,7 @@ const AvailabilityConsultation = ({
 					start_time: to24HourTime(value.start_time),
 					end_time: to24HourTime(value.end_time),
 				};
-				const res = await fetch(`${apiAdviserUrl}/availabilities/add`, {
+				const res = await fetch(`${apiAdviserUrl}/availabilities/add/${information.id}`, {
 					method: 'POST',
 					headers: {
 						'Content-type': 'application/json',

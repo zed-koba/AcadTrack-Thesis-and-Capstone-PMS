@@ -21,7 +21,7 @@ const AdviserDevelopmentMonitoring = ({
 	const [selectedId, setSelectedId] = useState<number | undefined>(
 		projects.length > 0 ? projects[0].id : undefined,
 	);
-	if (!projects) {
+	if (projects.length === 0) {
 		return (
 			<>
 				<div className="flex flex-col justify-center items-center opacity-50 h-full">

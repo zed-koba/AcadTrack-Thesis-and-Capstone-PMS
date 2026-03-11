@@ -35,14 +35,16 @@ const Login = () => {
 				password,
 			});
 			const { token, user, data, project } = response.data;
+			console.log(user);
+			if (user === 'admin') {
+				navigate('/Admin', { replace: true });
+				return;
+			}
 			localStorage.setItem('token', token);
 			localStorage.setItem('user', JSON.stringify(user));
 			localStorage.setItem('data', JSON.stringify(data));
 			localStorage.setItem('project', JSON.stringify(project));
 			switch (user.role) {
-				case 'admin':
-					navigate('/Admin');
-					break;
 				case 'student':
 					navigate('/Student', { replace: true });
 					break;

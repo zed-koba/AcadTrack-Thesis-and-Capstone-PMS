@@ -56,7 +56,7 @@ const ChapterItem = ({
 		}
 	};
 	const checkIfVersionLatest = selectedDocument === checkVersion;
-
+	console.log(currentDocument);
 	return (
 		<div className="space-y-1">
 			<div
@@ -64,11 +64,11 @@ const ChapterItem = ({
 					'flex items-center gap-3 p-3 rounded-md bg-muted/50 transition-colors cursor-pointer border border-muted-foreground/40',
 
 					checkVersion.version &&
-						checkVersion.status === 'need revision' &&
-						'border border-red-500/50',
+					checkVersion.status === 'need revision' &&
+					'border border-red-500/50',
 					checkVersion.version &&
-						checkVersion.id === selectedDocument?.id &&
-						'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+					checkVersion.id === selectedDocument?.id &&
+					'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 				)}
 				onClick={(e) => {
 					if ((e.target as HTMLElement).closest('button')) return;
@@ -191,7 +191,7 @@ const ChapterItem = ({
 								className={cn(
 									'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
 									version.id === selectedDocument?.id &&
-										'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+									'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 								)}
 								onClick={() => {
 									setSelectedDocument(version);
@@ -249,7 +249,7 @@ const ChapterItem = ({
 						className={cn(
 							'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
 							currentDocument.id === selectedDocument?.id &&
-								'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+							'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 						)}
 						onClick={() => {
 							setSelectedDocument(currentDocument);

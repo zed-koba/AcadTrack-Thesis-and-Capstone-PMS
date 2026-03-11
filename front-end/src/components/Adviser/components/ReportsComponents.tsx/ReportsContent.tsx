@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/table';
 import { to12HourTime } from '../../interface/consultation';
 import { Badge } from '@/components/ui/badge';
+import { BookOpen } from 'lucide-react';
 
 const tooltipStyle = {
 	backgroundColor: 'var(--popover)',
@@ -103,18 +104,18 @@ const ReportsContent = ({
 			const submitted = documentsGrouped.filter((doc) =>
 				doc.versions.length > 0
 					? doc.versions[0].status === 'passed' &&
-						findDeadline?.document_title === doc.versions[0].title_name
+					findDeadline?.document_title === doc.versions[0].title_name
 					: doc.status === 'passed' &&
-						findDeadline?.document_title === doc.title_name,
+					findDeadline?.document_title === doc.title_name,
 			).length;
 
 			const approved = documentsGrouped.filter((doc) =>
 				doc.versions.length > 0
 					? (doc.versions[0].status === 'passed' ||
-							doc.versions[0].status === 'approved') &&
-						findDeadline?.document_title === doc.versions[0].title_name
+						doc.versions[0].status === 'approved') &&
+					findDeadline?.document_title === doc.versions[0].title_name
 					: (doc.status === 'passed' || doc.status === 'approved') &&
-						findDeadline?.document_title === doc.title_name,
+					findDeadline?.document_title === doc.title_name,
 			).length;
 
 			const totalRevision = doc.versions.length;
@@ -179,7 +180,18 @@ const ReportsContent = ({
 
 		return Object.values(monthly);
 	}, [filteredWeeklies]);
-
+	if (projects.length === 0) {
+		return (
+			<>
+				<div className="flex flex-col justify-center items-center opacity-50 h-full">
+					<BookOpen className="h-24 w-24 text-muted-foreground" />
+					<p className="text-mb text-muted-foreground font-medium">
+						There's not yet assigned thesis or capstone group in your advisory.
+					</p>
+				</div>
+			</>
+		);
+	}
 	return (
 		<>
 			<div className="mt-4 flex gap-2">

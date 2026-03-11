@@ -97,7 +97,7 @@ const DPMonitoringContent = ({
 	const handleMarkasComplete = async (development: DevelopmentProcessProps) => {
 		const checkStatus =
 			development.status === 'completed' ||
-			development.status === 'completed-late'
+				development.status === 'completed-late'
 				? 'checked'
 				: development.status === 'checked'
 					? 'completed'
@@ -230,15 +230,13 @@ const DPMonitoringContent = ({
 							return (
 								<div
 									key={f.id}
-									className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${
-										isOverdue
+									className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isOverdue
 											? 'border-destructive/30 bg-destructive/5'
 											: 'border-border bg-card hover:bg-accent/5'
-									} ${isChecked && 'border-emerald-600/30 bg-emerald-600/5'}`}
+										} ${isChecked && 'border-emerald-600/30 bg-emerald-600/5'}`}
 								>
 									<div
-										className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${
-											isComplete
+										className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${isComplete
 												? 'bg-green-500/15'
 												: isOverdue
 													? 'bg-destructive/15'
@@ -247,7 +245,7 @@ const DPMonitoringContent = ({
 														: isChecked
 															? 'bg-emerald-600/15'
 															: 'bg-muted'
-										}`}
+											}`}
 									>
 										{isComplete ? (
 											<Check className="h-4 w-4 text-green-500" />
@@ -287,7 +285,7 @@ const DPMonitoringContent = ({
 													✓ Done {format(f.completed_date, 'MMM dd')}
 												</span>
 											)}
-											{!isComplete && !isOverdue && daysLeft >= 0 && (
+											{!isComplete && !isOverdue && !isChecked && daysLeft >= 0 && (
 												<span>{daysLeft}d left</span>
 											)}
 											{isOverdue && (

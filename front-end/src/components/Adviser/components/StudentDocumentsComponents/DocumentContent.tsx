@@ -32,6 +32,9 @@ const DocumentContent = ({
 		null,
 	);
 
+	const studentIds = projects.map((project) => [project?.group_leader.id, ...project.details
+		.map((detail) => detail.student.student_id)]).filter((id) => id !== undefined);
+
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState('all');
 	const [sortBy, setSortBy] = useState('latest');
@@ -72,7 +75,7 @@ const DocumentContent = ({
 		}
 		setExpandedProjects(newExpanded);
 	};
-
+	console.log(studentIds);
 	return (
 		<>
 			<section className="w-full grid h-auto lg:grid-rows-[auto-1fr] xl:grid-rows-none xl:grid-cols-[1000px_1fr] gap-3">

@@ -14,7 +14,9 @@ const DocumentContent = ({
 	deadlines,
 	refresh,
 }: DocumentContentProps) => {
-	const studentIds = project?.details.map((v) => v.student_id);
+	const studentIds = [project?.group_leader.id,
+	...(project?.details.map((d) => d.student_id) ?? []),
+	].filter((id) => id !== undefined);;
 
 	const filterDocuments = useMemo(() => {
 		return documents.filter(
@@ -55,7 +57,7 @@ const DocumentContent = ({
 			? d.versions[0].status === 'need revision'
 			: d.status === 'need revision',
 	);
-
+	console.log(studentIds);
 	return (
 		<>
 			{needRevisionDocs.length > 0 && (

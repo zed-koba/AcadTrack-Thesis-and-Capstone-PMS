@@ -84,15 +84,13 @@ Route::prefix("admin")->group(function () {
     Route::post('instructors/add', [InstructorsController::class, 'storeInstructor']);
     Route::put('instructors/edit/{id}', [InstructorsController::class, 'updateInstructor']);
     Route::delete('instructors/delete/{id}', [InstructorsController::class, 'deleteInstructor']);
-
-   
 });
 
 
 Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(function () {
     //Adviser Availability
     Route::get("{id}/availabilities", [AdviserAvailabilityController::class, "getAvailabilities"]);
-    Route::post("availabilities/add", [AdviserAvailabilityController::class, "storeAvailability"]);
+    Route::post("availabilities/add/{id}", [AdviserAvailabilityController::class, "storeAvailability"]);
     Route::put("availabilities/update", [AdviserAvailabilityController::class, "updateAvailabilty"]);
     Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class, "deleteAvailability"]);
 
@@ -147,8 +145,14 @@ Route::prefix("student")->group(function () {
     Route::post('my-group/transfer/{id}', [GroupController::class, 'transferGroupLeader']);
     Route::put('my-group/updateRole/{id}', [GroupController::class, 'updateRoleMember']);
     Route::delete('my-group/leaveGroup/{id}', [GroupController::class, 'leaveGroup']);
+<<<<<<< HEAD
+=======
+
+
+    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
 
     
+>>>>>>> 04166f201b145cbc906d94bffea4a5232ccd4609
 });
 
 Route::prefix("instructor")->group(function () {
@@ -163,9 +167,9 @@ Route::prefix("instructor")->group(function () {
     Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getInstructorDevelopmentProcess']);
     Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
 
-     //Archiving
+    //Archiving
     Route::get('archiving', [ArchivedDocumentsController::class, 'getDocuments']);
-    Route::post('archiving/add', [ArchivedDocumentsController::class,'storeDocument']);
+    Route::post('archiving/add', [ArchivedDocumentsController::class, 'storeDocument']);
     Route::get('archving/{id}/download/pdf', [ArchivedDocumentsController::class, 'downloadDocument']);
 });
 

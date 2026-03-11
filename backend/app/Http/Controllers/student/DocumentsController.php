@@ -175,9 +175,16 @@ class DocumentsController extends Controller
 
         return response()->download($filePath, $document->original_name);
     }
-    public function passDocument($id)
+    public function passDocument(Request $request, $id)
     {
+        $project = Proponents::where('proponents_id', $request->proponents_id)->first();
         $document = Documents::findOrFail($id);
+        NotificationService::store([
+            'instructor_id' => $project->groupLeader->instructor_id,
+            'type' => 'document',
+            'title' => $project->title,
+            'message' => 'has passed the document ' . $document->title_name,
+        ]);
         $document->update([
             'status' => 'passed',
             'passed_date' => now(),

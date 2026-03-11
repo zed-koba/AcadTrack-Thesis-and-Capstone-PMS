@@ -1,4 +1,5 @@
 import { apiStudentUrl } from '@/Routes/http';
+import { getProjectId, getUserToken } from '@/components/functions/functions';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -26,6 +27,8 @@ const DocumentPass = ({
 	refresh,
 }: DocumentPassProps) => {
 	const [loading, setLoading] = useState(false);
+	const projectId = getProjectId();
+	const userToken = getUserToken();
 	const handlePass = async () => {
 		if (!document_id) return;
 		setLoading(true);
@@ -37,7 +40,9 @@ const DocumentPass = ({
 					headers: {
 						'Content-type': 'application/json',
 						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
+					body: JSON.stringify({ proponents_id: projectId.proponents_id }),
 				},
 			);
 			const result = await res.json();

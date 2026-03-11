@@ -48,8 +48,10 @@ const DocumentProjectCard = ({
 			const versions = filterDocuments
 				.filter((d) => d.parent_document_id === parent.id)
 				.sort((a, b) => b.version - a.version);
+			console.log(parent);
 			return { ...parent, versions };
 		});
+		console.log(parents);
 		return groupedDocuments;
 	}, [filterDocuments]);
 
