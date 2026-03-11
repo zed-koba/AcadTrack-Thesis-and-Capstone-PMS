@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\student;
 
+use App\Events\NotificationService;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Proponents;
 use App\Models\student\DevelopmentProcess;
@@ -81,6 +82,7 @@ class DevelopmentProcessController extends Controller
                 'errors' => $e->getMessage(),
             ], 500);
         }
+        
     }
 
     public function updateStatus(Request $request, $id)
@@ -94,6 +96,12 @@ class DevelopmentProcessController extends Controller
                     'status' => $request->status,
                     'completed_date' => today(),
                 ]);
+                NotificationService::store([
+                'instructor_id' => $request->instructor_id,
+                'type' => 'development',
+                'title' => $request->project_name,
+                'message' => 'has mark the feature' . $development->feature . ' as complete' 
+            ]);
             }
             if ($request->status === 'in-progress') {
                 $development->update([

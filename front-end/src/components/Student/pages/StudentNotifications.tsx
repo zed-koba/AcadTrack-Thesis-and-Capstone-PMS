@@ -13,6 +13,7 @@ import {
 	CheckCircle2,
 	Clock,
 	FileText,
+	GitBranch,
 	MessageSquare,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -42,7 +43,6 @@ const StudentNotifications = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 			const result = await res.json();
 			await setNotifications(result.notifications);
-			console.log(result);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -76,6 +76,11 @@ const StudentNotifications = () => {
 			icon: MessageSquare,
 			color: 'text-primary',
 			bg: 'bg-primary/10',
+		},
+		development: {
+			icon: GitBranch,
+			color: 'text-purple-500',
+			bg: 'bg-purple-500/10',
 		},
 	};
 	const unreadNotification = notifications.filter(

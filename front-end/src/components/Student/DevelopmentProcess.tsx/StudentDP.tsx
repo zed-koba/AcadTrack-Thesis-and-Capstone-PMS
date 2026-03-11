@@ -36,7 +36,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { apiStudentUrl } from '@/Routes/http';
-import { getUserToken } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 import { toast } from 'sonner';
 import DeleteFeature from './DeleteFeature';
 
@@ -53,6 +53,7 @@ const StudentDevelopmentProcessComponent = ({
 	const [editMode, setEditMode] = useState(false);
 	const [open, setOpen] = useState(false);
 	const userToken = getUserToken();
+	const information = getInformation();
 	const progress = developments.filter(
 		(development) =>
 			development.status === 'checked' || development.status === 'completed',
@@ -115,6 +116,11 @@ const StudentDevelopmentProcessComponent = ({
 		const checkStatus =
 			development.status === 'completed' ? 'in-progress' : 'completed';
 		try {
+			const payLoad = {
+				instructor_id: information.instructor_id,
+				project_name: development.project.title,
+				status: checkStatus,
+			};
 			const res = await fetch(
 				`${apiStudentUrl}/development-process/update/${development.id}`,
 				{
@@ -124,7 +130,7 @@ const StudentDevelopmentProcessComponent = ({
 						Accept: 'application/json',
 						Authorization: `Bearer ${userToken}`,
 					},
-					body: JSON.stringify({ status: checkStatus }),
+					body: JSON.stringify(payLoad),
 				},
 			);
 			const result = await res.json();
@@ -141,6 +147,7 @@ const StudentDevelopmentProcessComponent = ({
 			}
 			if (result.status === 200) {
 				toast.success(result.message);
+				console.log(payLoad);
 				refresh?.();
 			}
 		} catch (error) {
@@ -243,12 +250,12 @@ const StudentDevelopmentProcessComponent = ({
 							const isOverdue = health === 'overdue';
 							const isComplete = health === 'completed';
 							const inProgress = health === 'in-progress';
+							const isNotStarted = health === 'not-started';
 							const isChecked = f.status === 'checked';
 							const isCompletedLate = health === 'completed-late';
 							const si = statusInfo[health];
 							const Icon = si.icon;
 							const daysLeft = differenceInDays(f.end_date, new Date());
-
 							return (
 								<div
 									key={f.id}
@@ -359,37 +366,40 @@ const StudentDevelopmentProcessComponent = ({
 												</TooltipContent>
 											</Tooltip>
 										)}
-
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													variant="ghost"
-													className="h-8 w-8"
-													onClick={() => {
-														setSelectedFeature(f);
-														setOpen(true);
-														setEditMode(true);
-													}}
-												>
-													<Pencil className="h-4 w-4" />
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>Edit</TooltipContent>
-										</Tooltip>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													variant="ghost"
-													className="h-8 w-8 text-destructive"
-													onClick={() => setSelectedId(f.id)}
-												>
-													<Trash2 className="h-4 w-4" />
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>Delete</TooltipContent>
-										</Tooltip>
+										{(inProgress || isNotStarted) && (
+											<>
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<Button
+															size="icon"
+															variant="ghost"
+															className="h-8 w-8"
+															onClick={() => {
+																setSelectedFeature(f);
+																setOpen(true);
+																setEditMode(true);
+															}}
+														>
+															<Pencil className="h-4 w-4" />
+														</Button>
+													</TooltipTrigger>
+													<TooltipContent>Edit</TooltipContent>
+												</Tooltip>
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<Button
+															size="icon"
+															variant="ghost"
+															className="h-8 w-8 text-destructive"
+															onClick={() => setSelectedId(f.id)}
+														>
+															<Trash2 className="h-4 w-4" />
+														</Button>
+													</TooltipTrigger>
+													<TooltipContent>Delete</TooltipContent>
+												</Tooltip>
+											</>
+										)}
 									</div>
 								</div>
 							);

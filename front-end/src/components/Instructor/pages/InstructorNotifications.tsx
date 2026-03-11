@@ -13,6 +13,7 @@ import {
 	CheckCircle2,
 	Clock,
 	FileText,
+	GitBranch,
 	MessageSquare,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -78,6 +79,11 @@ const InstructorNotifications = () => {
 			icon: MessageSquare,
 			color: 'text-primary',
 			bg: 'bg-primary/10',
+		},
+		development: {
+			icon: GitBranch,
+			color: 'text-purple-500',
+			bg: 'bg-purple-500/10',
 		},
 	};
 	const unreadNotification = notifications.filter(
