@@ -151,6 +151,9 @@ Route::prefix("student")->group(function () {
 
     Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
 
+
+    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
+
     
 >>>>>>> 04166f201b145cbc906d94bffea4a5232ccd4609
 });
