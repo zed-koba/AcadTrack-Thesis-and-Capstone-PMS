@@ -117,7 +117,7 @@ const Sidebar = ({ navItem }: NavItemProps) => {
 							<div className="group relative flex items-center w-full rounded-md transition-all duration-200 px-3 py-2.5 hover:text-foreground text-muted-foreground cursor-pointer">
 								<CircleUserRound className="w-5 h-5" strokeWidth={2.5} />
 								<span className="ml-3 font-medium whitespace-nowrap relative z-10 transition-all duration-300 opacity-100">
-									{information.name ? information.name : 'Admin'}
+									{information.name}
 								</span>
 							</div>
 						</li>

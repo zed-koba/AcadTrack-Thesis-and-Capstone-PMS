@@ -21,7 +21,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import type { NotificationProps } from '@/components/Student/interface/notification';
-import { useNavigate } from 'react-router-dom';
 
 const InstructorNotifications = () => {
 	const [loading, setLoading] = useState(false);
@@ -29,7 +28,6 @@ const InstructorNotifications = () => {
 	const information = getInformation();
 	const user = getUser();
 	const projectId = getProjectId();
-	const navigate = useNavigate();
 	const fetchNotifications = async () => {
 		try {
 			const res = await fetch(
@@ -87,9 +85,9 @@ const InstructorNotifications = () => {
 		setNotifications((prev) =>
 			prev.map((n) => ({ ...n, read_at: new Date() })),
 		);
-		unreadNotification.map((notif) => markAsRead(notif.id, ''));
+		unreadNotification.map((notif) => markAsRead(notif.id));
 	};
-	const markAsRead = async (id: number, type: string) => {
+	const markAsRead = async (id: number) => {
 		setNotifications((prev) =>
 			prev.map((n) => (n.id === id ? { ...n, read_at: new Date() } : n)),
 		);
@@ -108,13 +106,7 @@ const InstructorNotifications = () => {
 				return;
 			}
 			if (result.status === 200) {
-				if (type === 'document') {
-					navigate('/Instructor/Document');
-				} else if (type === 'development') {
-					navigate('/Instructor/Development-Monitoring');
-				} else {
-					window.location.reload();
-				}
+				window.location.reload();
 			}
 		} catch (error) {
 			console.log(error);
@@ -158,7 +150,7 @@ const InstructorNotifications = () => {
 									<Card
 										key={n.id}
 										className={`p-0 cursor-pointer transition-colors ${!n.read_at ? 'border-primary/30 bg-primary/5' : ''}`}
-										onClick={() => markAsRead(n.id, n.type)}
+										onClick={() => markAsRead(n.id)}
 									>
 										<CardContent className="p-4 flex items-start gap-3">
 											<div className={`p-2 rounded-lg ${config.bg} mt-0.5`}>

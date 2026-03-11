@@ -13,15 +13,8 @@ import {
 	X,
 } from 'lucide-react';
 import type { ProponentsDocumentsProps } from '../Adviser/interface/adviserdocument';
-import type {
-	AdviserAvailabilityProps,
-	AdviserWeeklyProps,
-} from '../Adviser/interface/consultation';
-import { addDays, parse } from 'date-fns';
-import type {
-	AdviserAvailability,
-	CalendarConsultation,
-} from './greedyAlgorithmn';
+import type { AdviserWeeklyProps } from '../Adviser/interface/consultation';
+import { parse } from 'date-fns';
 
 export function formatDate(dateString: string) {
 	const date = new Date(dateString);
@@ -225,81 +218,3 @@ export const generateTimeSlots = (meetingDuration: number) => {
 export const getTime = (dateForDay: string, timeSlot: string) => {
 	return parse(`${dateForDay} ${timeSlot}`, 'yyyy-MM-dd HH:mm:ss', new Date());
 };
-
-export function formatTimeDisplay(time: string): string {
-	const [hours, minutes] = time.split(':').map(Number);
-	const period = hours >= 12 ? 'PM' : 'AM';
-	const displayHours = hours % 12 || 12;
-	return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-}
-
-export function mapWeeklyToConsultations(
-	weekly: AdviserWeeklyProps[],
-): CalendarConsultation[] {
-	return weekly.map((w) => ({
-		id: w.id,
-		student_id: w.student_id,
-		project_name:
-			w.student.project?.title ??
-			w.student.proponent_detail?.proponent?.title ??
-			'Unknown Project',
-		date: new Date(w.date),
-		project_id: w.student.project.proponents_id,
-		scheduledStart: w.start_time,
-		scheduledEnd: w.end_time,
-		status: w.status as 'upcoming' | 'cancelled' | 'completed',
-	}));
-}
-export function mapWeekly(weekly: AdviserWeeklyProps): CalendarConsultation {
-	const cancelledWeekly: CalendarConsultation = {
-		id: weekly.id,
-		student_id: weekly.student_id,
-		project_name:
-			weekly.student.project?.title ??
-			weekly.student.proponent_detail?.proponent?.title ??
-			'Unknown Project',
-		date: new Date(weekly.date),
-		project_id: weekly.student.project.proponents_id,
-		scheduledStart: weekly.start_time,
-		scheduledEnd: weekly.end_time,
-		status: weekly.status as 'upcoming' | 'cancelled' | 'completed',
-	};
-
-	return cancelledWeekly;
-}
-
-const dayMap: Record<string, number> = {
-	sunday: 0,
-	monday: 1,
-	tuesday: 2,
-	wednesday: 3,
-	thursday: 4,
-	friday: 5,
-	saturday: 6,
-};
-export function generateAvailabilitySlots(
-	availabilities: AdviserAvailabilityProps[],
-	startDate: Date,
-	maxDaysAhead: number,
-): AdviserAvailability[] {
-	const slots: AdviserAvailability[] = [];
-
-	for (let offset = 0; offset <= maxDaysAhead; offset++) {
-		const date = addDays(startDate, offset);
-		const dayOfWeek = date.getDay();
-
-		const matchingTemplates = availabilities.filter(
-			(a) => a.is_available && dayMap[a.day.toLowerCase()] === dayOfWeek,
-		);
-
-		for (const template of matchingTemplates) {
-			slots.push({
-				date,
-				start: template.start_time,
-				end: template.end_time,
-			});
-		}
-	}
-
-	return slots;
-}

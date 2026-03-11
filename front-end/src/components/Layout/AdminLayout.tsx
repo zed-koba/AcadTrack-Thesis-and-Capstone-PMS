@@ -16,7 +16,7 @@ const AdminLayout = () => {
 	const navItem: NavItem[] = [
 		{
 			label: 'Proponents',
-			to: '/Admin',
+			to: '/Admin/Proponents',
 			icon: <Users className="w-5 h-5" strokeWidth={2.5} />,
 		},
 		{

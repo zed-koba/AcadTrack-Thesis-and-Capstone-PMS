@@ -148,9 +148,6 @@ Route::prefix("student")->group(function () {
     Route::put('my-group/updateRole/{id}', [GroupController::class, 'updateRoleMember']);
     Route::delete('my-group/leaveGroup/{id}', [GroupController::class, 'leaveGroup']);
 
-
-    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
-
     
 });
 

@@ -4,6 +4,7 @@ import Home from '@/components/Home';
 import Registration from '@/components/Registration';
 import AdminStudents from '@/components/Admin/pages/Students';
 import AdminProponents from '@/components/Admin/pages/Proponents';
+import { default as AdminDashboard } from '../components/Admin/pages/Dashboard';
 import { default as AdviserDashboard } from '../components/Adviser/pages/Dashboard';
 import { default as StudentDashboard } from '../components/Student/pages/Dashboard';
 import { default as AdviserStudentDocument } from '../components/Adviser/pages/StudentDocument';
@@ -57,8 +58,9 @@ export const router = createBrowserRouter([
 		path: '/Admin',
 		element: <AdminLayout />,
 		children: [
-			{ index: true, element: <AdminStudents /> },
+			{ index: true, element: <AdminDashboard /> },
 			{ path: 'Projects', element: <AdminProponents /> },
+			{ path: 'Proponents', element: <AdminStudents /> },
 			{ path: 'Adviser', element: <Adviser /> },
 			{ path: 'Instructor', element: <Instructors /> },
 			{ path: 'Departments', element: <Departments /> },
