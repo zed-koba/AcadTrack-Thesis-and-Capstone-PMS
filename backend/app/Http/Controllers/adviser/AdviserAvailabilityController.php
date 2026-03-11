@@ -16,7 +16,7 @@ class AdviserAvailabilityController extends Controller
     public function getAvailabilities($id)
     {
         $availabilities = AdviserAvailability::where("adviser_id", $id)->with('adviser')->get();
-        $weeklies = AdviserWeekly::with('student:id,name', 'adviser', 'student.project', 'student.project.groupLeader', 'student.project.details.student')->where("adviser_id", $id)->get();
+        $weeklies = AdviserWeekly::with('student:id,name', 'adviser', 'student.project', 'student.project.groupLeader', 'student.project.details.student', 'student.proponentDetail.proponent', 'student.proponentDetail.proponent.groupLeader', 'student.proponentDetail.proponent.details.student')->where("adviser_id", $id)->get();
         return response()->json([
             "status" => 200,
             "message" => "Sucessfully fetch availabilities",

@@ -194,7 +194,7 @@ const Dashboard = () => {
 	const completedCount = tasks?.filter((d) => d.is_completed === 1).length;
 	const progressPercent =
 		tasks?.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
-	console.log(deadlines);
+
 	return (
 		<>
 			<main className="flex-1 p-6 h-full">
@@ -324,32 +324,38 @@ const Dashboard = () => {
 										</div>
 									)}
 									{deadlines.length > 0 &&
-										deadlines.map((deadline) => {
-											const daysInfo = getDaysLabel(deadline.deadline);
-											return (
-												<div
-													key={deadline.id}
-													className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
-												>
-													<div className="flex-1 min-w-0">
-														<p className="font-medium text-sm truncate">
-															{deadline.document_title}
-														</p>
-														<p className="text-xs text-muted-foreground mt-0.5">
-															{deadline.instructor.name}
-														</p>
-														<p className="text-xs text-muted-foreground mt-0.5">
-															Due: {format(deadline.deadline, 'MMM d, yyyy')}
-														</p>
+										deadlines
+											.sort(
+												(a, b) =>
+													new Date(a.deadline).getTime() -
+													new Date(b.deadline).getTime(),
+											)
+											.map((deadline) => {
+												const daysInfo = getDaysLabel(deadline.deadline);
+												return (
+													<div
+														key={deadline.id}
+														className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
+													>
+														<div className="flex-1 min-w-0">
+															<p className="font-medium text-sm truncate">
+																{deadline.document_title}
+															</p>
+															<p className="text-xs text-muted-foreground mt-0.5">
+																{deadline.instructor.name}
+															</p>
+															<p className="text-xs text-muted-foreground mt-0.5">
+																Due: {format(deadline.deadline, 'MMM d, yyyy')}
+															</p>
+														</div>
+														<div className="text-right ml-3 shrink-0">
+															<p className={`text-xs ${daysInfo.className}`}>
+																{daysInfo.text}
+															</p>
+														</div>
 													</div>
-													<div className="text-right ml-3 shrink-0">
-														<p className={`text-xs ${daysInfo.className}`}>
-															{daysInfo.text}
-														</p>
-													</div>
-												</div>
-											);
-										})}
+												);
+											})}
 								</CardContent>
 							</Card>
 

@@ -43,6 +43,7 @@ class DocumentsController extends Controller
             'status' => 200,
             'document' => $document,
             'projects' => $projects,
+            'deadline' => $deadline,
 
         ], 200);
     }

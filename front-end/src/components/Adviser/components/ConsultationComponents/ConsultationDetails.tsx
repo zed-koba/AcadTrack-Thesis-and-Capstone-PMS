@@ -130,7 +130,7 @@ const ConsultationDetails = ({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="sm:max-w-[500px] text-white">
+				<DialogContent className="sm:min-w-[500px] w-auto max-w-xl! text-white">
 					<DialogHeader>
 						<DialogTitle className="flex items-center justify-between capitalize">
 							<span>Consultation Details</span>
@@ -175,7 +175,9 @@ const ConsultationDetails = ({
 								<div>
 									<p className="text-sm font-medium">Thesis/Capstone:</p>
 									<p className="text-sm text-muted-foreground">
-										{weekly.student.project.title}
+										{weekly.student.project
+											? weekly.student.project.title
+											: weekly.student.proponent_detail.proponent.title}
 									</p>
 								</div>
 							</div>
@@ -187,20 +189,37 @@ const ConsultationDetails = ({
 										<div className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary">
 											<User className="w-4 h-4" />
 											<p className="text-xs font-medium">
-												{weekly.student.project.group_leader.name}
+												{weekly.student.project
+													? weekly.student.project.group_leader.name
+													: weekly.student.proponent_detail.proponent
+															.group_leader.name}
 											</p>
 										</div>
-										{weekly.student.project.details.map((student) => (
-											<div
-												key={student.student.id}
-												className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
-											>
-												<User className="w-4 h-4" />
-												<p className="text-xs font-medium">
-													{student.student.name}
-												</p>
-											</div>
-										))}
+										{weekly.student.project
+											? weekly.student.project.details.map((student) => (
+													<div
+														key={student.student.id}
+														className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
+													>
+														<User className="w-4 h-4" />
+														<p className="text-xs font-medium">
+															{student.student.name}
+														</p>
+													</div>
+												))
+											: weekly.student.proponent_detail.proponent.details.map(
+													(student) => (
+														<div
+															key={student.student.id}
+															className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
+														>
+															<User className="w-4 h-4" />
+															<p className="text-xs font-medium">
+																{student.student.name}
+															</p>
+														</div>
+													),
+												)}
 									</div>
 								</div>
 							</div>

@@ -5,13 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-	Select,
-	SelectTrigger,
-	SelectContent,
-	SelectItem,
-	SelectValue,
-} from '@/components/ui/select';
-import {
 	Table,
 	TableHeader,
 	TableBody,
@@ -19,13 +12,13 @@ import {
 	TableHead,
 	TableRow,
 } from '@/components/ui/table';
-import { ChevronRight, Search, Users } from 'lucide-react';
+import { Search, Users } from 'lucide-react';
 import {
 	getRiskColor,
 	type Deadlines,
 	type RiskLevel,
 } from '../interface/deadlines';
-import { Button } from '@/components/ui/button';
+
 import type { DocumentProps } from '@/components/Student/interface/document';
 import { cn } from '@/lib/utils';
 import { format, isAfter, isBefore, isEqual } from 'date-fns';
@@ -49,6 +42,7 @@ const GroupsComponent = ({
 	const filterDeadlines = deadlines.filter(
 		(deadline) => deadline.instructor_id === information.id,
 	);
+
 	const getRisklevel = (
 		passedDocuments: number,
 		totalDeadlines: number,
@@ -80,27 +74,6 @@ const GroupsComponent = ({
 						className="pl-9"
 					/>
 				</div>
-				<Select>
-					<SelectTrigger className="w-40">
-						<SelectValue placeholder="Risk Level" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">All Risks</SelectItem>
-						<SelectItem value="on-track">On Track</SelectItem>
-						<SelectItem value="slightly-delayed">Slightly Delayed</SelectItem>
-						<SelectItem value="at-risk">At Risk</SelectItem>
-						<SelectItem value="critical">Critical</SelectItem>
-					</SelectContent>
-				</Select>
-				<Select>
-					<SelectTrigger className="w-[140px]">
-						<SelectValue placeholder="Section" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">All Sections</SelectItem>
-						{/* {sections.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)} */}
-					</SelectContent>
-				</Select>
 			</div>
 
 			{/* Groups Table */}
@@ -127,7 +100,6 @@ const GroupsComponent = ({
 									<TableHead className="text-center">On-time</TableHead>
 									<TableHead className="text-center">Late</TableHead>
 									<TableHead>Next Deadline</TableHead>
-									<TableHead></TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -248,16 +220,7 @@ const GroupsComponent = ({
 											<TableCell className="text-xs text-muted-foreground">
 												{nextDeadline.length > 0
 													? format(nextDeadline[0].deadline, 'MMM dd, yyyy')
-													: 'No Document Uploaded'}
-											</TableCell>
-											<TableCell>
-												<Button
-													variant="ghost"
-													size="sm"
-													// onClick={() => setSelectedGroup(g)}
-												>
-													<ChevronRight className="h-4 w-4" />
-												</Button>
+													: 'No new deadline'}
 											</TableCell>
 										</TableRow>
 									);

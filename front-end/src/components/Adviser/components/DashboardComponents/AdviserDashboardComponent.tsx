@@ -93,33 +93,39 @@ const AdviserDashboardComponent = ({
 						<ScrollArea className="max-h-[300px]">
 							<div className="space-y-2">
 								{deadlines.length > 0 ? (
-									deadlines.map((g) => {
-										const days = differenceInDays(g.deadline, new Date());
-										return (
-											<div
-												key={g.id}
-												className={`flex items-center justify-between p-3 rounded-lg border ${days <= 3 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-muted/20'}`}
-											>
-												<div className="min-w-0">
-													<p className="font-medium text-sm truncate">
-														{g.document_title}
-													</p>
-												</div>
-												<div className="flex items-center gap-2 shrink-0">
-													<div className="text-right">
-														<p className="text-xs font-medium">
-															{format(g.deadline, 'MMM dd')}
-														</p>
-														<p
-															className={`text-[10px] font-medium ${days <= 3 ? 'text-amber-500' : 'text-muted-foreground'}`}
-														>
-															{days === 0 ? 'Due today' : `${days}d left`}
+									deadlines
+										.sort(
+											(a, b) =>
+												new Date(a.deadline).getTime() -
+												new Date(b.deadline).getTime(),
+										)
+										.map((g) => {
+											const days = differenceInDays(g.deadline, new Date());
+											return (
+												<div
+													key={g.id}
+													className={`flex items-center justify-between p-3 rounded-lg border ${days <= 3 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-muted/20'}`}
+												>
+													<div className="min-w-0">
+														<p className="font-medium text-sm truncate">
+															{g.document_title}
 														</p>
 													</div>
+													<div className="flex items-center gap-2 shrink-0">
+														<div className="text-right">
+															<p className="text-xs font-medium">
+																{format(g.deadline, 'MMM dd')}
+															</p>
+															<p
+																className={`text-[10px] font-medium ${days <= 3 ? 'text-amber-500' : 'text-muted-foreground'}`}
+															>
+																{days === 0 ? 'Due today' : `${days}d left`}
+															</p>
+														</div>
+													</div>
 												</div>
-											</div>
-										);
-									})
+											);
+										})
 								) : (
 									<div className="text-center py-8 text-muted-foreground">
 										<CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />

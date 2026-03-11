@@ -18,10 +18,9 @@ import {
 } from '../interface/archiving';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import FinalApprovalDialog from './FinalApprovalDialog';
-import { toast } from 'sonner';
-import { apiInstructorUrl } from '@/Routes/http';
+
 import { downloadDocument } from '@/components/functions/functions';
+import FinalApprovalDialog from './FinalApprovalDialog';
 
 const ArchivingContent = ({
 	documents,

@@ -3,7 +3,7 @@ import { apiInstructorUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import GroupsComponent from '../components/GroupsComponent';
-import { getInformation } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 import type { DocumentProps } from '@/components/Student/interface/document';
 import type { Deadlines } from '../interface/deadlines';
 
@@ -13,6 +13,7 @@ const StudentGroups = () => {
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
 	const [deadlines, setDeadlines] = useState<Deadlines[]>([]);
 	const information = getInformation();
+	const userToken = getUserToken();
 	const fetchProponents = async () => {
 		try {
 			const res = await fetch(
@@ -22,6 +23,7 @@ const StudentGroups = () => {
 					headers: {
 						'Content-type': 'application/json',
 						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
 				},
 			);
@@ -32,7 +34,6 @@ const StudentGroups = () => {
 				await setProjects(result.projects);
 				await setDocuments(result.document);
 				await setDeadlines(result.deadline);
-				return result.document;
 			}
 		} catch (error) {
 			console.log(error);

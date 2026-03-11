@@ -31,7 +31,7 @@ const features = [
 	},
 	{
 		icon: BarChart3,
-		title: 'Analytics & Reports',
+		title: 'Reports',
 		description:
 			'Gain insights into group performance, submission trends, and milestone completion.',
 	},
@@ -141,12 +141,9 @@ const Home = () => {
 						<h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
 							Ready to Get Started?
 						</h2>
-						<p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-							Join your institution's thesis management system and stay on top
-							of every milestone.
-						</p>
+						<p className="text-muted-foreground mb-8 max-w-lg mx-auto"></p>
 						<Button size="lg" className="px-8" asChild>
-							<Link to="/register">Create Your Account</Link>
+							<Link to="/Registration">Create Your Account</Link>
 						</Button>
 					</CardContent>
 				</Card>
