@@ -70,6 +70,7 @@ class DocumentsDeadlineController extends Controller
             return response()->json([
                 'status' => 500,
                 'message' => 'An error occurred while adding the deadline',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
