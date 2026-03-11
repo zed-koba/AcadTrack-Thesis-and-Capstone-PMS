@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('foreign_proponents_id');
             $table->foreign('foreign_proponents_id')->references('proponents_id')->on('proponents')->onDelete('cascade');
+            $table->string('title_name');
             $table->string('original_name');
             $table->string('stored_name');      
             $table->string('path');

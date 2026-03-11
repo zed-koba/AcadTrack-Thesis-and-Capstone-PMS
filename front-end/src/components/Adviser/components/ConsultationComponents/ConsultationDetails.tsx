@@ -34,11 +34,15 @@ import {
 } from '@/components/ui/tooltip';
 import {
 	consultationIcon,
+	generateAvailabilitySlots,
 	getUserToken,
+	mapWeekly,
+	mapWeeklyToConsultations,
 	statusColor,
 } from '@/components/functions/functions';
-import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
+
 import { cn } from '@/lib/utils';
+import RescheduleConsultation from './RescheduleConsultation';
 
 const ConsultationDetails = ({
 	open,
@@ -391,9 +395,13 @@ const ConsultationDetails = ({
 						<RescheduleConsultation
 							open={rescheduleDialog}
 							setOpen={setRescheduleDialog}
-							availabilities={availabilities}
-							weeklies={weeklies}
-							selectedSchedule={weekly}
+							adviserAvailability={generateAvailabilitySlots(
+								availabilities,
+								new Date(weekly.date),
+								5,
+							)}
+							consultations={mapWeeklyToConsultations(weeklies)}
+							selectedSchedule={mapWeekly(weekly)}
 							refresh={refresh}
 						/>
 					)}

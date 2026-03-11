@@ -199,6 +199,7 @@ const BookConsultationDialog = ({
 			end_time: selectedWindow?.end_time.slice(0, 5),
 			purpose: purpose.trim(),
 			project_name: project?.title,
+			reschedule: false,
 		};
 
 		try {

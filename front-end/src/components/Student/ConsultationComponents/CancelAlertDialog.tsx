@@ -12,8 +12,9 @@ import { AlertTriangle } from 'lucide-react';
 import type { CancelAlertProps } from '../interface/consultation';
 import { format } from 'date-fns';
 import { to12HourTime } from '@/components/Adviser/interface/consultation';
-import { apiAdviserUrl } from '@/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { toast } from 'sonner';
+import { getUserToken } from '@/components/functions/functions';
 
 const CancelAlertDialog = ({
 	open,
@@ -22,18 +23,20 @@ const CancelAlertDialog = ({
 	project,
 	refresh,
 }: CancelAlertProps) => {
+	const userToken = getUserToken();
 	const updateStatus = async (status: string) => {
 		try {
 			const payLoad = {
 				status: status,
 			};
 			const res = await fetch(
-				`${apiAdviserUrl}/${selectedSchedule.id}/weekly/update`,
+				`${apiStudentUrl}/${selectedSchedule.id}/weekly/update`,
 				{
 					method: 'PUT',
 					headers: {
 						'Content-type': 'application/json',
 						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
 					body: JSON.stringify(payLoad),
 				},
@@ -54,7 +57,6 @@ const CancelAlertDialog = ({
 			if (result.status === 200) {
 				toast.success(result.message);
 				setOpen(false);
-				console.log(result.request);
 				refresh?.();
 			}
 		} catch (error) {
