@@ -19,10 +19,10 @@ const DevelopmentMonitoring = ({
 	const [selectedId, setSelectedId] = useState<number | undefined>(
 		projects.length > 0 ? projects[0].id : undefined,
 	);
-	if (!projects) {
+	if (projects.length === 0) {
 		return (
 			<>
-				<div className="flex flex-col justify-center items-center opacity-50 h-full">
+				<div className="flex flex-col justify-center items-center opacity-50 h-screen">
 					<BookOpen className="h-24 w-24 text-muted-foreground" />
 					<p className="text-mb text-muted-foreground font-medium">
 						There's not yet assigned thesis or capstone group in your advisory.

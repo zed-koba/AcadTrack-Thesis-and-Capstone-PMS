@@ -51,8 +51,8 @@ class AdviserWeeklyController extends Controller
     public function storeSchedule(Request $request)
     {
         $rules = [
-            'adviser_id' => 'required|integer|',
-            'student_id' => 'required|integer|',
+            'adviser_id' => 'required|integer',
+            'student_id' => 'required|integer',
             'date' => 'required|date|date_format:Y-m-d|',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i',
@@ -87,12 +87,21 @@ class AdviserWeeklyController extends Controller
                 'purpose' => $request->purpose,
                 'status' => 'upcoming',
             ]);
+            if($request->reschedule === false) {
             NotificationService::store([
                 'adviser_id' => $request->adviser_id,
                 'type' => 'consultation',
                 'title' => $request->project_name,
                 'message' => 'has booked a consultation'
             ]);
+            }else{
+                NotificationService::store([
+                'foreign_proponents_id' => $request->project_id,
+                'type' => 'consultation',
+                'title' => $request->adviser_name,
+                'message' => 'has rescheduled your consultation'
+            ]);
+            }
             DB::commit();
             return response()->json([
                 'status' => 201,
