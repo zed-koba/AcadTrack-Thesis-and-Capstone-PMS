@@ -34,7 +34,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import {
 	generateTimeSlots,
 	statusColor,
@@ -140,14 +140,15 @@ const WeeklyConsultation = ({
 
 			if (
 				isAfter(nowDate, endDateTime) &&
-				w.status === 'pending' &&
+				w.status === 'upcoming' &&
 				!expiredPostedRef.current.has(String(w.id))
 			) {
 				expiredPostedRef.current.add(String(w.id));
 				updateStatus(w.id, 'expired', '');
+				refresh?.();
 			}
 		});
-	}, [weeklies]);
+	}, [weeklies, refresh]);
 	const weekConsultations = useMemo(
 		() =>
 			weeklies.filter((c) => weekDays.some((day) => isSameDay(c.date, day))),
@@ -168,6 +169,7 @@ const WeeklyConsultation = ({
 		}),
 		[weekConsultations],
 	);
+
 	return (
 		<>
 			<Card className="bg-card border-border">
@@ -414,11 +416,13 @@ const WeeklyConsultation = ({
 																								<div className="flex-1 min-w-0">
 																									<div className="font-medium truncate flex items-center gap-1">
 																										<BookOpen className="h-4 w-4 shrink-0" />
-																										{
-																											consultation.student
-																												.proponent_detail
-																												.proponent.title
-																										}
+																										{consultation.student
+																											.project
+																											? consultation.student
+																													.project.title
+																											: consultation.student
+																													.proponent_detail
+																													.proponent.title}
 																									</div>
 																									<div className="opacity-80 text-[12px]">
 																										{formatTime(
@@ -435,11 +439,12 @@ const WeeklyConsultation = ({
 																					>
 																						<div className="space-y-1">
 																							<div className="font-semibold text-sm">
-																								{
-																									consultation.student
-																										.proponent_detail.proponent
-																										.title
-																								}
+																								{consultation.student.project
+																									? consultation.student.project
+																											.title
+																									: consultation.student
+																											.proponent_detail
+																											.proponent.title}
 																							</div>
 																							<div className="text-xs text-muted-foreground flex flex-col mb-2">
 																								<span>Purpose: </span>{' '}

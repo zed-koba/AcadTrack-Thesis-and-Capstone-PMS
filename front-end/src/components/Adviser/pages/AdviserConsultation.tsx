@@ -5,10 +5,9 @@ import type {
 	AdviserAvailabilityProps,
 	AdviserWeeklyProps,
 } from '../interface/consultation';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { Spinner } from '@/components/ui/spinner';
-import { adviserId } from '@/components/functions/functions';
-import type { ProponentsDocumentsProps } from '../interface/adviserdocument';
+import { getInformation, getUserToken } from '@/components/functions/functions';
 
 const AdviserConsultation = () => {
 	const [availabilities, setAvabilities] = useState<AdviserAvailabilityProps[]>(
@@ -16,20 +15,27 @@ const AdviserConsultation = () => {
 	);
 	const [weeklies, setWeeklies] = useState<AdviserWeeklyProps[]>([]);
 	const [loading, setLoading] = useState(true);
+	const userToken = getUserToken();
+	const information = getInformation();
 	const fetchAvaibilities = async () => {
 		try {
-			const res = await fetch(`${apiAdviserUrl}/${adviserId}/availabilities`, {
-				method: 'GET',
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
+			const res = await fetch(
+				`${apiAdviserUrl}/${information.id}/availabilities`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/json',
+						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
+					},
 				},
-			});
+			);
 			if (!res.ok) throw new Error('Failed to fetch data');
 			const result = await res.json();
 			if (result.status === 200) {
 				setAvabilities(result.availabilities);
 				setWeeklies(result.weeklies);
+				console.log(result);
 			}
 		} catch (error) {
 			console.log(error);

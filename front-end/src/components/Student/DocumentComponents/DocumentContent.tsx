@@ -11,12 +11,20 @@ import ChapterItem from './ChapterItem';
 const DocumentContent = ({
 	documents,
 	project,
+	deadlines,
 	refresh,
 }: DocumentContentProps) => {
-	const studentIds = project?.details.map((v) => v.student_id);
+	const studentIds = [project?.group_leader.id,
+	...(project?.details.map((d) => d.student_id) ?? []),
+	].filter((id) => id !== undefined);;
+
 	const filterDocuments = useMemo(() => {
-		return documents.filter((doc) => studentIds?.includes(doc.student_id));
-	}, [documents, studentIds]);
+		return documents.filter(
+			(doc) =>
+				studentIds?.includes(doc.student_id) ||
+				doc.student_id === project?.student_id,
+		);
+	}, [documents, studentIds, project?.student_id]);
 
 	const [searchQuery, setSearchQuery] = useState('');
 	const documentsGrouped = useMemo(() => {
@@ -49,7 +57,7 @@ const DocumentContent = ({
 			? d.versions[0].status === 'need revision'
 			: d.status === 'need revision',
 	);
-
+	console.log(studentIds);
 	return (
 		<>
 			{needRevisionDocs.length > 0 && (
@@ -86,7 +94,10 @@ const DocumentContent = ({
 									</div>
 								</div>
 								<div className="flex items-center gap-2">
-									<DocumentUploadDialog refresh={refresh} />
+									<DocumentUploadDialog
+										refresh={refresh}
+										deadlines={deadlines}
+									/>
 								</div>
 							</div>
 							<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-4">
@@ -110,16 +121,6 @@ const DocumentContent = ({
 									</div>
 								) : (
 									<div className="space-y-4">
-										{/* {filteredChaptersGrouped.map((chapter) => (
-											<ChaptersDocument
-												key={chapter.chapter}
-												chapter={chapter}
-												isExpanded={expandedChapters.has(chapter.chapter)}
-												onToggle={() => toggleChapter(chapter.chapter)}
-												projectAdviser={project?.adviser ?? null}
-												refresh={refresh}
-											/>
-										))} */}
 										{filteredDocumentsGrouped.map((doc) => (
 											<ChapterItem
 												key={doc.id}
@@ -134,15 +135,6 @@ const DocumentContent = ({
 						</CardContent>
 					</Card>
 				</div>
-				{/* {selectedDocument && (
-					<DocumentsComments
-						document={selectedDocument}
-						refresh={refresh}
-						loading={loading}
-						adviser={projectAdviser}
-						setSelectedDocument={setSelectedDocument}
-					/>
-				)} */}
 			</section>
 		</>
 	);

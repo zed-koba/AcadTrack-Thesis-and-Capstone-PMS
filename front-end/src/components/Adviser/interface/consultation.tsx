@@ -1,4 +1,5 @@
-import type { ProponentsDocumentsProps } from './adviserdocument';
+import type { ProjectDetails } from '@/components/Student/interface/project-setup';
+import type { DetailsDocumentsProps } from './adviserdocument';
 
 export const DAYS = [
 	'Monday',
@@ -69,19 +70,17 @@ export type AdviserWeeklyProps = {
 	student: {
 		id: number;
 		name: string;
+		project: ProjectDetails;
 		proponent_detail: {
-			student_id: number;
 			foreign_proponents_id: string;
 			proponent: {
-				proponents_id: string;
 				title: string;
-				details: {
-					student_id: number;
-					student: {
-						id: number;
-						name: string;
-					};
-				}[];
+				group_leader: {
+					id: number;
+					name: string;
+					student_id: string;
+				};
+				details: DetailsDocumentsProps[];
 			};
 		};
 	};

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\admin\AccountsController;
 use App\Http\Controllers\admin\AdvisersController;
+use App\Http\Controllers\NewUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\ProponentsController;
 use App\Http\Controllers\admin\DepartmentsController;
@@ -11,18 +12,30 @@ use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\adviser\AdviserAvailabilityController;
 use App\Http\Controllers\adviser\AdviserWeeklyController;
 use App\Http\Controllers\adviser\DocumentCommentsController;
+use App\Http\Controllers\ArchivedDocumentsController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\instructor\DocumentsDeadlineController;
+use App\Http\Controllers\InstructorController;
+use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\student\DevelopmentProcessController;
 use App\Http\Controllers\student\DocumentsController;
 use App\Http\Controllers\StudentsController;
+use App\Http\Controllers\TaskListsController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
+Route::post('/login', [AccountsController::class, 'loginAccount']);
+Route::post('/accounts/add', [AccountsController::class, 'storeAccount']);
+Route::get('/getDepartments', [NewUserController::class, 'getDepartments']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AccountsController::class, 'logout']);
+});
 
 Route::prefix("admin")->group(function () {
 
     //Accounts Routes
     Route::get('accounts', [AccountsController::class, 'getData']);
-    Route::post('accounts/add', [AccountsController::class, 'storeAccount']);
     Route::put('accounts/edit/{id}', [AccountsController::class, 'updateAccount']);
     Route::delete('accounts/delete/{id}', [AccountsController::class, 'deleteAccount']);
 
@@ -44,6 +57,7 @@ Route::prefix("admin")->group(function () {
     Route::get('departments', [DepartmentsController::class, 'getDepartments']);
     Route::post('departments/add', [DepartmentsController::class, 'storeDepartment']);
     Route::put('departments/edit/{id}', [DepartmentsController::class, 'updateDepartment']);
+    Route::delete('departments/delete/{id}', [DepartmentsController::class, 'deleteDepartment']);
 
 
     //Roles Routes
@@ -55,6 +69,7 @@ Route::prefix("admin")->group(function () {
     Route::get('programs', [ProgramsController::class, 'getPrograms']);
     Route::post('programs/add', [ProgramsController::class, 'storeProgram']);
     Route::put('programs/edit/{id}', [ProgramsController::class, 'updateProgram']);
+    Route::delete('programs/delete/{id}', [ProgramsController::class, 'deleteProgram']);
 
 
     //Advisers Routes
@@ -72,28 +87,94 @@ Route::prefix("admin")->group(function () {
 });
 
 
-Route::prefix("adviser")->group(function() {
+Route::middleware(['auth:sanctum', 'role:adviser'])->prefix("adviser")->group(function () {
     //Adviser Availability
     Route::get("{id}/availabilities", [AdviserAvailabilityController::class, "getAvailabilities"]);
-    Route::post("availabilities/add", [AdviserAvailabilityController::class, "storeAvailability"]);
+    Route::post("availabilities/add/{id}", [AdviserAvailabilityController::class, "storeAvailability"]);
     Route::put("availabilities/update", [AdviserAvailabilityController::class, "updateAvailabilty"]);
-    Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class,"deleteAvailability"]);
+    Route::delete("{id}/availabilities/delete", [AdviserAvailabilityController::class, "deleteAvailability"]);
 
     //Adviser Weekly
-    Route::put("{id}/weekly/update", [AdviserWeeklyController::class,"updateSchedule"]);
+    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
 
     //Adviser Comment
     Route::get('{id}/comments', [DocumentCommentsController::class, 'getComments']);
     Route::post('comments/add', [DocumentCommentsController::class, 'storeComment']);
+    //Documents
+    Route::get('documents/{id}', [DocumentsController::class, 'getStudentDocuments']);
+
+    Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getAdviserDevelopmentProcess']);
+
+    Route::get('datas/{id}', [InstructorController::class, 'getAdviserDatas']);
+    Route::get('datas/reports/{id}', [InstructorController::class, 'getReportsData']);
 });
 
-Route::prefix("student")->group(function() {
+Route::prefix("student")->group(function () {
     //Student Documents
-    Route::get('documents', [DocumentsController::class, 'getDocuments']);
+    Route::get('documents/{id}', [DocumentsController::class, 'getDocuments']);
     Route::post('documents/add', [DocumentsController::class, 'storeDocument']);
-    Route::get('{id}/download/pdf', [DocumentsController::class,'downloadDocument']);
+    Route::get('{id}/download/pdf', [DocumentsController::class, 'downloadDocument']);
+    Route::put('documents/passed/{id}', [DocumentsController::class, 'passDocument']);
 
     //Student Consultation
     Route::get('weekly', [AdviserWeeklyController::class, "getSchedules"]);
     Route::post('weekly/add', [AdviserWeeklyController::class, 'storeSchedule']);
-}); 
+    Route::get('deadlines/{id}', [DocumentsDeadlineController::class, 'getDeadlines']);
+
+    //Task
+    Route::get('tasks/{id}', [TaskListsController::class, 'getTaskList']);
+    Route::post('tasks/add', [TaskListsController::class, 'storeTask']);
+    Route::put('tasks/update/{id}', [TaskListsController::class, 'updateTask']);
+    Route::delete('tasks/delete/{id}', [TaskListsController::class, 'deleteTask']);
+
+    //Project Setup
+    Route::get('project-setup', [NewUserController::class, 'getData']);
+    Route::put('project-setup/updateStudent/{id}', [NewUserController::class, 'updateStudent']);
+    Route::post('project-setup/storeProject/{id}', [NewUserController::class, 'storeProject']);
+    Route::post('project-setup/joinProject/{id}', [NewUserController::class, 'joinProject']);
+
+    //Development Process
+    Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getDevelopmentProcess']);
+    Route::post('development-process/store', [DevelopmentProcessController::class, 'storeDevelopmentProcess']);
+    Route::put('development-process/edit/{id}', [DevelopmentProcessController::class, 'editDevelopmentProcess']);
+    Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
+    Route::delete('development-process/delete/{id}', [DevelopmentProcessController::class, 'deleteDevelopmentProcess']);
+
+    //My Groups
+    Route::get('my-group/{id}', [GroupController::class, 'getProjectMembers']);
+    Route::post('my-group/transfer/{id}', [GroupController::class, 'transferGroupLeader']);
+    Route::put('my-group/updateRole/{id}', [GroupController::class, 'updateRoleMember']);
+    Route::delete('my-group/leaveGroup/{id}', [GroupController::class, 'leaveGroup']);
+<<<<<<< HEAD
+=======
+
+
+    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
+
+
+    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
+
+    
+>>>>>>> 04166f201b145cbc906d94bffea4a5232ccd4609
+});
+
+Route::prefix("instructor")->group(function () {
+    Route::get('deadlines/{id}', [DocumentsDeadlineController::class, 'getDeadlines']);
+    Route::post('deadlines/add', [DocumentsDeadlineController::class, 'addDeadlines']);
+    Route::put('deadlines/update/{id}', [DocumentsDeadlineController::class, 'updateDeadline']);
+    Route::delete('deadlines/delete/{id}', [DocumentsDeadlineController::class, 'deleteDeadline']);
+
+    Route::get('datas/{id}', [InstructorController::class, 'getDatas']);
+    Route::get('documents/{id}', [DocumentsController::class, 'getInstructorDocuments']);
+
+    Route::get('development-process/{id}', [DevelopmentProcessController::class, 'getInstructorDevelopmentProcess']);
+    Route::put('development-process/update/{id}', [DevelopmentProcessController::class, 'updateStatus']);
+
+    //Archiving
+    Route::get('archiving', [ArchivedDocumentsController::class, 'getDocuments']);
+    Route::post('archiving/add', [ArchivedDocumentsController::class, 'storeDocument']);
+    Route::get('archving/{id}/download/pdf', [ArchivedDocumentsController::class, 'downloadDocument']);
+});
+
+Route::get('notifications/{id}/{role}', [NotificationsController::class, 'getNotifications']);
+Route::put('notifications/read/{id}', [NotificationsController::class, 'readNotification']);

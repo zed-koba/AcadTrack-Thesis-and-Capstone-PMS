@@ -23,7 +23,7 @@ import {
 } from '../../interface/consultation';
 import { Badge } from '@/components/ui/badge';
 import { differenceInMinutes, format, isAfter, parse } from 'date-fns';
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,10 +34,15 @@ import {
 } from '@/components/ui/tooltip';
 import {
 	consultationIcon,
+	generateAvailabilitySlots,
+	getUserToken,
+	mapWeekly,
+	mapWeeklyToConsultations,
 	statusColor,
 } from '@/components/functions/functions';
-import RescheduleConsultation from '@/components/Student/ConsultationComponents/RescheduleConsultationv2';
+
 import { cn } from '@/lib/utils';
+import RescheduleConsultation from './RescheduleConsultation';
 
 const ConsultationDetails = ({
 	open,
@@ -52,6 +57,7 @@ const ConsultationDetails = ({
 	);
 	const nowDateTime = format(new Date(), 'HH:mm');
 	const [rescheduleDialog, setRescheduleDialog] = useState(false);
+	const userToken = getUserToken();
 	if (!weekly) return null;
 
 	const updateStatus = async (
@@ -73,6 +79,7 @@ const ConsultationDetails = ({
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 				body: JSON.stringify(payLoad),
 			});
@@ -127,7 +134,7 @@ const ConsultationDetails = ({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="sm:max-w-[500px] text-white">
+				<DialogContent className="sm:min-w-[500px] w-auto max-w-xl! text-white">
 					<DialogHeader>
 						<DialogTitle className="flex items-center justify-between capitalize">
 							<span>Consultation Details</span>
@@ -172,7 +179,9 @@ const ConsultationDetails = ({
 								<div>
 									<p className="text-sm font-medium">Thesis/Capstone:</p>
 									<p className="text-sm text-muted-foreground">
-										{weekly.student.proponent_detail.proponent.title}
+										{weekly.student.project
+											? weekly.student.project.title
+											: weekly.student.proponent_detail.proponent.title}
 									</p>
 								</div>
 							</div>
@@ -181,19 +190,40 @@ const ConsultationDetails = ({
 								<div>
 									<p className="text-sm font-medium">Members:</p>
 									<div className="text-sm text-muted-foreground flex gap-1.5 mt-1">
-										{weekly.student.proponent_detail.proponent.details.map(
-											(student) => (
-												<div
-													key={student.student.id}
-													className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
-												>
-													<User className="w-4 h-4" />
-													<p className="text-xs font-medium">
-														{student.student.name}
-													</p>
-												</div>
-											),
-										)}
+										<div className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary">
+											<User className="w-4 h-4" />
+											<p className="text-xs font-medium">
+												{weekly.student.project
+													? weekly.student.project.group_leader.name
+													: weekly.student.proponent_detail.proponent
+															.group_leader.name}
+											</p>
+										</div>
+										{weekly.student.project
+											? weekly.student.project.details.map((student) => (
+													<div
+														key={student.student.id}
+														className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
+													>
+														<User className="w-4 h-4" />
+														<p className="text-xs font-medium">
+															{student.student.name}
+														</p>
+													</div>
+												))
+											: weekly.student.proponent_detail.proponent.details.map(
+													(student) => (
+														<div
+															key={student.student.id}
+															className="bg-primary/10 border-primary/40 py-1 px-2 border rounded-sm flex gap-2 items-center text-primary"
+														>
+															<User className="w-4 h-4" />
+															<p className="text-xs font-medium">
+																{student.student.name}
+															</p>
+														</div>
+													),
+												)}
 									</div>
 								</div>
 							</div>
@@ -353,6 +383,7 @@ const ConsultationDetails = ({
 									}}
 									className="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-500 col-start-1 col-span-2"
 									variant="outline"
+									disabled={!feedback}
 								>
 									<Check />
 									Leave a feedback
@@ -364,9 +395,13 @@ const ConsultationDetails = ({
 						<RescheduleConsultation
 							open={rescheduleDialog}
 							setOpen={setRescheduleDialog}
-							availabilities={availabilities}
-							weeklies={weeklies}
-							selectedSchedule={weekly}
+							adviserAvailability={generateAvailabilitySlots(
+								availabilities,
+								new Date(weekly.date),
+								5,
+							)}
+							consultations={mapWeeklyToConsultations(weeklies)}
+							selectedSchedule={mapWeekly(weekly)}
 							refresh={refresh}
 						/>
 					)}

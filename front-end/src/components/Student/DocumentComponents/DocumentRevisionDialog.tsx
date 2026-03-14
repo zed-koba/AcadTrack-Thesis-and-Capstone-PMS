@@ -16,9 +16,9 @@ import { AlertCircle, FileText, FileUp, Upload, X } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { Badge } from '@/components/ui/badge';
-import { studentId } from '@/components/functions/functions';
+import { getInformation, getProjectId } from '@/components/functions/functions';
 
 const uploadSchema = z.object({});
 
@@ -34,7 +34,8 @@ const DocumentRevisionDialog = ({
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	type formValues = z.infer<typeof uploadSchema>;
 	const defaultValues: formValues = {};
-
+	const information = getInformation();
+	const projectId = getProjectId();
 	const form = useForm({
 		defaultValues,
 		validators: {
@@ -51,12 +52,10 @@ const DocumentRevisionDialog = ({
 			setLoading(true);
 			const formData = new FormData();
 			formData.append('file', selectedFile);
-			formData.append('student_id', String(studentId));
+			formData.append('student_id', information.id);
 			formData.append('currentId', String(document.id));
-			formData.append(
-				'title_name',
-				document.title_name + '_v' + (document?.version + 1),
-			);
+			formData.append('title_name', document.title_name);
+			formData.append('project_id', projectId.proponents_id);
 			formData.append(
 				'parent_document_id',
 				String(

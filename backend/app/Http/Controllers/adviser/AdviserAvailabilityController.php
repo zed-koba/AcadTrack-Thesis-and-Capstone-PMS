@@ -16,7 +16,7 @@ class AdviserAvailabilityController extends Controller
     public function getAvailabilities($id)
     {
         $availabilities = AdviserAvailability::where("adviser_id", $id)->with('adviser')->get();
-        $weeklies = AdviserWeekly::with('student:id,name', 'adviser', 'student.proponentDetail.proponent:proponents_id,title', 'student.proponentDetail.proponent.details.student:id,name')->where("adviser_id", $id)->get();
+        $weeklies = AdviserWeekly::with('student:id,name', 'adviser', 'student.project', 'student.project.groupLeader', 'student.project.details.student', 'student.proponentDetail.proponent', 'student.proponentDetail.proponent.groupLeader', 'student.proponentDetail.proponent.details.student')->where("adviser_id", $id)->get();
         return response()->json([
             "status" => 200,
             "message" => "Sucessfully fetch availabilities",
@@ -25,7 +25,7 @@ class AdviserAvailabilityController extends Controller
         ]);
     }
 
-    public function storeAvailability(Request $request)
+    public function storeAvailability(Request $request, $id)
     {
         $rules = [
             'day' => 'required',
@@ -46,7 +46,7 @@ class AdviserAvailabilityController extends Controller
         try {
             DB::beginTransaction();
             $availability = AdviserAvailability::create([
-                'adviser_id' => 1,
+                'adviser_id' => $id,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'day' => $request->day,
@@ -88,13 +88,15 @@ class AdviserAvailabilityController extends Controller
         }
         try {
             DB::beginTransaction();
-            $availability = Advisers::findOrFail($request->id)->update($request->only(['consultation_limit', 'duration'
+            $availability = Advisers::findOrFail($request->id)->update($request->only([
+                'consultation_limit',
+                'duration'
             ]));
 
             DB::commit();
             return response()->json([
                 'status' => 200,
-                'message' => 'Successfully updated your settings',           
+                'message' => 'Successfully updated your settings',
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();

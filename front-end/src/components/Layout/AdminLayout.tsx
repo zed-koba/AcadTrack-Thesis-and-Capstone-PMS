@@ -6,7 +6,6 @@ import {
 	Glasses,
 	GraduationCap,
 	Landmark,
-	LayoutDashboard,
 	LibraryBig,
 	UserCog,
 	Users,
@@ -16,13 +15,8 @@ import { Toaster } from 'sonner';
 const AdminLayout = () => {
 	const navItem: NavItem[] = [
 		{
-			label: 'Dashboard',
-			to: '/Admin',
-			icon: <LayoutDashboard className="w-5 h-5" strokeWidth={2.5} />,
-		},
-		{
 			label: 'Proponents',
-			to: '/Admin/Proponents',
+			to: '/Admin',
 			icon: <Users className="w-5 h-5" strokeWidth={2.5} />,
 		},
 		{

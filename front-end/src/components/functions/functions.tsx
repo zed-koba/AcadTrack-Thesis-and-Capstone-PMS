@@ -1,5 +1,5 @@
 import { toast } from 'sonner';
-import { apiStudentUrl } from '../Routes/http';
+import { apiStudentUrl } from '../../Routes/http';
 import type { JSX } from 'react/jsx-runtime';
 import {
 	CalendarCheck,
@@ -13,8 +13,15 @@ import {
 	X,
 } from 'lucide-react';
 import type { ProponentsDocumentsProps } from '../Adviser/interface/adviserdocument';
-import type { AdviserWeeklyProps } from '../Adviser/interface/consultation';
-import { parse } from 'date-fns';
+import type {
+	AdviserAvailabilityProps,
+	AdviserWeeklyProps,
+} from '../Adviser/interface/consultation';
+import { addDays, parse } from 'date-fns';
+import type {
+	AdviserAvailability,
+	CalendarConsultation,
+} from './greedyAlgorithmn';
 
 export function formatDate(dateString: string) {
 	const date = new Date(dateString);
@@ -25,6 +32,23 @@ export function formatDate(dateString: string) {
 		year: 'numeric',
 	});
 }
+export const studentId = 1;
+export const adviserId = 1;
+export const instructorId = 1;
+export const START_HOUR = 7;
+export const END_HOUR = 19;
+export const getUser = () => {
+	return JSON.parse(localStorage.getItem('user') || '{}');
+};
+export const getInformation = () => {
+	return JSON.parse(localStorage.getItem('data') || '{}');
+};
+export const getProjectId = () => {
+	return JSON.parse(localStorage.getItem('project') || '{}');
+};
+export const getUserToken = () => {
+	return localStorage.getItem('token') || '';
+};
 
 export function formatDateWithTime(dateString: string) {
 	const date = new Date(dateString);
@@ -105,9 +129,6 @@ export const consultationIcon: Record<string, JSX.Element> = {
 	ongoing: <CalendarClock className="h-3 w-3 mr-1" />,
 };
 
-export const studentId = 2;
-export const adviserId = 1;
-
 const dayToNumber: Record<string, number> = {
 	monday: 1,
 	tuesday: 2,
@@ -183,12 +204,11 @@ export const getDateLabel = (dateStr: string): string => {
 };
 
 export const studentIds = (project?: ProponentsDocumentsProps | null) => {
-	return (project?.details.map((d) => d.student_id) ?? []).filter(
-		(id) => id !== undefined,
-	);
+	return [
+		project?.group_leader.id,
+		...(project?.details.map((d) => d.student_id) ?? []),
+	].filter((id) => id !== undefined);
 };
-export const START_HOUR = 7;
-export const END_HOUR = 19;
 
 // Generate time slots based on meeting duration
 export const generateTimeSlots = (meetingDuration: number) => {
@@ -205,3 +225,81 @@ export const generateTimeSlots = (meetingDuration: number) => {
 export const getTime = (dateForDay: string, timeSlot: string) => {
 	return parse(`${dateForDay} ${timeSlot}`, 'yyyy-MM-dd HH:mm:ss', new Date());
 };
+
+export function formatTimeDisplay(time: string): string {
+	const [hours, minutes] = time.split(':').map(Number);
+	const period = hours >= 12 ? 'PM' : 'AM';
+	const displayHours = hours % 12 || 12;
+	return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+}
+
+export function mapWeeklyToConsultations(
+	weekly: AdviserWeeklyProps[],
+): CalendarConsultation[] {
+	return weekly.map((w) => ({
+		id: w.id,
+		student_id: w.student_id,
+		project_name:
+			w.student.project?.title ??
+			w.student.proponent_detail?.proponent?.title ??
+			'Unknown Project',
+		date: new Date(w.date),
+		project_id: w.student.project.proponents_id,
+		scheduledStart: w.start_time,
+		scheduledEnd: w.end_time,
+		status: w.status as 'upcoming' | 'cancelled' | 'completed',
+	}));
+}
+export function mapWeekly(weekly: AdviserWeeklyProps): CalendarConsultation {
+	const cancelledWeekly: CalendarConsultation = {
+		id: weekly.id,
+		student_id: weekly.student_id,
+		project_name:
+			weekly.student.project?.title ??
+			weekly.student.proponent_detail?.proponent?.title ??
+			'Unknown Project',
+		date: new Date(weekly.date),
+		project_id: weekly.student.project.proponents_id,
+		scheduledStart: weekly.start_time,
+		scheduledEnd: weekly.end_time,
+		status: weekly.status as 'upcoming' | 'cancelled' | 'completed',
+	};
+
+	return cancelledWeekly;
+}
+
+const dayMap: Record<string, number> = {
+	sunday: 0,
+	monday: 1,
+	tuesday: 2,
+	wednesday: 3,
+	thursday: 4,
+	friday: 5,
+	saturday: 6,
+};
+export function generateAvailabilitySlots(
+	availabilities: AdviserAvailabilityProps[],
+	startDate: Date,
+	maxDaysAhead: number,
+): AdviserAvailability[] {
+	const slots: AdviserAvailability[] = [];
+
+	for (let offset = 0; offset <= maxDaysAhead; offset++) {
+		const date = addDays(startDate, offset);
+		const dayOfWeek = date.getDay();
+
+		const matchingTemplates = availabilities.filter(
+			(a) => a.is_available && dayMap[a.day.toLowerCase()] === dayOfWeek,
+		);
+
+		for (const template of matchingTemplates) {
+			slots.push({
+				date,
+				start: template.start_time,
+				end: template.end_time,
+			});
+		}
+	}
+
+	return slots;
+}

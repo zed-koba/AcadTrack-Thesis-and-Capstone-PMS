@@ -28,11 +28,12 @@ import {
 } from 'date-fns';
 import {
 	getDayNumber,
+	getInformation,
 	getTime,
-	studentId,
+	getUserToken,
 } from '@/components/functions/functions';
 import { Textarea } from '@/components/ui/textarea';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -49,7 +50,8 @@ const BookConsultationDialog = ({
 }: BookConsultationprops) => {
 	const [currentStep, setCurrentStep] = useState<Step>('date');
 	const [selectedDate, setSelectedDate] = useState<Date>();
-
+	const information = getInformation();
+	const userToken = getUserToken();
 	const [purpose, setPurpose] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [selectedWindow, setSelectedWindow] =
@@ -191,11 +193,13 @@ const BookConsultationDialog = ({
 		setIsSubmitting(true);
 		const payLoad = {
 			adviser_id: project?.adviser_id,
-			student_id: studentId,
-			date: format(selectedDate?.toISOString() ?? '', 'yyyy-MM-dd'),
+			student_id: information.id,
+			date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
 			start_time: selectedWindow?.start_time.slice(0, 5),
 			end_time: selectedWindow?.end_time.slice(0, 5),
 			purpose: purpose.trim(),
+			project_name: project?.title,
+			reschedule: false,
 		};
 
 		try {
@@ -204,6 +208,7 @@ const BookConsultationDialog = ({
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 				body: JSON.stringify(payLoad),
 			});
@@ -340,7 +345,7 @@ const BookConsultationDialog = ({
 													checkExistigSchedule(date)
 												);
 											}}
-											className="rounded-md border border-border pointer-events-auto"
+											className="rounded-md border border-border pointer-events-auto focus:outline-none focus:border-none"
 											modifiers={{
 												available: (date) =>
 													dateHasAvailability(date) && date >= today,

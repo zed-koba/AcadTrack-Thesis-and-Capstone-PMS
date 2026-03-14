@@ -1,4 +1,4 @@
-import { apiAdviserUrl } from '@/components/Routes/http';
+import { apiAdviserUrl } from '@/Routes/http';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -14,6 +14,7 @@ import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { DeleteScheduleProps } from '../../interface/consultation';
+import { getUserToken } from '@/components/functions/functions';
 const DeleteSchedule = ({
 	open,
 	setOpen,
@@ -21,6 +22,7 @@ const DeleteSchedule = ({
 	refresh,
 }: DeleteScheduleProps) => {
 	const [loading, setLoading] = useState(false);
+	const userToken = getUserToken();
 	const handleDelete = async () => {
 		if (!sched_id) return;
 		setLoading(true);
@@ -32,14 +34,15 @@ const DeleteSchedule = ({
 					headers: {
 						'Content-type': 'application/json',
 						Accept: 'application/json',
+						Authorization: `Bearer ${userToken}`,
 					},
-				}
+				},
 			);
 			const result = await res.json();
 			if (result.status === 422) {
 				const errors = result.errors as Record<string, string[]>;
 				Object.values(errors).forEach((errorMessages) =>
-					errorMessages.forEach((message) => toast.error(message))
+					errorMessages.forEach((message) => toast.error(message)),
 				);
 				return;
 			}

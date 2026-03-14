@@ -3,6 +3,7 @@
 namespace App\Models\admin;
 
 use App\Models\adviser\AdviserWeekly;
+use App\Models\Notifications;
 use App\Models\student\Documents;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,9 @@ class Students extends Model
     public function proponentDetail():HasOne {
         return $this->hasOne(ProponentsDetails::class, 'student_id');
     }
+    public function project():HasOne {
+        return $this->hasOne(Proponents::class, 'student_id');
+    }
 
     public function instructor():BelongsTo {
         return $this->belongsTo(Instructors::class, 'instructor_id');
@@ -61,4 +65,8 @@ class Students extends Model
     public function document():HasMany {
         return $this->hasMany(Documents::class, 'student_id');
     }
+    public function notification():HasMany {
+        return $this->hasMany(Notifications::class, 'student_id');
+    }
+    
 }

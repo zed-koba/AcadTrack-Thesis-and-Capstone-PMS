@@ -6,10 +6,13 @@ use App\Models\admin\Advisers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Accounts extends Model
+class Accounts extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens, Notifiable;
     //table name
     protected $table = 'accounts';
 
@@ -20,6 +23,7 @@ class Accounts extends Model
         'student_id',
         'program',
         'section',
+        'new_user'
     ];
 
     protected $hidden = [

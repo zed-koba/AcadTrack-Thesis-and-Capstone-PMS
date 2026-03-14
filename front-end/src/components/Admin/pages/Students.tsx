@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import {
 	type InstructorStudentsProps,
 	type DepartmentStudentsProps,
@@ -9,7 +9,7 @@ import {
 import StudentTable from '../StudentComponents/StudentTable';
 import { useState, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
-import { ProponentsProps } from '../interface/proponent';
+import type { ProponentsProps } from '../interface/proponent';
 
 const Students = () => {
 	const [loading, setLoading] = useState(true);

@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { } from '@radix-ui/react-dialog';
+import {} from '@radix-ui/react-dialog';
 import { useForm } from '@tanstack/react-form';
 import { ArrowRightToLine } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -91,7 +91,7 @@ const RolesEdit = ({
 					Object.values(errors).forEach((errorMessages) =>
 						errorMessages.forEach((message) => {
 							toast.error(message);
-						})
+						}),
 					);
 					return;
 				} else if (result.status == 500) {

@@ -20,8 +20,8 @@ return new class extends Migration
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->time('actual_start');
-            $table->time('actual_end');
+            $table->time('actual_start')->nullabe();
+            $table->time('actual_end')->nullabe();
             $table->string('purpose');
             $table->string('feedback')->nullable();
             $table->enum('status', ['upcoming', 'completed', 'cancelled', 'ongoing' ,'expired'])->default('upcoming');

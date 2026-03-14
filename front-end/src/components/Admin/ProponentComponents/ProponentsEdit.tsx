@@ -18,7 +18,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -65,7 +65,7 @@ const ProponentsEdit = ({
 	//const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [selectAdviserId, setSelectedAdviserId] = useState(
-		proponent.adviser_id
+		proponent.adviser_id,
 	);
 	const [removedStudentsIds, setRemovedStudentsIds] = useState<number[]>([]);
 	type formValues = z.infer<typeof proponentSchema>;
@@ -109,7 +109,7 @@ const ProponentsEdit = ({
 				if (result.status === 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) => toast.error(message))
+						errorMessages.forEach((message) => toast.error(message)),
 					);
 					return;
 				}
@@ -142,7 +142,8 @@ const ProponentsEdit = ({
 				title: proponent.title,
 				adviser: proponent.adviser_id,
 				studentsId: updatedStudentsIds,
-			}); ``
+			});
+
 			setUpdatedStudentsIds(studentsIds);
 			setSelectedAdviserId(proponent.adviser_id);
 		}
@@ -245,7 +246,7 @@ const ProponentsEdit = ({
 														'w-full justify-between',
 														field.state.value === 0
 															? 'text-muted-foreground'
-															: 'text-white'
+															: 'text-white',
 													)}
 												>
 													{selectedAdviser
@@ -273,7 +274,7 @@ const ProponentsEdit = ({
 																		'',
 																		selectAdviserId === adv.id
 																			? 'bg-blue-600! text-white hover:bg-blue-600!'
-																			: 'hover:bg-card/50'
+																			: 'hover:bg-card/50',
 																	)}
 																>
 																	<Check
@@ -281,7 +282,7 @@ const ProponentsEdit = ({
 																			'h-4 w-4',
 																			Number(field.state.value) === adv.id
 																				? 'opacity-100 text-white'
-																				: 'opacity-0'
+																				: 'opacity-0',
 																		)}
 																	/>
 																	{adv.name}

@@ -3,8 +3,8 @@ import type {
 	AdviserAvailabilityProps,
 	AdviserWeeklyProps,
 } from '@/components/Adviser/interface/consultation';
-import { studentId } from '@/components/functions/functions';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { getInformation } from '@/components/functions/functions';
+import { apiStudentUrl } from '@/Routes/http';
 import { useEffect, useState } from 'react';
 import ConsultationDashboard from '../ConsultationComponents/ConsultationDashboard';
 import { Spinner } from '@/components/ui/spinner';
@@ -29,13 +29,20 @@ const Consultation = () => {
 			});
 
 			const result = await res.json();
+			const information = getInformation();
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
 				await setWeeklies(result.schedules);
 				await setProject(
-					result.projects.find((p: ProponentsDocumentsProps) =>
-						p.details.some((detail) => detail.student.id === studentId),
-					) ?? null,
+					result.projects.find((p: ProponentsDocumentsProps) => {
+						if (p.student_id === information.id) {
+							return p;
+						} else {
+							return p.details.some(
+								(detail) => detail.student_id === information.id,
+							);
+						}
+					}) ?? null,
 				);
 
 				await setAvailabilities(result.availability);
@@ -49,6 +56,7 @@ const Consultation = () => {
 	useEffect(() => {
 		fetchSchedules();
 	}, []);
+
 	return (
 		<>
 			<div className="flex items-start justify-between text-white text-base w-full h-full">

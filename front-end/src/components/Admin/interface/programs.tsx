@@ -1,5 +1,3 @@
-import type { ProponentsProps } from './proponent';
-
 export type ProgramsProps = {
 	id: number;
 	name: string;
@@ -48,4 +46,11 @@ export type ProgramsTableProps = {
 	departments: DepartmentProgramsProps[];
 	loading: boolean;
 	refresh: () => void;
+};
+
+export type ProgramDeleteProps = {
+	open: boolean;
+	setOpen: (open: boolean) => void;
+	program: ProgramsProps;
+	onSuccess?: () => void;
 };

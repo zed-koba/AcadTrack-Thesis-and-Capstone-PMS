@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Documents extends Model
 {
-    protected $fillable = ['student_id', 'original_name', 'title_name', 'stored_name', 'status', 'path', 'mime_type', 'size', 'parent_document_id', 'version'];
+    protected $fillable = ['student_id', 'original_name', 'title_name', 'stored_name', 'status', 'path', 'mime_type', 'size', 'parent_document_id', 'version', 'approved_date', 'passed_date'];
     protected $table = "documents";
 
     public function student(): BelongsTo {

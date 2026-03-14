@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('academic_yr');
             $table->string('title');
             $table->foreignId('adviser_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('student_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('original_name');       
             $table->string('title_name');
             $table->string('stored_name');
-            $table->enum('status', ['pending', 'under review', 'need revision', 'approved', 'revised'])->default('pending');
+            $table->enum('status', ['pending', 'under review', 'need revision', 'approved', 'revised', 'passed'])->default('pending');
             $table->string('path');
             $table->string('mime_type', 100);
             $table->unsignedBigInteger('size');
@@ -26,6 +26,8 @@ return new class extends Migration
                 ->constrained('documents')
                 ->cascadeOnDelete();
             $table->integer('version')->default(1);
+            $table->date('approved_date')->nullable();
+            $table->date('passed_date')->nullable();
             $table->timestamps();
         });
     }

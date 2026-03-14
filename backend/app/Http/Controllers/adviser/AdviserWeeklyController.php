@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\adviser;
 
+use App\Events\NotificationService;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Proponents;
 use App\Models\adviser\AdviserAvailability;
@@ -18,7 +19,7 @@ class AdviserWeeklyController extends Controller
     {
         $schedules = AdviserWeekly::orderBy('created_at', 'desc')->get();
         $availability = AdviserAvailability::orderBy('created_at', 'desc')->get();
-        $projects = Proponents::with('details.student:id,student_id,program_id,name', 'details.student.program:id,name,code', 'adviser', 'adviser.department:id,name,code')->orderBy('created_at', 'asc')->get();
+        $projects = Proponents::with('groupLeader:id,student_id,program_id,name,instructor_id,department_id','groupLeader.instructor:id,name', 'groupLeader.program:id,name,code', 'adviser', 'adviser.department', 'groupLeader.department:id,name,code', 'details')->orderBy('created_at', 'asc')->get();
 
         return response()->json([
             'status' => 200,
@@ -50,8 +51,8 @@ class AdviserWeeklyController extends Controller
     public function storeSchedule(Request $request)
     {
         $rules = [
-            'adviser_id' => 'required|integer|',
-            'student_id' => 'required|integer|',
+            'adviser_id' => 'required|integer',
+            'student_id' => 'required|integer',
             'date' => 'required|date|date_format:Y-m-d|',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i',
@@ -86,6 +87,21 @@ class AdviserWeeklyController extends Controller
                 'purpose' => $request->purpose,
                 'status' => 'upcoming',
             ]);
+            if($request->reschedule === false) {
+            NotificationService::store([
+                'adviser_id' => $request->adviser_id,
+                'type' => 'consultation',
+                'title' => $request->project_name,
+                'message' => 'has booked a consultation'
+            ]);
+            }else{
+                NotificationService::store([
+                'foreign_proponents_id' => $request->project_id,
+                'type' => 'consultation',
+                'title' => $request->adviser_name,
+                'message' => 'has rescheduled your consultation'
+            ]);
+            }
             DB::commit();
             return response()->json([
                 'status' => 201,

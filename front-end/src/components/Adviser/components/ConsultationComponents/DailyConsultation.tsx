@@ -352,10 +352,12 @@ const DailyConsultation = ({
 																		<div className="flex items-center gap-2 flex-wrap">
 																			<div className="font-semibold text-sm flex items-center gap-1">
 																				<BookOpen className="h-3.5 w-3.5 shrink-0" />
-																				{
-																					consultation.student.proponent_detail
-																						.proponent.title
-																				}
+																				{consultation.student.project
+																					? consultation.student.project
+																						.title
+																					: consultation.student
+																						.proponent_detail
+																						.proponent.title}
 																			</div>
 																			{/* Status badges */}
 

@@ -9,6 +9,7 @@ export type ProponentsProps = {
 	proponents_id: string;
 	academic_yr: string;
 	title: string;
+	student_id: number;
 	adviser_id: number;
 	created_at: string;
 	updated_at: string;

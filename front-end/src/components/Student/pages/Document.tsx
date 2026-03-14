@@ -3,24 +3,27 @@ import { useEffect, useState } from 'react';
 import DocumentDashboard from '../DocumentComponents/DocumentDashboard';
 import DocumentContent from '../DocumentComponents/DocumentContent';
 import type { DocumentProps } from '../interface/document';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
 
-import { studentId } from '@/components/functions/functions';
+import { getInformation, getUserToken } from '@/components/functions/functions';
+import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 const Document = () => {
 	const [loading, setLoading] = useState(true);
 	const [documents, setDocuments] = useState<DocumentProps[]>([]);
-	const [projects, setProjects] = useState<ProponentsDocumentsProps[]>([]);
+	const [deadlines, setDeadline] = useState<Deadlines[]>([]);
 	const [project, setProject] = useState<ProponentsDocumentsProps | null>(null);
-
+	const userToken = getUserToken();
+	const information = getInformation();
 	const fetchDocuments = async () => {
 		try {
-			const res = await fetch(`${apiStudentUrl}/documents`, {
+			const res = await fetch(`${apiStudentUrl}/documents/${information.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					Authorization: `Bearer ${userToken}`,
 				},
 			});
 
@@ -28,24 +31,23 @@ const Document = () => {
 			if (!res.ok) throw new Error('Failed to fetch data');
 			if (result.status === 200) {
 				await setDocuments(result.document);
-				await setProjects(result.projects);
+				await setDeadline(result.deadline);
 				setProject(
-					result.projects.find((p: ProponentsDocumentsProps) =>
-						p.details.some((detail) => detail.student.id === studentId),
-					) ?? null,
+					result.projects.find((p: ProponentsDocumentsProps) => {
+						if (p.student_id === information.id) {
+							return p;
+						} else {
+							return p.details.some(
+								(detail) => detail.student.id === information.id,
+							);
+						}
+					}) ?? null,
 				);
-				return result.document;
 			}
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setLoading(false);
-
-			// console.log(
-			// 	projects.find((p) =>
-			// 		p.details.some((detail) => detail.student.id === 1),
-			// 	),
-			// );
 		}
 	};
 	useEffect(() => {
@@ -72,6 +74,7 @@ const Document = () => {
 					<DocumentContent
 						documents={documents}
 						project={project}
+						deadlines={deadlines}
 						refresh={fetchDocuments}
 					/>
 				</>

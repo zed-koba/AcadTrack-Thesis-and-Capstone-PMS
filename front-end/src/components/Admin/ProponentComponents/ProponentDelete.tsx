@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -42,7 +42,7 @@ const ProponentDelete = ({
 			if (result.status === 422) {
 				const errors = result.errors as Record<string, string[]>;
 				Object.values(errors).forEach((errorMessages) =>
-					errorMessages.forEach((message) => toast.error(message))
+					errorMessages.forEach((message) => toast.error(message)),
 				);
 				return;
 			}

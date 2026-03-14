@@ -18,7 +18,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -73,7 +73,9 @@ const StudentEdit = ({
 	onSuccess,
 }: StudentEditProps) => {
 	const [loading, setLoading] = useState(false);
-	const [selectInstructorId, setSelectInstructorId] = useState(student.instructor_id);
+	const [selectInstructorId, setSelectInstructorId] = useState(
+		student.instructor_id,
+	);
 	const [instructorOpen, setInstructorOpen] = useState(false);
 
 	type formValues = z.infer<typeof studentSchema>;
@@ -124,7 +126,7 @@ const StudentEdit = ({
 				if (result.status == 422) {
 					const errors = result.errors as Record<string, string[]>;
 					Object.values(errors).forEach((errorMessages) =>
-						errorMessages.forEach((message) => toast.error(message))
+						errorMessages.forEach((message) => toast.error(message)),
 					);
 					return;
 				} else if (result.status == 500) {
@@ -151,19 +153,21 @@ const StudentEdit = ({
 		},
 	});
 	const [selectedDepartmentId, setSelectedDepartmentId] = useState(
-		student.department_id
+		student.department_id,
 	);
 
 	const filteredPrograms = programs.filter(
-		(p) => p.department_id === selectedDepartmentId
+		(p) => p.department_id === selectedDepartmentId,
 	);
 
 	const filteredRoles = roles.filter(
-		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1
+		(r) => r.department_id === selectedDepartmentId || r.globalRole === 1,
 	);
-	const filteredInstructor = instructors.filter((ins) => ins.department_id === selectedDepartmentId);
+	const filteredInstructor = instructors.filter(
+		(ins) => ins.department_id === selectedDepartmentId,
+	);
 	const selectedInstructor = instructors.find(
-		(i) => i.id === selectInstructorId
+		(i) => i.id === selectInstructorId,
 	);
 	useEffect(() => {
 		if (student) {
@@ -386,7 +390,7 @@ const StudentEdit = ({
 														'w-full justify-between',
 														field.state.value === 0
 															? 'text-muted-foreground'
-															: 'text-white'
+															: 'text-white',
 													)}
 												>
 													{selectedInstructor
@@ -414,7 +418,7 @@ const StudentEdit = ({
 																		'',
 																		selectInstructorId === adv.id
 																			? 'bg-blue-600! text-white hover:bg-blue-600!'
-																			: 'hover:bg-card/50'
+																			: 'hover:bg-card/50',
 																	)}
 																>
 																	<Check
@@ -422,7 +426,7 @@ const StudentEdit = ({
 																			'h-4 w-4',
 																			Number(field.state.value) === adv.id
 																				? 'opacity-100 text-white'
-																				: 'opacity-0'
+																				: 'opacity-0',
 																		)}
 																	/>
 																	{adv.name}

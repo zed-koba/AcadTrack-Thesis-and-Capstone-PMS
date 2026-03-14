@@ -7,8 +7,8 @@ import {
 	FileText,
 } from 'lucide-react';
 import type { DocumentDashboardProps } from '@/components/Student/interface/document';
-
-const DocumentDashboard = ({ documents }: DocumentDashboardProps) => {
+type AdviserDocumentDashboard = Pick<DocumentDashboardProps, 'documents'>;
+const DocumentDashboard = ({ documents }: AdviserDocumentDashboard) => {
 	const pendingLength = documents.filter((d) => d.status === 'pending').length;
 	const underReviewLength = documents.filter(
 		(d) => d.status === 'under review',

@@ -5,10 +5,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import type {
-	ProponentsDetails,
-	ProponentsDetailsProps,
-} from '../interface/proponent';
+
 import { Separator } from '@/components/ui/separator';
 import {
 	Briefcase,

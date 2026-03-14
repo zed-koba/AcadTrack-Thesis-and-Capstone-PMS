@@ -5,7 +5,6 @@ import {
 	CalendarClock,
 	CalendarPlus,
 	CheckCircle,
-	RefreshCcw,
 	User,
 	X,
 } from 'lucide-react';
@@ -37,9 +36,12 @@ const ConsultationContent = ({
 	availabilities,
 	refresh,
 }: ConsultationContentProps) => {
-	const studentIds = (project?.details.map((d) => d.student_id) ?? []).filter(
-		(id) => id !== undefined,
-	);
+	const studentIds = [
+		project?.group_leader.id,
+		...(project?.details.map((d) => d.student_id) ?? []).filter(
+			(id) => id !== undefined,
+		),
+	].filter((id) => id !== undefined) as number[];
 	const [bookingDialog, setBookingDialog] = useState(false);
 	const [rescheduleDialog, setRescheduleDialog] = useState(false);
 	const [cancelDialog, setCancelDialog] = useState(false);
@@ -52,6 +54,7 @@ const ConsultationContent = ({
 			const bStart = new Date(`${b.date}T${b.start_time}`).getTime();
 			return aStart - bStart;
 		});
+
 	const filterPastSessions = pastSessions(weeklies).filter((past) =>
 		studentIds?.includes(past.student_id),
 	);

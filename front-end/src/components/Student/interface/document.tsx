@@ -1,5 +1,6 @@
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
 import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/adviserdocument';
+import type { Deadlines } from '@/components/Instructor/interface/deadlines';
 
 export type DocumentProps = {
 	id: number;
@@ -13,6 +14,8 @@ export type DocumentProps = {
 	size: number;
 	parent_document_id: number | null;
 	version: number;
+	approved_date: Date;
+	passed_date: Date;
 	created_at: string;
 	updated_at: string;
 	versions: DocumentProps[];
@@ -21,6 +24,12 @@ export type DocumentProps = {
 		id: number;
 		name: string;
 		student_id: string;
+		proponent_detail: {
+			foreign_proponents_id: string;
+		};
+		project: {
+			proponents_id: string;
+		};
 	};
 };
 
@@ -35,6 +44,7 @@ export type CommentProps = {
 };
 export type DocumentUploadProps = {
 	refresh?: () => void;
+	deadlines: Deadlines[];
 };
 export type DocumentRevisionProps = {
 	document: DocumentProps;
@@ -47,6 +57,7 @@ export type DocumentRevisionProps = {
 export type DocumentContentProps = {
 	documents: DocumentProps[];
 	project: ProponentsDocumentsProps | null;
+	deadlines: Deadlines[];
 	refresh?: () => void;
 };
 

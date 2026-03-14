@@ -33,7 +33,6 @@ const DocumentItem = ({
 	selectedDocument,
 	setProjectAdviser,
 	projectAdviser,
-	refresh,
 }: DocumentItemProps) => {
 	const [showVersions, setShowVersions] = useState(true);
 

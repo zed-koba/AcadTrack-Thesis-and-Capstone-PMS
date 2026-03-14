@@ -2,7 +2,6 @@ import type { ProponentsDocumentsProps } from '@/components/Adviser/interface/ad
 import type {
 	AdviserAvailabilityProps,
 	AdviserWeeklyProps,
-	AvailabilityConsultationProps,
 } from '@/components/Adviser/interface/consultation';
 
 export type ConsultationDashboardProps = {

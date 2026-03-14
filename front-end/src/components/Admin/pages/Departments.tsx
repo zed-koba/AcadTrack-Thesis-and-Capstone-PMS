@@ -1,4 +1,4 @@
-import { apiUrl } from '@/components/Routes/http';
+import { apiUrl } from '@/Routes/http';
 import DepartmentsDashboard from '../DepartmentsComponents/DepartmentsDashboard';
 import DepartmentsTable from '../DepartmentsComponents/DepartmentsTable';
 import { useEffect, useState } from 'react';

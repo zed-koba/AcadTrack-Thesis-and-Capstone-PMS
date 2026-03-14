@@ -1,12 +1,6 @@
 import type { AdviserProps } from '@/components/Admin/interface/adviser';
-import type {
-	ProponentsDetailsProps,
-	ProponentsProps,
-} from '@/components/Admin/interface/proponent';
-import type {
-	CommentProps,
-	DocumentProps,
-} from '@/components/Student/interface/document';
+import type { ProponentsProps } from '@/components/Admin/interface/proponent';
+import type { DocumentProps } from '@/components/Student/interface/document';
 
 export type ChapterDocumentsProps = {
 	chapter: number;
@@ -27,19 +21,35 @@ export type DocumentItemProps = {
 	onSelectDocument: (document: DocumentProps) => void;
 	selectedDocument: DocumentProps | null;
 	setProjectAdviser: (adviser: AdviserProps) => void;
-	refresh?: () => void;
 };
 
-export type ProponentsDocumentsProps = {
-	id: number;
-	proponents_id: string;
-	academic_yr: string;
-	title: string;
-	adviser_id: number;
-	created_at: string;
-	updated_at: string;
+export type ProponentsDocumentsProps = Omit<ProponentsProps, 'details'> & {
 	details: DetailsDocumentsProps[];
 	adviser: AdviserProps;
+	group_leader: {
+		id: number;
+		name: string;
+		instructor_id: number;
+		program_id: number;
+		section: string;
+		semester: string;
+		instructor: {
+			id: number;
+			name: string;
+		};
+		program: {
+			id: number;
+			name: string;
+			code: string;
+		};
+		document: {
+			id: number;
+			title_name: string;
+			status: string;
+			approved_date: Date;
+			passed_date: Date;
+		}[];
+	};
 };
 export type DetailsDocumentsProps = {
 	propsdetails_id?: number;
@@ -49,12 +59,25 @@ export type DetailsDocumentsProps = {
 	student: {
 		name: string;
 		student_id: string;
+		instructor_id: number;
+		section: string;
 		id: number;
-		program: {
+		role_id: number;
+		account: {
+			id: number;
+			email: string;
+		};
+		role: {
 			id: number;
 			name: string;
-			code: string;
 		};
+		document: {
+			id: number;
+			title_name: string;
+			status: string;
+			approved_date: Date;
+			passed_date: Date;
+		}[];
 	};
 };
 export type ProjectWithStatus = ProponentsDocumentsProps & { status?: string };
@@ -76,7 +99,6 @@ export type ProjectCollapseProps = {
 	onSelectDocument: (document: DocumentProps) => void;
 	selectedDocument: DocumentProps | null;
 	setProjectAdviser: (adviser: AdviserProps) => void;
-	refresh?: () => void;
 };
 export type ViewDetailsProps = {
 	selectedDocumentId: number;

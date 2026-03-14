@@ -5,6 +5,7 @@ import {
 	Download,
 	Eye,
 	FileText,
+	Forward,
 	MessageCircle,
 	MoreVertical,
 	User,
@@ -30,17 +31,19 @@ import { Button } from '@/components/ui/button';
 import DocumentViewDialog from './DocumentViewDialog';
 import type { DocumentItemProps, DocumentProps } from '../interface/document';
 import DocumentRevisionDialog from './DocumentRevisionDialog';
+import DocumentPass from './DocumentPass';
 
 const ChapterItem = ({
 	currentDocument,
 	projectAdviser,
 	refresh,
 }: DocumentItemProps) => {
-	const [showVersions, setShowVersions] = useState(true);
+	const [showVersions, setShowVersions] = useState(false);
 	const [selectedDocument, setSelectedDocument] =
 		useState<DocumentProps | null>(null);
 	const [revisionOpen, setRevisionOpen] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [openPass, setOpenPass] = useState(false);
 	const checkVersion =
 		currentDocument.versions.length > 0
 			? currentDocument.versions[0]
@@ -53,7 +56,7 @@ const ChapterItem = ({
 		}
 	};
 	const checkIfVersionLatest = selectedDocument === checkVersion;
-
+	console.log(currentDocument);
 	return (
 		<div className="space-y-1">
 			<div
@@ -61,11 +64,11 @@ const ChapterItem = ({
 					'flex items-center gap-3 p-3 rounded-md bg-muted/50 transition-colors cursor-pointer border border-muted-foreground/40',
 
 					checkVersion.version &&
-						checkVersion.status === 'need revision' &&
-						'border border-red-500/50',
+					checkVersion.status === 'need revision' &&
+					'border border-red-500/50',
 					checkVersion.version &&
-						checkVersion.id === selectedDocument?.id &&
-						'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+					checkVersion.id === selectedDocument?.id &&
+					'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 				)}
 				onClick={(e) => {
 					if ((e.target as HTMLElement).closest('button')) return;
@@ -125,6 +128,17 @@ const ChapterItem = ({
 						setSubmitRevision={setRevisionOpen}
 					/>
 				)}
+				{checkVersion.status === 'approved' && (
+					<Button
+						variant="outline"
+						className="bg-emerald-500 hover:bg-emerald-500/80"
+						onClick={() => setOpenPass(true)}
+					>
+						<Forward className="h-4 w-4 mr-2" />
+						Submit to Instructor
+					</Button>
+				)}
+
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -177,7 +191,7 @@ const ChapterItem = ({
 								className={cn(
 									'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
 									version.id === selectedDocument?.id &&
-										'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+									'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 								)}
 								onClick={() => {
 									setSelectedDocument(version);
@@ -235,7 +249,7 @@ const ChapterItem = ({
 						className={cn(
 							'flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors text-sm pr-4',
 							currentDocument.id === selectedDocument?.id &&
-								'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
+							'bg-primary/20 border border-primary/50 hover:bg-primary/30 ',
 						)}
 						onClick={() => {
 							setSelectedDocument(currentDocument);
@@ -306,6 +320,14 @@ const ChapterItem = ({
 					selectedDocumentId={1}
 					refresh={refresh}
 					checkIfLatestVersion={checkIfVersionLatest}
+				/>
+			)}
+			{setOpenPass && (
+				<DocumentPass
+					document_id={checkVersion.id}
+					open={openPass}
+					setOpen={setOpenPass}
+					refresh={refresh}
 				/>
 			)}
 		</div>

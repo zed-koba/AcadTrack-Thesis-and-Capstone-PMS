@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 class AdvisersController extends Controller
 {
     //
-
     public function getAdvisers(Request $request)
     {
         $advisers = Advisers::with('account:id,email')->orderBy('created_at', 'DESC')->get();
@@ -133,7 +132,7 @@ class AdvisersController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => 500,
-                'message' => 'An error occurred while deleting the student.',
+                'message' => 'An error occurred while deleting the adviser.',
                 'error' => $e->getMessage(),
             ], 500);
         }

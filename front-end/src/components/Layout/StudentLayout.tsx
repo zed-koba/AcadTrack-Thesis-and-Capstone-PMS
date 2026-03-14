@@ -1,8 +1,16 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import type { NavItem } from '../interface/type';
-import { CalendarClock, FileText, LayoutDashboard } from 'lucide-react';
+import {
+	Bell,
+	CalendarClock,
+	FileText,
+	GitBranch,
+	LayoutDashboard,
+	Users,
+} from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
+import UserNav from '../common/UserNav';
 
 const StundentLayout = () => {
 	const navItem: NavItem[] = [
@@ -10,6 +18,11 @@ const StundentLayout = () => {
 			label: 'Dashboard',
 			to: '/Student',
 			icon: <LayoutDashboard className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'My Group',
+			to: '/Student/MyGroup',
+			icon: <Users className="w-5 h-5" strokeWidth={2.5} />,
 		},
 		{
 			label: 'Consultation',
@@ -21,13 +34,27 @@ const StundentLayout = () => {
 			to: '/Student/Document',
 			icon: <FileText className="w-5 h-5" strokeWidth={2.5} />,
 		},
+		{
+			label: 'Notifications',
+			to: '/Student/Notifications',
+			icon: <Bell className="w-5 h-5" strokeWidth={2.5} />,
+		},
+		{
+			label: 'Development Process',
+			to: '/Student/Development-Process',
+			icon: <GitBranch className="w-5 h-5" strokeWidth={2.5} />,
+		},
 	];
+
 	return (
-		<div className="flex gap-5 content-start h-full relative">
+		<div className="flex content-start h-full relative">
 			<Sidebar navItem={navItem} />
-			<main className="px-4 py-5 bg-background grow relative">
-				<Outlet />
-				<Toaster position="top-center" />
+			<main className="w-full">
+				<UserNav />
+				<div className="px-10 py-5 bg-background grow relative h-auto">
+					<Outlet />
+					<Toaster position="top-center" />
+				</div>
 			</main>
 		</div>
 	);

@@ -10,26 +10,34 @@ import React, { useState } from 'react';
 import z from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { FileText, Upload, X } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { apiStudentUrl } from '@/components/Routes/http';
+import { apiStudentUrl } from '@/Routes/http';
 
-import { studentId } from '@/components/functions/functions';
+import { getInformation, getProjectId } from '@/components/functions/functions';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 
 const uploadSchema = z.object({
 	document_title: z.string().min(2, 'Title required'),
 	description: z.string().nullable().optional(),
 });
 
-const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
+const DocumentUploadDialog = ({ refresh, deadlines }: DocumentUploadProps) => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const information = getInformation();
+	const projectId = getProjectId();
 	type formValues = z.infer<typeof uploadSchema>;
 	const defaultValues: formValues = {
 		document_title: '',
@@ -52,8 +60,9 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 
 			const formData = new FormData();
 			formData.append('file', selectedFile);
-			formData.append('student_id', String(studentId));
+			formData.append('student_id', information.id);
 			formData.append('title_name', value.document_title);
+			formData.append('project_id', projectId.proponents_id);
 
 			try {
 				const res = await fetch(`${apiStudentUrl}/documents/add`, {
@@ -86,7 +95,6 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 					toast.success(result.message);
 					setOpen(false);
 					refresh?.();
-					console.log(result.documents);
 				}
 			} catch (error) {
 				console.log(error);
@@ -170,16 +178,34 @@ const DocumentUploadDialog = ({ refresh }: DocumentUploadProps) => {
 												<FieldLabel htmlFor={field.name}>
 													Document Title *
 												</FieldLabel>
-												<Input
-													id={field.name}
+
+												<Select
 													name={field.name}
+													defaultValue={field.state.value}
 													value={field.state.value}
-													onBlur={field.handleBlur}
-													onChange={(e) => field.handleChange(e.target.value)}
-													aria-invalid={isInvalid}
-													placeholder={'Ex. Rationale Draft Review'}
-													autoComplete="off"
-												/>
+													onValueChange={(v) => field.handleChange(v)}
+												>
+													<SelectTrigger
+														className="w-full"
+														aria-invalid={isInvalid}
+														id={field.name}
+													>
+														<SelectValue
+															placeholder={
+																deadlines.length > 0
+																	? 'Select a document'
+																	: 'No deadline has been scheduled yet'
+															}
+														/>
+													</SelectTrigger>
+													<SelectContent>
+														{deadlines.map((deadline) => (
+															<SelectItem value={deadline.document_title}>
+																{deadline.document_title}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												{isInvalid && (
 													<FieldError errors={field.state.meta.errors} />
 												)}
