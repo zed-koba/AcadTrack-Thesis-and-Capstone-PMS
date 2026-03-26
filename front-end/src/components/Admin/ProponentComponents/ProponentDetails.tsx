@@ -11,7 +11,6 @@ import {
 	Calendar,
 	CalendarDays,
 	FileDigit,
-	FileText,
 	Megaphone,
 	User,
 } from 'lucide-react';

@@ -145,17 +145,6 @@ Route::prefix("student")->group(function () {
     Route::post('my-group/transfer/{id}', [GroupController::class, 'transferGroupLeader']);
     Route::put('my-group/updateRole/{id}', [GroupController::class, 'updateRoleMember']);
     Route::delete('my-group/leaveGroup/{id}', [GroupController::class, 'leaveGroup']);
-<<<<<<< HEAD
-=======
-
-
-    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
-
-
-    Route::put("{id}/weekly/update", [AdviserWeeklyController::class, "updateSchedule"]);
-
-    
->>>>>>> 04166f201b145cbc906d94bffea4a5232ccd4609
 });
 
 Route::prefix("instructor")->group(function () {
