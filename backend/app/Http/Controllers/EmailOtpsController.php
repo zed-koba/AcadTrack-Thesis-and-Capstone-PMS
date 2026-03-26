@@ -30,7 +30,7 @@ class EmailOtpsController extends Controller
         Mail::to($request->email)->send(new OtpMail($otp));
         return response()->json(['message' => 'OTP sent']);
     }
-
+    
     public function verifyOtp(Request $request)
     {
         $request->validate([
